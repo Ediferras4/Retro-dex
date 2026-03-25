@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Retro DEX</title>
-  <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
   <style>
     * {
@@ -26,8 +26,8 @@
 
     .container {
       width: 100%;
-      max-width: 380px;
-      background: rgba(0, 0, 0, 0.88);
+      max-width: 390px;
+      background: rgba(0, 0, 0, 0.92);
       border: 3px solid #00ffd5;
       border-radius: 18px;
       padding: 22px;
@@ -36,7 +36,7 @@
 
     .title {
       text-align: center;
-      font-size: 30px;
+      font-size: 28px;
       margin-bottom: 8px;
       text-shadow: 0 0 10px #00ffd5;
     }
@@ -83,7 +83,7 @@
 
     .input-box:disabled {
       color: #8fffee;
-      opacity: 0.85;
+      opacity: 0.95;
     }
 
     .btn {
@@ -98,10 +98,6 @@
       margin-top: 14px;
       cursor: pointer;
       box-shadow: 0 0 12px rgba(0, 255, 213, 0.35);
-    }
-
-    .btn:active {
-      transform: scale(0.98);
     }
 
     .main-btn {
@@ -127,7 +123,8 @@
     <div class="status-box">
       <div id="walletStatus" class="status-line">Wallet não conectada</div>
       <div id="networkStatus" class="status-line">Rede: -</div>
-      <div id="balance" class="status-line">Saldo: -</div>
+      <div id="balance" class="status-line">Saldo da rede: -</div>
+      <div id="gameoverBalance" class="status-line">Saldo GAMEOVER: -</div>
     </div>
 
     <button class="btn" onclick="connectWallet()">CONNECT WALLET</button>
@@ -155,6 +152,14 @@
   </div>
 
   <script>
+    const GAMEOVER_ADDRESS = "0x706abf10e96a1bb91F8F82740fcfABDa0F940843";
+
+    const ERC20_ABI = [
+      "function balanceOf(address owner) view returns (uint256)",
+      "function decimals() view returns (uint8)",
+      "function symbol() view returns (string)"
+    ];
+
     async function connectWallet() {
       if (!window.ethereum) {
         alert("Abra o site no navegador da MetaMask.");
@@ -163,7 +168,6 @@
 
       try {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-
         const accounts = await window.ethereum.request({
           method: "eth_requestAccounts"
         });
@@ -178,14 +182,28 @@
         document.getElementById("networkStatus").innerText =
           "Rede: " + network.name + " (chainId " + network.chainId + ")";
 
-        const balance = await provider.getBalance(wallet);
-        const nativeBalance = ethers.utils.formatEther(balance);
-
+        const nativeBalance = await provider.getBalance(wallet);
         document.getElementById("balance").innerText =
-          "Saldo: " + parseFloat(nativeBalance).toFixed(4);
+          "Saldo da rede: " + parseFloat(ethers.utils.formatEther(nativeBalance)).toFixed(4);
+
+        const tokenContract = new ethers.Contract(GAMEOVER_ADDRESS, ERC20_ABI, provider);
+
+        const [rawTokenBalance, decimals, symbol] = await Promise.all([
+          tokenContract.balanceOf(wallet),
+          tokenContract.decimals(),
+          tokenContract.symbol()
+        ]);
+
+        const formattedTokenBalance = ethers.utils.formatUnits(rawTokenBalance, decimals);
+
+        document.getElementById("gameoverBalance").innerText =
+          "Saldo " + symbol + ": " + Number(formattedTokenBalance).toLocaleString("pt-BR", {
+            maximumFractionDigits: 2
+          });
 
       } catch (error) {
-        alert("Erro ao conectar wallet.");
+        console.error(error);
+        alert("Erro ao conectar wallet ou ler o token.");
       }
     }
 
@@ -197,7 +215,7 @@
         return;
       }
 
-      alert("Swap simulado: " + amount + " -> GAMEOVER");
+      alert("Swap ainda é simulado. Próximo passo: ligar compra real do GAMEOVER.");
     }
   </script>
 </body>
