@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Retro DEX</title>
   <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
 
@@ -12,6 +13,7 @@
       font-family: monospace;
       text-align: center;
       padding-top: 50px;
+      margin: 0;
     }
 
     .box {
@@ -29,15 +31,23 @@
       padding: 10px;
       margin-top: 10px;
       cursor: pointer;
+      font-family: monospace;
     }
 
     input {
       width: 90%;
-      padding: 5px;
+      padding: 8px;
       margin: 5px;
       background: black;
       border: 1px solid #00ffcc;
       color: #00ffcc;
+      font-family: monospace;
+    }
+
+    #walletStatus {
+      margin-top: 15px;
+      font-size: 14px;
+      word-break: break-all;
     }
   </style>
 </head>
@@ -48,6 +58,8 @@
 
   <div class="box">
     <button onclick="connectWallet()">CONNECT WALLET</button>
+
+    <div id="walletStatus">Wallet não conectada</div>
 
     <h3>SEND</h3>
     <input id="sendAmount" placeholder="USDC amount" />
@@ -60,16 +72,28 @@
 
   <script>
     async function connectWallet() {
-      if (window.ethereum) {
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        alert("Wallet conectada!");
-      } else {
-        alert("Instale a MetaMask");
+      if (!window.ethereum) {
+        alert("Instale ou abra no navegador da MetaMask");
+        return;
+      }
+
+      try {
+        const accounts = await window.ethereum.request({
+          method: "eth_requestAccounts"
+        });
+
+        const wallet = accounts[0];
+        const shortWallet = wallet.slice(0, 6) + "..." + wallet.slice(-4);
+
+        document.getElementById("walletStatus").innerText =
+          "Wallet conectada: " + shortWallet;
+      } catch (error) {
+        alert("Não foi possível conectar a wallet");
       }
     }
 
     function fakeSwap() {
-      alert("Swap simulado (em breve real)");
+      alert("Swap ainda é simulado. Vamos ligar o token real depois.");
     }
   </script>
 
