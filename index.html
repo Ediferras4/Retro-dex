@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Retro DEX</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
+
+  <style>
+    body {
+      background: black;
+      color: #00ffcc;
+      font-family: monospace;
+      text-align: center;
+      padding-top: 50px;
+    }
+
+    .box {
+      border: 2px solid #00ffcc;
+      padding: 20px;
+      width: 300px;
+      margin: auto;
+      border-radius: 10px;
+    }
+
+    button {
+      background: black;
+      border: 2px solid #00ffcc;
+      color: #00ffcc;
+      padding: 10px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    input {
+      width: 90%;
+      padding: 5px;
+      margin: 5px;
+      background: black;
+      border: 1px solid #00ffcc;
+      color: #00ffcc;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>🎮 RETRO DEX</h1>
+
+  <div class="box">
+    <button onclick="connectWallet()">CONNECT WALLET</button>
+
+    <h3>SEND</h3>
+    <input id="sendAmount" placeholder="USDC amount" />
+
+    <h3>RECEIVE</h3>
+    <input placeholder="GAMEOVER" disabled />
+
+    <button onclick="fakeSwap()">PRESS START</button>
+  </div>
+
+  <script>
+    async function connectWallet() {
+      if (window.ethereum) {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        alert("Wallet conectada!");
+      } else {
+        alert("Instale a MetaMask");
+      }
+    }
+
+    function fakeSwap() {
+      alert("Swap simulado (em breve real)");
+    }
+  </script>
+
+</body>
+</html>
