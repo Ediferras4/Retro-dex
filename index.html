@@ -1,222 +1,399 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Retro DEX</title>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+import React, { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { ArrowDownUp, Wallet, Coins, RefreshCw } from "lucide-react";
+import { ethers } from "ethers";
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+const ARC_CHAIN_ID = "0x7b152"; // 5042002 in hex
+const ARC_NETWORK = {
+  chainId: ARC_CHAIN_ID,
+  chainName: "Arc Network Testnet",
+  nativeCurrency: {
+    name: "ETH",
+    symbol: "ETH",
+    decimals: 18,
+  },
+  rpcUrls: ["https://rpc-testnet.arc.xyz"],
+  blockExplorerUrls: ["https://testnet.arcscan.app"],
+};
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background:
-        radial-gradient(circle at top, #2a003f 0%, #12001f 35%, #000000 75%);
-      color: #00ffd5;
-      font-family: monospace;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
+const GAMEOVER = "0x706abf10e96a1bb91F8F82740fcfABDa0F940843";
+const USDC = "0x3600000000000000000000000000000000000000";
+const RETRO_PAIR = "0x3e0f14368f385CE4c5c5d4B816Ec8c8c475c63F0";
 
-    .container {
-      width: 100%;
-      max-width: 390px;
-      background: rgba(0, 0, 0, 0.92);
-      border: 3px solid #00ffd5;
-      border-radius: 18px;
-      padding: 22px;
-      box-shadow: 0 0 18px #00ffd5;
-    }
+const erc20Abi = [
+  "function approve(address spender, uint256 amount) external returns (bool)",
+  "function allowance(address owner, address spender) external view returns (uint256)",
+  "function balanceOf(address owner) external view returns (uint256)",
+  "function decimals() external view returns (uint8)",
+  "function symbol() external view returns (string)",
+];
 
-    .title {
-      text-align: center;
-      font-size: 28px;
-      margin-bottom: 8px;
-      text-shadow: 0 0 10px #00ffd5;
-    }
+const retroPairAbi = [
+  "function token0() external view returns (address)",
+  "function token1() external view returns (address)",
+  "function reserve0() external view returns (uint256)",
+  "function reserve1() external view returns (uint256)",
+  "function getAmountOut(uint256 amountIn, uint256 reserveIn, uint256 reserveOut) external pure returns (uint256)",
+  "function swap(address tokenIn, uint256 amountIn) external",
+  "function addLiquidity(uint256 amount0, uint256 amount1) external",
+];
 
-    .subtitle {
-      text-align: center;
-      color: #ff4fd8;
-      margin-bottom: 20px;
-      font-size: 13px;
-    }
+const TOKENS = {
+  USDC: {
+    address: USDC,
+    symbol: "USDC",
+    decimals: 6,
+  },
+  GAMEOVER: {
+    address: GAMEOVER,
+    symbol: "GAMEOVER",
+    decimals: 18,
+  },
+};
 
-    .status-box {
-      border: 2px solid #ff4fd8;
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 18px;
-      background: rgba(255, 79, 216, 0.08);
-    }
+function formatAddress(address) {
+  if (!address) return "";
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
 
-    .status-line {
-      font-size: 14px;
-      margin: 6px 0;
-      word-break: break-all;
-    }
+function formatUnitsSafe(value, decimals, max = 6) {
+  try {
+    const n = Number(ethers.formatUnits(value, decimals));
+    if (!Number.isFinite(n)) return "0";
+    return n.toLocaleString(undefined, { maximumFractionDigits: max });
+  } catch {
+    return "0";
+  }
+}
 
-    .label {
-      display: block;
-      margin: 14px 0 6px;
-      color: #ffd54a;
-      font-size: 14px;
-    }
+export default function RetroDexInterface() {
+  const [account, setAccount] = useState("");
+  const [provider, setProvider] = useState(null);
+  const [signer, setSigner] = useState(null);
+  const [status, setStatus] = useState("Disconnected");
+  const [fromToken, setFromToken] = useState("USDC");
+  const [toToken, setToToken] = useState("GAMEOVER");
+  const [amountIn, setAmountIn] = useState("0.1");
+  const [quoteOut, setQuoteOut] = useState("");
+  const [reserves, setReserves] = useState({ reserve0: 0n, reserve1: 0n });
+  const [balances, setBalances] = useState({ USDC: "0", GAMEOVER: "0" });
+  const [loading, setLoading] = useState(false);
 
-    .input-box {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #00ffd5;
-      border-radius: 10px;
-      background: #050505;
-      color: #00ffd5;
-      font-size: 16px;
-      outline: none;
-      font-family: monospace;
-    }
+  const pairContract = useMemo(() => {
+    if (!provider) return null;
+    return new ethers.Contract(RETRO_PAIR, retroPairAbi, provider);
+  }, [provider]);
 
-    .input-box:disabled {
-      color: #8fffee;
-      opacity: 0.95;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 13px;
-      border: 2px solid #00ffd5;
-      border-radius: 12px;
-      background: #000;
-      color: #00ffd5;
-      font-size: 16px;
-      font-family: monospace;
-      margin-top: 14px;
-      cursor: pointer;
-      box-shadow: 0 0 12px rgba(0, 255, 213, 0.35);
-    }
-
-    .main-btn {
-      border-color: #ffd54a;
-      color: #ffd54a;
-      box-shadow: 0 0 12px rgba(255, 213, 74, 0.4);
-      font-weight: bold;
-    }
-
-    .footer {
-      text-align: center;
-      margin-top: 16px;
-      font-size: 12px;
-      color: #aaa;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="title">🎮 RETRO DEX</div>
-    <div class="subtitle">Arcade Swap Testnet</div>
-
-    <div class="status-box">
-      <div id="walletStatus" class="status-line">Wallet não conectada</div>
-      <div id="networkStatus" class="status-line">Rede: -</div>
-      <div id="balance" class="status-line">Saldo da rede: -</div>
-      <div id="gameoverBalance" class="status-line">Saldo GAMEOVER: -</div>
-    </div>
-
-    <button class="btn" onclick="connectWallet()">CONNECT WALLET</button>
-
-    <label class="label">SEND</label>
-    <input
-      id="sendAmount"
-      class="input-box"
-      type="number"
-      placeholder="Digite a quantidade"
-    />
-
-    <label class="label">RECEIVE</label>
-    <input
-      id="receiveToken"
-      class="input-box"
-      type="text"
-      value="GAMEOVER"
-      disabled
-    />
-
-    <button class="btn main-btn" onclick="fakeSwap()">PRESS START</button>
-
-    <div class="footer">Retro DEX online 🚀</div>
-  </div>
-
-  <script>
-    const GAMEOVER_ADDRESS = "0x706abf10e96a1bb91F8F82740fcfABDa0F940843";
-
-    const ERC20_ABI = [
-      "function balanceOf(address owner) view returns (uint256)",
-      "function decimals() view returns (uint8)",
-      "function symbol() view returns (string)"
-    ];
-
-    async function connectWallet() {
-      if (!window.ethereum) {
-        alert("Abra o site no navegador da MetaMask.");
-        return;
-      }
-
-      try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts"
+  async function ensureArcNetwork() {
+    if (!window.ethereum) throw new Error("MetaMask not found");
+    const current = await window.ethereum.request({ method: "eth_chainId" });
+    if (current === ARC_CHAIN_ID) return;
+    try {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: ARC_CHAIN_ID }],
+      });
+    } catch (err) {
+      if (err.code === 4902) {
+        await window.ethereum.request({
+          method: "wallet_addEthereumChain",
+          params: [ARC_NETWORK],
         });
-
-        const wallet = accounts[0];
-        const shortWallet = wallet.slice(0, 6) + "..." + wallet.slice(-4);
-
-        document.getElementById("walletStatus").innerText =
-          "Wallet: " + shortWallet;
-
-        const network = await provider.getNetwork();
-        document.getElementById("networkStatus").innerText =
-          "Rede: " + network.name + " (chainId " + network.chainId + ")";
-
-        const nativeBalance = await provider.getBalance(wallet);
-        document.getElementById("balance").innerText =
-          "Saldo da rede: " + parseFloat(ethers.utils.formatEther(nativeBalance)).toFixed(4);
-
-        const tokenContract = new ethers.Contract(GAMEOVER_ADDRESS, ERC20_ABI, provider);
-
-        const [rawTokenBalance, decimals, symbol] = await Promise.all([
-          tokenContract.balanceOf(wallet),
-          tokenContract.decimals(),
-          tokenContract.symbol()
-        ]);
-
-        const formattedTokenBalance = ethers.utils.formatUnits(rawTokenBalance, decimals);
-
-        document.getElementById("gameoverBalance").innerText =
-          "Saldo " + symbol + ": " + Number(formattedTokenBalance).toLocaleString("pt-BR", {
-            maximumFractionDigits: 2
-          });
-
-      } catch (error) {
-        console.error(error);
-        alert("Erro ao conectar wallet ou ler o token.");
+      } else {
+        throw err;
       }
     }
+  }
 
-    function fakeSwap() {
-      const amount = document.getElementById("sendAmount").value;
+  async function connectWallet() {
+    try {
+      setLoading(true);
+      if (!window.ethereum) {
+        setStatus("Install MetaMask first");
+        return;
+      }
+      await ensureArcNetwork();
+      const browserProvider = new ethers.BrowserProvider(window.ethereum);
+      const accounts = await browserProvider.send("eth_requestAccounts", []);
+      const signerInstance = await browserProvider.getSigner();
+      setProvider(browserProvider);
+      setSigner(signerInstance);
+      setAccount(accounts[0]);
+      setStatus("Wallet connected");
+    } catch (error) {
+      setStatus(error?.message || "Connection failed");
+    } finally {
+      setLoading(false);
+    }
+  }
 
-      if (!amount || Number(amount) <= 0) {
-        alert("Digite um valor para testar.");
+  async function loadData() {
+    if (!provider || !account || !pairContract) return;
+    try {
+      const [reserve0, reserve1] = await Promise.all([
+        pairContract.reserve0(),
+        pairContract.reserve1(),
+      ]);
+      setReserves({ reserve0, reserve1 });
+
+      const usdc = new ethers.Contract(USDC, erc20Abi, provider);
+      const gameover = new ethers.Contract(GAMEOVER, erc20Abi, provider);
+      const [usdcBal, gameBal] = await Promise.all([
+        usdc.balanceOf(account),
+        gameover.balanceOf(account),
+      ]);
+
+      setBalances({
+        USDC: formatUnitsSafe(usdcBal, 6, 4),
+        GAMEOVER: formatUnitsSafe(gameBal, 18, 4),
+      });
+    } catch (error) {
+      setStatus(error?.message || "Failed to load data");
+    }
+  }
+
+  async function estimateSwap() {
+    if (!pairContract || !amountIn || Number(amountIn) <= 0) {
+      setQuoteOut("");
+      return;
+    }
+    try {
+      const input = TOKENS[fromToken];
+      const output = TOKENS[toToken];
+      const parsedIn = ethers.parseUnits(amountIn, input.decimals);
+
+      const reserveIn = fromToken === "GAMEOVER" ? reserves.reserve0 : reserves.reserve1;
+      const reserveOut = output.symbol === "GAMEOVER" ? reserves.reserve0 : reserves.reserve1;
+
+      if (reserveIn === 0n || reserveOut === 0n) {
+        setQuoteOut("0");
         return;
       }
 
-      alert("Swap ainda é simulado. Próximo passo: ligar compra real do GAMEOVER.");
+      const out = await pairContract.getAmountOut(parsedIn, reserveIn, reserveOut);
+      setQuoteOut(formatUnitsSafe(out, output.decimals, 6));
+    } catch {
+      setQuoteOut("");
     }
-  </script>
-</body>
-</html>
+  }
+
+  async function approveIfNeeded(tokenKey) {
+    if (!signer || !account) throw new Error("Connect wallet first");
+    const token = TOKENS[tokenKey];
+    const tokenContract = new ethers.Contract(token.address, erc20Abi, signer);
+    const needed = ethers.parseUnits(amountIn, token.decimals);
+    const allowance = await tokenContract.allowance(account, RETRO_PAIR);
+    if (allowance >= needed) return;
+    setStatus(`Approving ${token.symbol}...`);
+    const tx = await tokenContract.approve(RETRO_PAIR, ethers.MaxUint256);
+    await tx.wait();
+  }
+
+  async function handleSwap() {
+    if (!signer || !amountIn || Number(amountIn) <= 0) {
+      setStatus("Enter a valid amount");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const input = TOKENS[fromToken];
+      const parsedIn = ethers.parseUnits(amountIn, input.decimals);
+      await approveIfNeeded(fromToken);
+      const pairWithSigner = new ethers.Contract(RETRO_PAIR, retroPairAbi, signer);
+      setStatus(`Swapping ${fromToken}...`);
+      const tx = await pairWithSigner.swap(input.address, parsedIn);
+      await tx.wait();
+      setStatus("Swap complete");
+      await loadData();
+      await estimateSwap();
+    } catch (error) {
+      setStatus(error?.shortMessage || error?.message || "Swap failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function flipTokens() {
+    setFromToken((prev) => (prev === "USDC" ? "GAMEOVER" : "USDC"));
+    setToToken((prev) => (prev === "USDC" ? "GAMEOVER" : "USDC"));
+    setQuoteOut("");
+  }
+
+  useEffect(() => {
+    if (!window.ethereum) return;
+    const handleAccountsChanged = (accounts) => setAccount(accounts?.[0] || "");
+    const handleChainChanged = () => window.location.reload();
+    window.ethereum.on("accountsChanged", handleAccountsChanged);
+    window.ethereum.on("chainChanged", handleChainChanged);
+    return () => {
+      window.ethereum?.removeListener("accountsChanged", handleAccountsChanged);
+      window.ethereum?.removeListener("chainChanged", handleChainChanged);
+    };
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [provider, account, pairContract]);
+
+  useEffect(() => {
+    estimateSwap();
+  }, [amountIn, fromToken, toToken, reserves]);
+
+  return (
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-4 md:p-8">
+      <div className="max-w-5xl mx-auto grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-6"
+        >
+          <div className="rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-zinc-900 via-zinc-950 to-zinc-900 p-6 shadow-2xl">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div className="text-sm uppercase tracking-[0.3em] text-cyan-300/80">Retro DEX</div>
+                <h1 className="text-4xl font-black mt-2">Swap like it&apos;s game over.</h1>
+                <p className="text-zinc-400 mt-2">Arc testnet · GAMEOVER / USDC pool live</p>
+              </div>
+              <Button
+                onClick={connectWallet}
+                disabled={loading}
+                className="rounded-2xl text-base px-5 py-6"
+              >
+                <Wallet className="mr-2 h-4 w-4" />
+                {account ? formatAddress(account) : "Connect Wallet"}
+              </Button>
+            </div>
+          </div>
+
+          <Card className="rounded-3xl border-zinc-800 bg-zinc-900/70 shadow-xl">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-2xl">
+                <ArrowDownUp className="h-5 w-5" /> Swap
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="rounded-2xl bg-zinc-950/70 p-4 border border-zinc-800">
+                <div className="text-sm text-zinc-400 mb-2">From</div>
+                <div className="flex gap-3">
+                  <Input
+                    value={amountIn}
+                    onChange={(e) => setAmountIn(e.target.value)}
+                    placeholder="0.0"
+                    className="h-12 rounded-2xl text-lg bg-zinc-900 border-zinc-700"
+                  />
+                  <Button
+                    variant="secondary"
+                    className="h-12 min-w-32 rounded-2xl"
+                    onClick={() => {
+                      setFromToken(fromToken === "USDC" ? "GAMEOVER" : "USDC");
+                      setToToken(toToken === "USDC" ? "GAMEOVER" : "USDC");
+                    }}
+                  >
+                    {fromToken}
+                  </Button>
+                </div>
+                <div className="mt-2 text-xs text-zinc-400">Balance: {balances[fromToken]}</div>
+              </div>
+
+              <div className="flex justify-center">
+                <Button onClick={flipTokens} variant="outline" className="rounded-full h-12 w-12 p-0 border-zinc-700 bg-zinc-900">
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="rounded-2xl bg-zinc-950/70 p-4 border border-zinc-800">
+                <div className="text-sm text-zinc-400 mb-2">To</div>
+                <div className="flex gap-3">
+                  <Input
+                    value={quoteOut}
+                    readOnly
+                    placeholder="Estimated output"
+                    className="h-12 rounded-2xl text-lg bg-zinc-900 border-zinc-700"
+                  />
+                  <Button variant="secondary" className="h-12 min-w-32 rounded-2xl">
+                    {toToken}
+                  </Button>
+                </div>
+                <div className="mt-2 text-xs text-zinc-400">Balance: {balances[toToken]}</div>
+              </div>
+
+              <Button
+                onClick={handleSwap}
+                disabled={loading || !account}
+                className="w-full h-14 rounded-2xl text-lg font-bold"
+              >
+                {loading ? "Processing..." : `Swap ${fromToken} → ${toToken}`}
+              </Button>
+
+              <div className="text-sm text-zinc-400 break-words">Status: {status}</div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="space-y-6"
+        >
+          <Card className="rounded-3xl border-zinc-800 bg-zinc-900/70 shadow-xl">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-2xl">
+                <Coins className="h-5 w-5" /> Pool Info
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-2xl bg-zinc-950 p-4 border border-zinc-800">
+                  <div className="text-sm text-zinc-400">GAMEOVER reserve</div>
+                  <div className="text-xl font-bold mt-1">{formatUnitsSafe(reserves.reserve0, 18, 4)}</div>
+                </div>
+                <div className="rounded-2xl bg-zinc-950 p-4 border border-zinc-800">
+                  <div className="text-sm text-zinc-400">USDC reserve</div>
+                  <div className="text-xl font-bold mt-1">{formatUnitsSafe(reserves.reserve1, 6, 4)}</div>
+                </div>
+              </div>
+
+              <div className="space-y-2 text-sm text-zinc-300">
+                <div className="flex items-center justify-between gap-3">
+                  <span>Pair</span>
+                  <Badge variant="secondary" className="rounded-xl">GAMEOVER / USDC</Badge>
+                </div>
+                <div className="flex items-start justify-between gap-3">
+                  <span>RetroPair</span>
+                  <span className="text-right text-zinc-400 break-all max-w-[220px]">{RETRO_PAIR}</span>
+                </div>
+                <div className="flex items-start justify-between gap-3">
+                  <span>GAMEOVER</span>
+                  <span className="text-right text-zinc-400 break-all max-w-[220px]">{GAMEOVER}</span>
+                </div>
+                <div className="flex items-start justify-between gap-3">
+                  <span>USDC</span>
+                  <span className="text-right text-zinc-400 break-all max-w-[220px]">{USDC}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-3xl border-zinc-800 bg-zinc-900/70 shadow-xl">
+            <CardHeader>
+              <CardTitle className="text-2xl">How this works</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-zinc-300">
+              <p>1. Connect MetaMask on Arc testnet.</p>
+              <p>2. Enter the token amount you want to swap.</p>
+              <p>3. The interface checks allowance and approves automatically if needed.</p>
+              <p>4. Swap runs through your RetroPair contract.</p>
+              <p className="text-zinc-500">This version is built for your current single-pair Retro DEX.</p>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
