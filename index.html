@@ -5,116 +5,466 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Retro DEX</title>
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg-1: #07070d;
+      --bg-2: #0f1020;
+      --bg-3: #15172b;
+      --line: rgba(129, 140, 248, 0.18);
+      --text: #f5f7ff;
+      --muted: #9ea6d6;
+      --pink: #ff4fd8;
+      --cyan: #37e8ff;
+      --purple: #7c5cff;
+      --yellow: #ffd447;
+      --green: #53ff93;
+      --shadow: 0 20px 60px rgba(0,0,0,0.45);
+    }
+
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0a0a0f;
-      color: #f5f5f5;
-      padding: 20px;
+      min-height: 100vh;
+      font-family: Inter, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255,79,216,0.14), transparent 28%),
+        radial-gradient(circle at top right, rgba(55,232,255,0.14), transparent 28%),
+        linear-gradient(180deg, #090a12 0%, #06070d 100%);
+      overflow-x: hidden;
     }
+
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(124,92,255,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,92,255,0.07) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.15));
+      pointer-events: none;
+    }
+
+    .glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255,79,216,0.10), transparent 20%),
+        radial-gradient(circle at 85% 15%, rgba(55,232,255,0.10), transparent 20%),
+        radial-gradient(circle at 50% 80%, rgba(124,92,255,0.10), transparent 25%);
+    }
+
     .wrap {
-      max-width: 720px;
+      position: relative;
+      z-index: 1;
+      max-width: 1120px;
       margin: 0 auto;
+      padding: 28px 18px 40px;
     }
-    .card {
-      background: #141420;
-      border: 1px solid #2a2a3a;
-      border-radius: 18px;
-      padding: 18px;
-      margin-bottom: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+      align-items: stretch;
+      margin-bottom: 18px;
     }
-    h1, h2, p { margin: 0 0 12px; }
-    .muted { color: #a1a1b5; }
-    .row { display: flex; gap: 10px; align-items: center; }
-    .col { display: flex; flex-direction: column; gap: 10px; }
-    input, select, button {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: 1px solid #33364a;
-      background: #0f1020;
-      color: white;
-      font-size: 16px;
+
+    .panel {
+      background: linear-gradient(180deg, rgba(21,23,43,0.92), rgba(10,12,22,0.92));
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
     }
-    button {
-      background: #5b5bf7;
-      border: none;
-      font-weight: bold;
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(255,79,216,0.45), rgba(55,232,255,0.25), rgba(124,92,255,0.4));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
     }
-    button.secondary { background: #24243a; }
-    button:disabled { opacity: 0.6; }
-    .grid {
+
+    .hero-left { padding: 28px; }
+    .hero-right { padding: 22px; display: flex; flex-direction: column; justify-content: center; }
+
+    .pixel {
+      font-family: "Press Start 2P", monospace;
+      line-height: 1.6;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #e9ecff;
+      font-size: 12px;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(28px, 6vw, 54px);
+      line-height: 1.02;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, var(--yellow), var(--pink), var(--cyan));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      margin: 16px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+      max-width: 720px;
+    }
+
+    .stats {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
+      margin-top: 22px;
     }
-    .pill {
-      display: inline-block;
-      padding: 6px 10px;
+
+    .stat {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .stat .label { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+    .stat .value { font-size: 20px; font-weight: 800; }
+
+    .connect-box {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .wallet-chip {
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.07);
+      color: #eef1ff;
+      font-size: 13px;
+      word-break: break-all;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 1fr 0.95fr;
+      gap: 18px;
+    }
+
+    .swap-card, .info-card { padding: 22px; }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .title-row h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .mini-pill {
+      background: rgba(124,92,255,0.16);
+      color: #d9d0ff;
+      border: 1px solid rgba(124,92,255,0.22);
+      padding: 8px 12px;
       border-radius: 999px;
-      background: #22263b;
-      color: #d2d7ff;
       font-size: 12px;
+    }
+
+    .field {
+      background: rgba(4,6,14,0.66);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 22px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+
+    .field label {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
       margin-bottom: 10px;
     }
-    .small { font-size: 13px; word-break: break-all; }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    input, select, button {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-family: inherit;
+    }
+
+    input, select {
+      background: rgba(255,255,255,0.04);
+      color: white;
+      padding: 15px 16px;
+      border-radius: 16px;
+      font-size: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    select {
+      cursor: pointer;
+      min-width: 150px;
+    }
+
+    button {
+      cursor: pointer;
+      padding: 15px 18px;
+      border-radius: 18px;
+      font-weight: 800;
+      transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .btn-primary {
+      background: linear-gradient(90deg, var(--pink), var(--purple), var(--cyan));
+      color: white;
+      box-shadow: 0 10px 28px rgba(124,92,255,0.32);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.06);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .btn-dark {
+      background: #101324;
+      color: white;
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .swap-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .status {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+      color: #dbe0ff;
+      border: 1px solid rgba(255,255,255,0.06);
+      font-size: 14px;
+    }
+
+    .reserve-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .reserve-box {
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .reserve-box .label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .reserve-box .value {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .contract-list {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .contract-item {
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      font-size: 13px;
+      line-height: 1.6;
+      word-break: break-all;
+    }
+
+    .contract-item strong { color: white; display: block; margin-bottom: 4px; }
+
+    .tip-box {
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(255,212,71,0.08), rgba(55,232,255,0.06));
+      border: 1px solid rgba(255,212,71,0.12);
+      color: #fff2bf;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 900px) {
+      .hero, .main { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .wrap { padding: 14px 12px 28px; }
+      .hero-left, .hero-right, .swap-card, .info-card { padding: 18px; }
+      .stats, .reserve-grid, .swap-actions { grid-template-columns: 1fr; }
+      .row { flex-direction: column; }
+      .hero h1 { font-size: 34px; }
+      .pixel { font-size: 10px; }
+    }
   </style>
 </head>
 <body>
+  <div class="grid-bg"></div>
+  <div class="glow"></div>
+
   <div class="wrap">
-    <div class="card">
-      <div class="pill">Arc Testnet · Retro DEX</div>
-      <h1>Retro DEX</h1>
-      <p class="muted">Swap simples entre GAMEOVER e USDC usando sua pool já criada.</p>
-      <button id="connectBtn">Conectar Carteira</button>
-      <p id="wallet" class="small muted" style="margin-top:12px;">Não conectado</p>
-      <p id="status" class="small muted">Status: aguardando</p>
-    </div>
+    <section class="hero">
+      <div class="panel hero-left">
+        <div class="badge pixel">ARCADE MODE · ARC TESTNET</div>
+        <h1><span class="gradient-text">Retro DEX</span><br>swap like a boss</h1>
+        <p class="subtitle">Sua mini DEX retrô já conectada com a pool <strong>GAMEOVER / USDC</strong>. Visual gamer, swap direto e reservas em tempo real.</p>
 
-    <div class="card">
-      <h2>Swap</h2>
-      <div class="col">
-        <label>Token que você vai enviar</label>
-        <select id="tokenIn">
-          <option value="USDC">USDC</option>
-          <option value="GAMEOVER">GAMEOVER</option>
-        </select>
-
-        <label>Quantidade</label>
-        <input id="amountIn" type="text" value="0.1" />
-
-        <label>Saída estimada</label>
-        <input id="amountOut" type="text" readonly placeholder="Aparece aqui" />
-
-        <button id="quoteBtn" class="secondary">Calcular</button>
-        <button id="swapBtn">Fazer Swap</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Pool</h2>
-      <div class="grid">
-        <div>
-          <p class="muted">Reserva GAMEOVER</p>
-          <p id="reserve0">-</p>
-        </div>
-        <div>
-          <p class="muted">Reserva USDC</p>
-          <p id="reserve1">-</p>
+        <div class="stats">
+          <div class="stat">
+            <div class="label">Par ativo</div>
+            <div class="value">GAMEOVER / USDC</div>
+          </div>
+          <div class="stat">
+            <div class="label">Rede</div>
+            <div class="value">Arc Testnet</div>
+          </div>
         </div>
       </div>
-      <button id="refreshBtn" class="secondary" style="margin-top:14px;">Atualizar Reservas</button>
-    </div>
 
-    <div class="card">
-      <h2>Contratos</h2>
-      <p class="small"><strong>GAMEOVER:</strong> 0x706abf10e96a1bb91F8F82740fcfABDa0F940843</p>
-      <p class="small"><strong>USDC:</strong> 0x3600000000000000000000000000000000000000</p>
-      <p class="small"><strong>RetroPair:</strong> 0x3e0f14368f385CE4c5c5d4B816Ec8c8c475c63F0</p>
-    </div>
+      <div class="panel hero-right">
+        <div class="connect-box">
+          <div class="title-row">
+            <h2>Wallet</h2>
+            <span class="mini-pill">Live</span>
+          </div>
+          <button id="connectBtn" class="btn-primary">Conectar Carteira</button>
+          <div id="wallet" class="wallet-chip">Não conectado</div>
+          <div id="status" class="status">Status: aguardando</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="main">
+      <div class="panel swap-card">
+        <div class="title-row">
+          <h2>Swap</h2>
+          <span class="mini-pill">Single Pair</span>
+        </div>
+
+        <div class="field">
+          <label>Token que você envia</label>
+          <div class="row">
+            <select id="tokenIn">
+              <option value="USDC">USDC</option>
+              <option value="GAMEOVER">GAMEOVER</option>
+            </select>
+            <input id="amountIn" type="text" value="0.1" placeholder="0.0" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Saída estimada</label>
+          <input id="amountOut" type="text" readonly placeholder="Clique em calcular" />
+        </div>
+
+        <div class="swap-actions">
+          <button id="quoteBtn" class="btn-secondary">Calcular</button>
+          <button id="swapBtn" class="btn-primary">Fazer Swap</button>
+        </div>
+      </div>
+
+      <div class="panel info-card">
+        <div class="title-row">
+          <h2>Pool Info</h2>
+          <button id="refreshBtn" class="btn-dark" style="max-width:170px;">Atualizar</button>
+        </div>
+
+        <div class="reserve-grid">
+          <div class="reserve-box">
+            <div class="label">Reserva GAMEOVER</div>
+            <div id="reserve0" class="value">-</div>
+          </div>
+          <div class="reserve-box">
+            <div class="label">Reserva USDC</div>
+            <div id="reserve1" class="value">-</div>
+          </div>
+        </div>
+
+        <div class="contract-list">
+          <div class="contract-item">
+            <strong>GAMEOVER</strong>
+            0x706abf10e96a1bb91F8F82740fcfABDa0F940843
+          </div>
+          <div class="contract-item">
+            <strong>USDC</strong>
+            0x3600000000000000000000000000000000000000
+          </div>
+          <div class="contract-item">
+            <strong>RetroPair</strong>
+            0x3e0f14368f385CE4c5c5d4B816Ec8c8c475c63F0
+          </div>
+        </div>
+
+        <div class="tip-box">
+          Dica: se for o primeiro swap de um token, a interface aprova automaticamente antes de executar.
+        </div>
+      </div>
+    </section>
   </div>
 
   <script>
@@ -154,7 +504,6 @@
     ];
 
     let provider, signer, account;
-
     const el = (id) => document.getElementById(id);
 
     function setStatus(text) {
@@ -169,16 +518,10 @@
       const current = await window.ethereum.request({ method: "eth_chainId" });
       if (current === ARC_CHAIN_ID) return;
       try {
-        await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: ARC_CHAIN_ID }]
-        });
+        await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: ARC_CHAIN_ID }] });
       } catch (err) {
         if (err.code === 4902) {
-          await window.ethereum.request({
-            method: "wallet_addEthereumChain",
-            params: [ARC_NETWORK]
-          });
+          await window.ethereum.request({ method: "wallet_addEthereumChain", params: [ARC_NETWORK] });
         } else {
           throw err;
         }
@@ -187,10 +530,7 @@
 
     async function connectWallet() {
       try {
-        if (!window.ethereum) {
-          setStatus("MetaMask não encontrado");
-          return;
-        }
+        if (!window.ethereum) return setStatus("MetaMask não encontrado");
         await ensureArcNetwork();
         provider = new ethers.BrowserProvider(window.ethereum);
         const accounts = await provider.send("eth_requestAccounts", []);
@@ -206,19 +546,19 @@
 
     async function loadReserves() {
       try {
-        if (!provider) provider = new ethers.BrowserProvider(window.ethereum);
+        if (!provider && window.ethereum) provider = new ethers.BrowserProvider(window.ethereum);
         const pair = new ethers.Contract(ADDR.RETRO_PAIR, pairAbi, provider);
         const [r0, r1] = await Promise.all([pair.reserve0(), pair.reserve1()]);
-        el("reserve0").textContent = Number(ethers.formatUnits(r0, 18)).toLocaleString();
-        el("reserve1").textContent = Number(ethers.formatUnits(r1, 6)).toLocaleString();
-      } catch (e) {
+        el("reserve0").textContent = Number(ethers.formatUnits(r0, 18)).toLocaleString(undefined, { maximumFractionDigits: 4 });
+        el("reserve1").textContent = Number(ethers.formatUnits(r1, 6)).toLocaleString(undefined, { maximumFractionDigits: 4 });
+      } catch {
         setStatus("erro ao carregar reservas");
       }
     }
 
     async function getQuote() {
       try {
-        if (!provider) provider = new ethers.BrowserProvider(window.ethereum);
+        if (!provider && window.ethereum) provider = new ethers.BrowserProvider(window.ethereum);
         const pair = new ethers.Contract(ADDR.RETRO_PAIR, pairAbi, provider);
         const tokenInKey = el("tokenIn").value;
         const tokenOutKey = tokenInKey === "USDC" ? "GAMEOVER" : "USDC";
@@ -230,9 +570,9 @@
         const reserveIn = tokenInKey === "GAMEOVER" ? r0 : r1;
         const reserveOut = tokenInKey === "GAMEOVER" ? r1 : r0;
         const out = await pair.getAmountOut(amountIn, reserveIn, reserveOut);
-        el("amountOut").value = ethers.formatUnits(out, tokenOut.decimals);
+        el("amountOut").value = Number(ethers.formatUnits(out, tokenOut.decimals)).toLocaleString(undefined, { maximumFractionDigits: 6 });
         setStatus("cotação calculada");
-      } catch (e) {
+      } catch {
         setStatus("erro ao calcular");
       }
     }
@@ -249,10 +589,7 @@
 
     async function doSwap() {
       try {
-        if (!signer || !account) {
-          setStatus("conecte a carteira primeiro");
-          return;
-        }
+        if (!signer || !account) return setStatus("conecte a carteira primeiro");
         const tokenInKey = el("tokenIn").value;
         const tokenIn = TOKENS[tokenInKey];
         const amountRaw = ethers.parseUnits(el("amountIn").value || "0", tokenIn.decimals);
