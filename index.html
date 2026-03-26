@@ -1,574 +1,241 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Retro DEX</title>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retro DEX</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Inter, Arial, sans-serif;
-      background:
-        radial-gradient(circle at top, #2b0a5a 0%, #150329 35%, #07010e 70%, #000 100%);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: radial-gradient(circle, #1a0033, #000);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: white;
+}
 
-    .app {
-      width: 100%;
-      max-width: 430px;
-    }
+.dex {
+  width: 400px;
+  background: #111;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 0 30px #00fff7;
+}
 
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
+.title {
+  text-align: center;
+  font-size: 22px;
+  margin-bottom: 15px;
+}
 
-    .brand {
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      color: #fff;
-    }
+.box {
+  background: #000;
+  padding: 15px;
+  border-radius: 15px;
+  margin-top: 10px;
+}
 
-    .sub {
-      font-size: 13px;
-      color: #b7a9d6;
-      margin-top: 4px;
-    }
+.label {
+  font-size: 12px;
+  color: #aaa;
+}
 
-    .wallet-btn {
-      border: none;
-      border-radius: 16px;
-      padding: 12px 16px;
-      background: linear-gradient(135deg, #8b5cf6, #ec4899);
-      color: #fff;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 10px 24px rgba(168, 85, 247, 0.35);
-    }
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    .card {
-      background: rgba(18, 18, 28, 0.92);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 24px;
-      padding: 16px;
-      box-shadow:
-        0 20px 40px rgba(0,0,0,0.35),
-        inset 0 1px 0 rgba(255,255,255,0.04);
-      backdrop-filter: blur(10px);
-    }
+.input {
+  border: none;
+  background: transparent;
+  color: white;
+  font-size: 20px;
+  outline: none;
+  width: 100%;
+}
 
-    .network-warning {
-      display: none;
-      margin-bottom: 12px;
-      padding: 12px 14px;
-      border-radius: 16px;
-      background: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.35);
-      color: #fecaca;
-      font-size: 14px;
-    }
+.token {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #222;
+  padding: 6px 10px;
+  border-radius: 10px;
+}
 
-    .swap-box {
-      background: #181825;
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 20px;
-      padding: 14px;
-      margin-bottom: 10px;
-    }
+.icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+}
 
-    .row-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      color: #a1a1b3;
-      font-size: 13px;
-    }
+.switch {
+  text-align: center;
+  margin: 10px;
+  cursor: pointer;
+}
 
-    .amount-row {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      justify-content: space-between;
-    }
+.btn {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(90deg, #ff00cc, #00fff7);
+  font-weight: bold;
+  cursor: pointer;
+}
 
-    .amount-input {
-      flex: 1;
-      min-width: 0;
-      border: none;
-      outline: none;
-      background: transparent;
-      color: #fff;
-      font-size: 34px;
-      font-weight: 700;
-    }
-
-    .amount-input::placeholder {
-      color: #6f7285;
-    }
-
-    .token-pill {
-      border: none;
-      border-radius: 999px;
-      background: #232338;
-      color: #fff;
-      padding: 10px 14px;
-      font-size: 14px;
-      font-weight: 700;
-      min-width: 120px;
-      text-align: center;
-    }
-
-    .balance {
-      margin-top: 8px;
-      font-size: 12px;
-      color: #9ca3af;
-    }
-
-    .switch-wrap {
-      display: flex;
-      justify-content: center;
-      margin: -4px 0 6px;
-      position: relative;
-      z-index: 2;
-    }
-
-    .switch-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: 4px solid #0f0f19;
-      background: #232338;
-      color: #fff;
-      font-size: 20px;
-      cursor: pointer;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
-    }
-
-    .details {
-      margin-top: 12px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.03);
-      padding: 12px;
-      font-size: 13px;
-      color: #c7c9d6;
-    }
-
-    .details-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin: 6px 0;
-    }
-
-    .main-btn {
-      width: 100%;
-      margin-top: 14px;
-      border: none;
-      border-radius: 18px;
-      padding: 16px;
-      font-size: 16px;
-      font-weight: 800;
-      cursor: pointer;
-      color: #fff;
-      background: linear-gradient(135deg, #7c3aed, #ec4899);
-      box-shadow: 0 12px 28px rgba(168, 85, 247, 0.32);
-    }
-
-    .main-btn:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-    }
-
-    .status {
-      margin-top: 12px;
-      text-align: center;
-      font-size: 13px;
-      color: #b7a9d6;
-      min-height: 18px;
-    }
-
-    .footer {
-      margin-top: 10px;
-      text-align: center;
-      color: #8d8fa3;
-      font-size: 12px;
-    }
-
-    .mini {
-      font-size: 12px;
-      color: #9ca3af;
-    }
-  </style>
+.status {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 12px;
+}
+</style>
 </head>
+
 <body>
-  <div class="app">
-    <div class="header">
-      <div>
-        <div class="brand">🎮 Retro DEX</div>
-        <div class="sub">USDC ⇄ GAMEOVER · Arc Testnet</div>
-      </div>
-      <button class="wallet-btn" onclick="connectWallet()" id="walletBtn">
-        Connect Wallet
-      </button>
+
+<div class="dex">
+
+<div class="title">🎮 Retro DEX</div>
+
+<!-- SEND -->
+<div class="box">
+  <div class="label">SEND</div>
+  <div class="row">
+    <input id="amount" class="input" placeholder="0.0" oninput="preview()">
+    <div class="token" id="tokenA">
+      <img id="iconA" class="icon" src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png">
+      <span id="labelA">USDC</span>
     </div>
-
-    <div class="card">
-      <div class="network-warning" id="networkWarning">
-        Conecte na Arc Testnet.
-      </div>
-
-      <div class="swap-box">
-        <div class="row-top">
-          <span>You pay</span>
-          <span class="mini" id="balanceIn">Balance: -</span>
-        </div>
-
-        <div class="amount-row">
-          <input
-            id="amountIn"
-            class="amount-input"
-            type="number"
-            inputmode="decimal"
-            placeholder="0.0"
-            oninput="handleAmountInput()"
-          />
-          <button class="token-pill" id="tokenInBtn" onclick="toggleDirection()">
-            USDC
-          </button>
-        </div>
-      </div>
-
-      <div class="switch-wrap">
-        <button class="switch-btn" onclick="toggleDirection()">⇅</button>
-      </div>
-
-      <div class="swap-box">
-        <div class="row-top">
-          <span>You receive</span>
-          <span class="mini" id="balanceOut">Balance: -</span>
-        </div>
-
-        <div class="amount-row">
-          <input
-            id="amountOut"
-            class="amount-input"
-            type="text"
-            placeholder="0.0"
-            disabled
-          />
-          <button class="token-pill" id="tokenOutBtn" onclick="toggleDirection()">
-            GAMEOVER
-          </button>
-        </div>
-      </div>
-
-      <div class="details">
-        <div class="details-row">
-          <span>Wallet</span>
-          <span id="walletStatus">-</span>
-        </div>
-        <div class="details-row">
-          <span>Network</span>
-          <span id="networkStatus">-</span>
-        </div>
-        <div class="details-row">
-          <span>Pair</span>
-          <span class="mini" id="pairStatus">RetroPair</span>
-        </div>
-      </div>
-
-      <button class="main-btn" id="swapBtn" onclick="executeSwap()" disabled>
-        Enter amount
-      </button>
-
-      <div class="status" id="statusText"></div>
-    </div>
-
-    <div class="footer">retro-dex-two.vercel.app</div>
   </div>
+</div>
 
-  <script>
-    const ARC_CHAIN_ID = 5042002;
-    const USDC_ADDRESS = "0x3600000000000000000000000000000000000000";
-    const GAMEOVER_ADDRESS = "0x706abf10e96a1bb91F8F82740fcfABDa0F940843";
-    const PAIR_ADDRESS = "0x3e0f14368f385CE4c5c5d4B816Ec8c8c475c63F0";
+<!-- SWITCH -->
+<div class="switch" onclick="invert()">⇅</div>
 
-    const ERC20_ABI = [
-      "function approve(address spender, uint256 amount) returns (bool)",
-      "function allowance(address owner, address spender) view returns (uint256)",
-      "function balanceOf(address owner) view returns (uint256)",
-      "function decimals() view returns (uint8)",
-      "function symbol() view returns (string)"
-    ];
+<!-- RECEIVE -->
+<div class="box">
+  <div class="label">RECEIVE</div>
+  <div class="row">
+    <input id="output" class="input" disabled>
+    <div class="token" id="tokenB">
+      <img id="iconB" class="icon" src="LINK_DA_SUA_IMAGEM">
+      <span id="labelB">GAMEOVER</span>
+    </div>
+  </div>
+</div>
 
-    const PAIR_ABI = [
-      "function swap(address tokenIn, uint256 amountIn) public",
-      "function getAmountOut(address tokenIn, uint256 amountIn) view returns (uint256)",
-      "function token0() view returns (address)",
-      "function token1() view returns (address)",
-      "function reserve0() view returns (uint256)",
-      "function reserve1() view returns (uint256)"
-    ];
+<button class="btn" onclick="connectWallet()">CONNECT WALLET</button>
+<button class="btn" onclick="swap()">SWAP</button>
 
-    let provider;
-    let signer;
-    let userAddress = null;
-    let direction = "USDC_TO_GAMEOVER"; // ou GAMEOVER_TO_USDC
+<div id="status" class="status">-</div>
 
-    function getTokenInAddress() {
-      return direction === "USDC_TO_GAMEOVER" ? USDC_ADDRESS : GAMEOVER_ADDRESS;
-    }
+</div>
 
-    function getTokenOutAddress() {
-      return direction === "USDC_TO_GAMEOVER" ? GAMEOVER_ADDRESS : USDC_ADDRESS;
-    }
+<script>
 
-    function getTokenInLabel() {
-      return direction === "USDC_TO_GAMEOVER" ? "USDC" : "GAMEOVER";
-    }
+const USDC = "0x3600000000000000000000000000000000000000";
+const GAMEOVER = "0x706abf10e96a1bb91F8F82740fcfABDa0F940843";
+const PAIR = "0x3e0f14368f385CE4c5c5d4B816Ec8c8c475c63F0";
 
-    function getTokenOutLabel() {
-      return direction === "USDC_TO_GAMEOVER" ? "GAMEOVER" : "USDC";
-    }
+const ERC20 = [
+ "function approve(address spender,uint amount) returns(bool)",
+ "function balanceOf(address) view returns(uint)",
+ "function decimals() view returns(uint8)"
+];
 
-    async function getTokenDecimals(tokenAddress) {
-      const token = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
-      return await token.decimals();
-    }
+const PAIR_ABI = [
+ "function swap(address tokenIn,uint amountIn)",
+ "function getAmountOut(address tokenIn,uint amountIn) view returns(uint)"
+];
 
-    function setStatus(text) {
-      document.getElementById("statusText").innerText = text || "";
-    }
+let tokenIn = USDC;
 
-    function shortAddress(addr) {
-      return addr ? addr.slice(0, 6) + "..." + addr.slice(-4) : "-";
-    }
+async function connectWallet(){
+ const provider = new ethers.providers.Web3Provider(window.ethereum);
+ await provider.send("eth_requestAccounts", []);
+ document.getElementById("status").innerText = "Wallet conectada";
+}
 
-    function updateDirectionUI() {
-      document.getElementById("tokenInBtn").innerText = getTokenInLabel();
-      document.getElementById("tokenOutBtn").innerText = getTokenOutLabel();
-      document.getElementById("amountIn").placeholder = "0.0";
-      document.getElementById("amountOut").value = "";
-      updateSwapButton();
-      if (userAddress) {
-        refreshBalances();
-      }
-    }
+function invert(){
+ if(tokenIn === USDC){
+   tokenIn = GAMEOVER;
+   document.getElementById("labelA").innerText = "GAMEOVER";
+   document.getElementById("labelB").innerText = "USDC";
 
-    function updateSwapButton() {
-      const amount = document.getElementById("amountIn").value;
-      const btn = document.getElementById("swapBtn");
+   document.getElementById("iconA").src = "LINK_DA_SUA_IMAGEM";
+   document.getElementById("iconB").src = "https://cryptologos.cc/logos/usd-coin-usdc-logo.png";
+ } else {
+   tokenIn = USDC;
+   document.getElementById("labelA").innerText = "USDC";
+   document.getElementById("labelB").innerText = "GAMEOVER";
 
-      if (!userAddress) {
-        btn.disabled = true;
-        btn.innerText = "Connect Wallet";
-        return;
-      }
+   document.getElementById("iconA").src = "https://cryptologos.cc/logos/usd-coin-usdc-logo.png";
+   document.getElementById("iconB").src = "LINK_DA_SUA_IMAGEM";
+ }
+}
 
-      if (!amount || Number(amount) <= 0) {
-        btn.disabled = true;
-        btn.innerText = "Enter amount";
-        return;
-      }
+async function preview(){
+ try{
+ const provider = new ethers.providers.Web3Provider(window.ethereum);
+ const pair = new ethers.Contract(PAIR, PAIR_ABI, provider);
 
-      btn.disabled = false;
-      btn.innerText = `Swap ${getTokenInLabel()} for ${getTokenOutLabel()}`;
-    }
+ const amount = document.getElementById("amount").value;
+ if(!amount) return;
 
-    async function connectWallet() {
-      if (!window.ethereum) {
-        alert("Abra no navegador da MetaMask.");
-        return;
-      }
+ const decimals = tokenIn === USDC ? 6 : 18;
 
-      try {
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        await provider.send("eth_requestAccounts", []);
-        signer = provider.getSigner();
-        userAddress = await signer.getAddress();
+ const amountIn = ethers.utils.parseUnits(amount, decimals);
+ const out = await pair.getAmountOut(tokenIn, amountIn);
 
-        const network = await provider.getNetwork();
-        document.getElementById("networkStatus").innerText =
-          `${network.name || "Arc Testnet"} (${network.chainId})`;
+ const decOut = tokenIn === USDC ? 18 : 6;
 
-        document.getElementById("walletStatus").innerText = shortAddress(userAddress);
-        document.getElementById("walletBtn").innerText = shortAddress(userAddress);
+ document.getElementById("output").value =
+ ethers.utils.formatUnits(out, decOut);
 
-        const isArc = Number(network.chainId) === ARC_CHAIN_ID;
-        document.getElementById("networkWarning").style.display = isArc ? "none" : "block";
+ }catch(e){}
+}
 
-        await refreshBalances();
-        updateSwapButton();
-        setStatus("Wallet conectada.");
-      } catch (err) {
-        console.error(err);
-        setStatus("Erro ao conectar wallet.");
-      }
-    }
+async function swap(){
+ try{
+ const provider = new ethers.providers.Web3Provider(window.ethereum);
+ const signer = provider.getSigner();
 
-    async function refreshBalances() {
-      if (!provider || !userAddress) return;
+ const amount = document.getElementById("amount").value;
 
-      try {
-        const tokenIn = new ethers.Contract(getTokenInAddress(), ERC20_ABI, provider);
-        const tokenOut = new ethers.Contract(getTokenOutAddress(), ERC20_ABI, provider);
+ const decimals = tokenIn === USDC ? 6 : 18;
+ const amountIn = ethers.utils.parseUnits(amount, decimals);
 
-        const [balInRaw, balOutRaw, decIn, decOut] = await Promise.all([
-          tokenIn.balanceOf(userAddress),
-          tokenOut.balanceOf(userAddress),
-          tokenIn.decimals(),
-          tokenOut.decimals()
-        ]);
+ const token = new ethers.Contract(tokenIn, ERC20, signer);
 
-        const balIn = Number(ethers.utils.formatUnits(balInRaw, decIn));
-        const balOut = Number(ethers.utils.formatUnits(balOutRaw, decOut));
+ document.getElementById("status").innerText = "Aprovando...";
 
-        document.getElementById("balanceIn").innerText =
-          `Balance: ${balIn.toLocaleString("pt-BR", { maximumFractionDigits: 4 })} ${getTokenInLabel()}`;
+ const tx1 = await token.approve(PAIR, amountIn);
+ await tx1.wait();
 
-        document.getElementById("balanceOut").innerText =
-          `Balance: ${balOut.toLocaleString("pt-BR", { maximumFractionDigits: 4 })} ${getTokenOutLabel()}`;
-      } catch (err) {
-        console.error(err);
-        setStatus("Erro ao ler saldos.");
-      }
-    }
+ document.getElementById("status").innerText = "Swapping...";
 
-    function toggleDirection() {
-      direction = direction === "USDC_TO_GAMEOVER"
-        ? "GAMEOVER_TO_USDC"
-        : "USDC_TO_GAMEOVER";
+ const pair = new ethers.Contract(PAIR, PAIR_ABI, signer);
+ const tx2 = await pair.swap(tokenIn, amountIn);
+ await tx2.wait();
 
-      updateDirectionUI();
-      handleAmountInput();
-    }
+ document.getElementById("status").innerText = "Swap concluído 🚀";
 
-    async function handleAmountInput() {
-      updateSwapButton();
+ }catch(e){
+ document.getElementById("status").innerText = "Erro no swap";
+ console.log(e);
+ }
+}
 
-      const amountText = document.getElementById("amountIn").value;
-      const output = document.getElementById("amountOut");
+</script>
 
-      if (!amountText || Number(amountText) <= 0 || !provider) {
-        output.value = "";
-        return;
-      }
-
-      try {
-        const pair = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, provider);
-        const tokenInAddress = getTokenInAddress();
-        const decIn = await getTokenDecimals(tokenInAddress);
-
-        const amountIn = ethers.utils.parseUnits(amountText, decIn);
-        const amountOutRaw = await pair.getAmountOut(tokenInAddress, amountIn);
-
-        const decOut = await getTokenDecimals(getTokenOutAddress());
-        const amountOut = ethers.utils.formatUnits(amountOutRaw, decOut);
-
-        output.value = Number(amountOut).toLocaleString("pt-BR", {
-          maximumFractionDigits: 6
-        });
-      } catch (err) {
-        console.error(err);
-        output.value = "";
-        setStatus("Não foi possível calcular o valor de saída.");
-      }
-    }
-
-    async function executeSwap() {
-      if (!window.ethereum) {
-        alert("Abra no navegador da MetaMask.");
-        return;
-      }
-
-      if (!userAddress) {
-        await connectWallet();
-        return;
-      }
-
-      try {
-        const network = await provider.getNetwork();
-        if (Number(network.chainId) !== ARC_CHAIN_ID) {
-          alert("Troque para a Arc Testnet.");
-          return;
-        }
-
-        const amountText = document.getElementById("amountIn").value;
-        if (!amountText || Number(amountText) <= 0) {
-          alert("Digite um valor.");
-          return;
-        }
-
-        const tokenInAddress = getTokenInAddress();
-        const decIn = await getTokenDecimals(tokenInAddress);
-        const amountIn = ethers.utils.parseUnits(amountText, decIn);
-
-        const tokenIn = new ethers.Contract(tokenInAddress, ERC20_ABI, signer);
-        const pair = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, signer);
-
-        setStatus(`Aprovando ${getTokenInLabel()}...`);
-        const approveTx = await tokenIn.approve(PAIR_ADDRESS, amountIn);
-        await approveTx.wait();
-
-        setStatus(`Fazendo swap ${getTokenInLabel()} → ${getTokenOutLabel()}...`);
-        const swapTx = await pair.swap(tokenInAddress, amountIn);
-        await swapTx.wait();
-
-        setStatus("Swap concluído com sucesso 🚀");
-        document.getElementById("amountIn").value = "";
-        document.getElementById("amountOut").value = "";
-        await refreshBalances();
-        updateSwapButton();
-      } catch (err) {
-        console.error(err);
-        setStatus("Erro no swap. Veja o console ou tente de novo.");
-        alert("Erro no swap.");
-      }
-    }
-
-    if (window.ethereum) {
-      window.ethereum.on("accountsChanged", async (accounts) => {
-        if (!accounts.length) {
-          userAddress = null;
-          document.getElementById("walletStatus").innerText = "-";
-          document.getElementById("walletBtn").innerText = "Connect Wallet";
-          document.getElementById("balanceIn").innerText = "Balance: -";
-          document.getElementById("balanceOut").innerText = "Balance: -";
-          document.getElementById("amountOut").value = "";
-          updateSwapButton();
-          setStatus("Wallet desconectada.");
-          return;
-        }
-
-        userAddress = accounts[0];
-        signer = provider.getSigner();
-        document.getElementById("walletStatus").innerText = shortAddress(userAddress);
-        document.getElementById("walletBtn").innerText = shortAddress(userAddress);
-        await refreshBalances();
-        await handleAmountInput();
-      });
-
-      window.ethereum.on("chainChanged", () => {
-        window.location.reload();
-      });
-    }
-
-    updateDirectionUI();
-  </script>
 </body>
 </html>
