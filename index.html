@@ -57,19 +57,44 @@
     }
 
     .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+    .brand-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 
-    .brand {
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      color: var(--text-main);
-    }
+.brand-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-face {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 0 10px rgba(86, 160, 255, 0.22));
+}
+
+.brand {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  color: var(--text-main);
+}
+
+.sub {
+  font-size: 13px;
+  color: var(--text-soft);
+  margin-top: 6px;
+}
 
     .sub {
       font-size: 13px;
@@ -302,14 +327,17 @@
 <body>
   <div class="app">
     <div class="header">
-      <div>
-        <div class="brand">🎮 Retro DEX</div>
-        <div class="sub">USDC ⇄ GAMEOVER · Arc Testnet</div>
-      </div>
-      <button class="wallet-btn" onclick="handleWalletButton()" id="walletBtn">
-        Connect Wallet
-      </button>
+  <div class="brand-wrap">
+    <div class="brand-line">
+      <img src="./retro-face.png" alt="Retro DEX" class="brand-face" />
+      <div class="brand">Retro DEX</div>
     </div>
+    <div class="sub">USDC ⇄ GAMEOVER · Arc Testnet</div>
+  </div>
+  <button class="wallet-btn" onclick="handleWalletButton()" id="walletBtn">
+    Connect Wallet
+  </button>
+</div>
 
     <div class="card">
       <div class="network-warning" id="networkWarning">
