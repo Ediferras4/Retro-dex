@@ -11,13 +11,40 @@
       box-sizing: border-box;
     }
 
+    :root {
+      --bg-top: #06122c;
+      --bg-mid: #0a234f;
+      --bg-bottom: #121a35;
+
+      --card-bg: rgba(10, 16, 34, 0.92);
+      --box-bg: rgba(14, 22, 44, 0.96);
+      --box-border: rgba(117, 146, 212, 0.18);
+
+      --text-main: #f3f7ff;
+      --text-soft: #b8c6e6;
+      --text-dim: #86a0d3;
+
+      --arc-blue: #2f6bff;
+      --arc-blue-2: #4f86ff;
+      --arc-indigo: #6e7dff;
+      --arc-lilac: #9a8cff;
+      --arc-peach: #ff9b8f;
+
+      --danger-1: #ef4444;
+      --danger-2: #f97316;
+
+      --shadow-blue: rgba(47, 107, 255, 0.28);
+      --shadow-soft: rgba(9, 18, 38, 0.55);
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
       font-family: Inter, Arial, sans-serif;
       background:
-        radial-gradient(circle at top, #2b0a5a 0%, #150329 35%, #07010e 70%, #000 100%);
-      color: #fff;
+        radial-gradient(circle at top, rgba(130, 110, 255, 0.20) 0%, rgba(130, 110, 255, 0) 26%),
+        linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 42%, var(--bg-bottom) 100%);
+      color: var(--text-main);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -41,12 +68,12 @@
       font-size: 28px;
       font-weight: 800;
       letter-spacing: 0.5px;
-      color: #fff;
+      color: var(--text-main);
     }
 
     .sub {
       font-size: 13px;
-      color: #b7a9d6;
+      color: var(--text-soft);
       margin-top: 4px;
     }
 
@@ -54,22 +81,27 @@
       border: none;
       border-radius: 16px;
       padding: 12px 16px;
-      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      background: linear-gradient(135deg, var(--arc-blue), var(--arc-lilac));
       color: #fff;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 10px 24px rgba(168, 85, 247, 0.35);
+      box-shadow: 0 10px 24px var(--shadow-blue);
       white-space: nowrap;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .wallet-btn:active {
+      transform: scale(0.98);
     }
 
     .card {
-      background: rgba(18, 18, 28, 0.92);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 24px;
+      background: var(--card-bg);
+      border: 1px solid rgba(98, 127, 197, 0.14);
+      border-radius: 28px;
       padding: 16px;
       box-shadow:
-        0 20px 40px rgba(0,0,0,0.35),
-        inset 0 1px 0 rgba(255,255,255,0.04);
+        0 20px 40px var(--shadow-soft),
+        inset 0 1px 0 rgba(255,255,255,0.03);
       backdrop-filter: blur(10px);
     }
 
@@ -78,9 +110,9 @@
       margin-bottom: 12px;
       padding: 12px 14px;
       border-radius: 16px;
-      background: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.35);
-      color: #fecaca;
+      background: rgba(239, 68, 68, 0.10);
+      border: 1px solid rgba(239, 68, 68, 0.28);
+      color: #ffd1d1;
       font-size: 14px;
     }
 
@@ -90,18 +122,19 @@
       border: none;
       border-radius: 14px;
       padding: 12px 14px;
-      background: linear-gradient(135deg, #ef4444, #f97316);
+      background: linear-gradient(135deg, var(--danger-1), var(--danger-2));
       color: #fff;
       font-weight: 700;
       cursor: pointer;
     }
 
     .swap-box {
-      background: #181825;
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 20px;
-      padding: 14px;
+      background: var(--box-bg);
+      border: 1px solid var(--box-border);
+      border-radius: 22px;
+      padding: 15px;
       margin-bottom: 10px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
     }
 
     .row-top {
@@ -109,7 +142,7 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
-      color: #a1a1b3;
+      color: var(--text-soft);
       font-size: 13px;
     }
 
@@ -126,38 +159,40 @@
       border: none;
       outline: none;
       background: transparent;
-      color: #fff;
+      color: var(--text-main);
       font-size: 34px;
       font-weight: 700;
     }
 
     .amount-input::placeholder {
-      color: #6f7285;
+      color: #7385af;
     }
 
     .token-pill {
-      border: none;
+      border: 1px solid rgba(112, 140, 210, 0.14);
       border-radius: 999px;
-      background: #232338;
-      color: #fff;
-      padding: 10px 14px;
+      background: rgba(27, 39, 76, 0.95);
+      color: var(--text-main);
+      padding: 11px 16px;
       font-size: 14px;
       font-weight: 700;
-      min-width: 140px;
+      min-width: 152px;
       text-align: center;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
       cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
     }
 
     .token-icon {
-      width: 20px;
-      height: 20px;
+      width: 28px;
+      height: 28px;
       border-radius: 999px;
       object-fit: cover;
       flex-shrink: 0;
+      box-shadow: 0 0 12px rgba(79, 134, 255, 0.18);
     }
 
     .switch-wrap {
@@ -169,54 +204,59 @@
     }
 
     .switch-btn {
-      width: 44px;
-      height: 44px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
-      border: 4px solid #0f0f19;
-      background: #232338;
-      color: #fff;
+      border: 4px solid #0c1530;
+      background: linear-gradient(180deg, #162856, #101d40);
+      color: #f2f6ff;
       font-size: 20px;
       cursor: pointer;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+      box-shadow:
+        0 8px 18px rgba(0,0,0,0.28),
+        0 0 18px rgba(79, 134, 255, 0.18);
     }
 
     .details {
       margin-top: 12px;
       border-radius: 18px;
-      background: rgba(255,255,255,0.03);
+      background: rgba(255,255,255,0.025);
       padding: 12px;
       font-size: 13px;
-      color: #c7c9d6;
+      color: var(--text-soft);
+      border: 1px solid rgba(117, 146, 212, 0.08);
     }
 
     .details-row {
       display: flex;
       justify-content: space-between;
       gap: 12px;
-      margin: 6px 0;
+      margin: 7px 0;
     }
 
     .slippage-row {
       display: flex;
       gap: 8px;
-      margin-top: 10px;
+      margin-top: 12px;
       flex-wrap: wrap;
     }
 
     .slippage-btn {
-      border: 1px solid rgba(255,255,255,0.12);
-      background: #232338;
-      color: #fff;
+      border: 1px solid rgba(122, 150, 220, 0.18);
+      background: rgba(26, 37, 74, 0.95);
+      color: var(--text-main);
       border-radius: 999px;
-      padding: 8px 12px;
+      padding: 9px 14px;
       cursor: pointer;
       font-size: 12px;
       font-weight: 700;
+      transition: all 0.15s ease;
     }
 
     .slippage-btn.active {
-      background: linear-gradient(135deg, #7c3aed, #ec4899);
+      background: linear-gradient(135deg, var(--arc-blue), var(--arc-lilac));
       border-color: transparent;
+      box-shadow: 0 0 16px rgba(79, 134, 255, 0.22);
     }
 
     .main-btn {
@@ -229,8 +269,8 @@
       font-weight: 800;
       cursor: pointer;
       color: #fff;
-      background: linear-gradient(135deg, #7c3aed, #ec4899);
-      box-shadow: 0 12px 28px rgba(168, 85, 247, 0.32);
+      background: linear-gradient(135deg, var(--arc-blue), var(--arc-lilac));
+      box-shadow: 0 12px 28px rgba(47, 107, 255, 0.28);
     }
 
     .main-btn:disabled {
@@ -242,20 +282,20 @@
       margin-top: 12px;
       text-align: center;
       font-size: 13px;
-      color: #b7a9d6;
+      color: var(--text-soft);
       min-height: 18px;
     }
 
     .footer {
       margin-top: 10px;
       text-align: center;
-      color: #8d8fa3;
+      color: var(--text-dim);
       font-size: 12px;
     }
 
     .mini {
       font-size: 12px;
-      color: #9ca3af;
+      color: var(--text-dim);
     }
   </style>
 </head>
@@ -266,7 +306,7 @@
         <div class="brand">🎮 Retro DEX</div>
         <div class="sub">USDC ⇄ GAMEOVER · Arc Testnet</div>
       </div>
-      <button class="wallet-btn" onclick="connectWallet()" id="walletBtn">
+      <button class="wallet-btn" onclick="handleWalletButton()" id="walletBtn">
         Connect Wallet
       </button>
     </div>
@@ -295,7 +335,7 @@
             oninput="handleAmountInput()"
           />
           <button class="token-pill" id="tokenInBtn" onclick="toggleDirection()">
-            <img id="tokenInIcon" class="token-icon" src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" alt="USDC">
+            <img id="tokenInIcon" class="token-icon" src="./Usdc.png" alt="USDC">
             <span id="tokenInText">USDC</span>
           </button>
         </div>
@@ -320,7 +360,7 @@
             disabled
           />
           <button class="token-pill" id="tokenOutBtn" onclick="toggleDirection()">
-            <img id="tokenOutIcon" class="token-icon" src="https://cdn-icons-png.flaticon.com/512/686/686589.png" alt="GAMEOVER">
+            <img id="tokenOutIcon" class="token-icon" src="./gameover.png" alt="GAMEOVER">
             <span id="tokenOutText">GAMEOVER</span>
           </button>
         </div>
@@ -377,8 +417,7 @@
     const PAIR_ADDRESS = "0xF55Abd9674b7faEF659cA7b01467324CFb731D6d";
 
     const USDC_ICON = "./Usdc.png";
-    const GAMEOVER_ICON = "./gameover.png"; 
-
+    const GAMEOVER_ICON = "./gameover.png";
 
     const ERC20_ABI = [
       "function approve(address spender, uint256 amount) returns (bool)",
@@ -440,12 +479,42 @@
       return addr ? addr.slice(0, 6) + "..." + addr.slice(-4) : "-";
     }
 
+    function updateWalletButton() {
+      const btn = document.getElementById("walletBtn");
+      btn.innerText = userAddress ? "Disconnect" : "Connect Wallet";
+    }
+
+    function clearWalletUI() {
+      userAddress = null;
+      signer = null;
+      provider = null;
+      document.getElementById("walletStatus").innerText = "-";
+      document.getElementById("walletBtn").innerText = "Connect Wallet";
+      document.getElementById("balanceIn").innerText = "Balance: -";
+      document.getElementById("balanceOut").innerText = "Balance: -";
+      document.getElementById("amountIn").value = "";
+      document.getElementById("amountOut").value = "";
+      document.getElementById("priceStatus").innerText = "-";
+      document.getElementById("minReceivedStatus").innerText = "-";
+      document.getElementById("networkStatus").innerText = "-";
+      document.getElementById("networkWarning").style.display = "none";
+      updateSwapButton();
+      setStatus("Wallet desconectada.");
+    }
+
+    async function handleWalletButton() {
+      if (userAddress) {
+        clearWalletUI();
+        return;
+      }
+      await connectWallet();
+    }
+
     function updateDirectionUI() {
       document.getElementById("tokenInText").innerText = getTokenInLabel();
       document.getElementById("tokenOutText").innerText = getTokenOutLabel();
       document.getElementById("tokenInIcon").src = getTokenInIcon();
       document.getElementById("tokenOutIcon").src = getTokenOutIcon();
-      document.getElementById("amountIn").placeholder = "0.0";
       document.getElementById("amountOut").value = "";
       document.getElementById("priceStatus").innerText = "-";
       document.getElementById("minReceivedStatus").innerText = "-";
@@ -548,7 +617,7 @@
             : `${network.name || "Unknown"} (${network.chainId})`;
 
         document.getElementById("walletStatus").innerText = shortAddress(userAddress);
-        document.getElementById("walletBtn").innerText = shortAddress(userAddress);
+        updateWalletButton();
 
         const isArc = Number(network.chainId) === ARC_CHAIN_ID;
         document.getElementById("networkWarning").style.display = isArc ? "none" : "block";
@@ -709,23 +778,14 @@
     if (window.ethereum) {
       window.ethereum.on("accountsChanged", async (accounts) => {
         if (!accounts.length) {
-          userAddress = null;
-          document.getElementById("walletStatus").innerText = "-";
-          document.getElementById("walletBtn").innerText = "Connect Wallet";
-          document.getElementById("balanceIn").innerText = "Balance: -";
-          document.getElementById("balanceOut").innerText = "Balance: -";
-          document.getElementById("amountOut").value = "";
-          document.getElementById("priceStatus").innerText = "-";
-          document.getElementById("minReceivedStatus").innerText = "-";
-          updateSwapButton();
-          setStatus("Wallet desconectada.");
+          clearWalletUI();
           return;
         }
 
         userAddress = accounts[0];
-        signer = provider.getSigner();
+        signer = provider ? provider.getSigner() : null;
         document.getElementById("walletStatus").innerText = shortAddress(userAddress);
-        document.getElementById("walletBtn").innerText = shortAddress(userAddress);
+        updateWalletButton();
         await refreshBalances();
         await handleAmountInput();
       });
@@ -736,6 +796,7 @@
     }
 
     updateDirectionUI();
+    updateWalletButton();
   </script>
 </body>
   </html>
