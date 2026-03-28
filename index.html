@@ -33,6 +33,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
       margin-bottom: 14px;
     }
 
@@ -58,6 +59,7 @@
       font-weight: 700;
       cursor: pointer;
       box-shadow: 0 10px 24px rgba(168, 85, 247, 0.35);
+      white-space: nowrap;
     }
 
     .card {
@@ -80,6 +82,18 @@
       border: 1px solid rgba(239, 68, 68, 0.35);
       color: #fecaca;
       font-size: 14px;
+    }
+
+    .switch-network-btn {
+      margin-top: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: linear-gradient(135deg, #ef4444, #f97316);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
     }
 
     .swap-box {
@@ -129,14 +143,21 @@
       padding: 10px 14px;
       font-size: 14px;
       font-weight: 700;
-      min-width: 120px;
+      min-width: 140px;
       text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
     }
 
-    .balance {
-      margin-top: 8px;
-      font-size: 12px;
-      color: #9ca3af;
+    .token-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      object-fit: cover;
+      flex-shrink: 0;
     }
 
     .switch-wrap {
@@ -173,6 +194,29 @@
       justify-content: space-between;
       gap: 12px;
       margin: 6px 0;
+    }
+
+    .slippage-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .slippage-btn {
+      border: 1px solid rgba(255,255,255,0.12);
+      background: #232338;
+      color: #fff;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .slippage-btn.active {
+      background: linear-gradient(135deg, #7c3aed, #ec4899);
+      border-color: transparent;
     }
 
     .main-btn {
@@ -229,7 +273,10 @@
 
     <div class="card">
       <div class="network-warning" id="networkWarning">
-        Conecte na Arc Testnet.
+        Você está na rede errada.
+        <button class="switch-network-btn" onclick="switchToArc()">
+          Switch to Arc Testnet
+        </button>
       </div>
 
       <div class="swap-box">
@@ -248,7 +295,8 @@
             oninput="handleAmountInput()"
           />
           <button class="token-pill" id="tokenInBtn" onclick="toggleDirection()">
-            USDC
+            <img id="tokenInIcon" class="token-icon" src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" alt="USDC">
+            <span id="tokenInText">USDC</span>
           </button>
         </div>
       </div>
@@ -272,7 +320,8 @@
             disabled
           />
           <button class="token-pill" id="tokenOutBtn" onclick="toggleDirection()">
-            GAMEOVER
+            <img id="tokenOutIcon" class="token-icon" src="https://cdn-icons-png.flaticon.com/512/686/686589.png" alt="GAMEOVER">
+            <span id="tokenOutText">GAMEOVER</span>
           </button>
         </div>
       </div>
@@ -288,7 +337,25 @@
         </div>
         <div class="details-row">
           <span>Pair</span>
-          <span class="mini" id="pairStatus">RetroPair</span>
+          <span class="mini" id="pairStatus">0xF55A...1D6d</span>
+        </div>
+        <div class="details-row">
+          <span>Price</span>
+          <span id="priceStatus">-</span>
+        </div>
+        <div class="details-row">
+          <span>Slippage</span>
+          <span id="slippageStatus">1%</span>
+        </div>
+        <div class="details-row">
+          <span>Minimum received</span>
+          <span id="minReceivedStatus">-</span>
+        </div>
+
+        <div class="slippage-row">
+          <button class="slippage-btn active" onclick="setSlippage(1)" id="slippage1">1%</button>
+          <button class="slippage-btn" onclick="setSlippage(0.5)" id="slippage05">0.5%</button>
+          <button class="slippage-btn" onclick="setSlippage(2)" id="slippage2">2%</button>
         </div>
       </div>
 
@@ -304,9 +371,13 @@
 
   <script>
     const ARC_CHAIN_ID = 5042002;
-const USDC_ADDRESS = "0x3600000000000000000000000000000000000000";
-const GAMEOVER_ADDRESS = "0x706abf10e96a1bb91F8F82740fcfABDa0F940843";
-const PAIR_ADDRESS = "0xF55Abd9674b7faEF659cA7b01467324CFb731D6d";
+    const ARC_CHAIN_ID_HEX = "0x4cef52";
+    const USDC_ADDRESS = "0x3600000000000000000000000000000000000000";
+    const GAMEOVER_ADDRESS = "0x706abf10e96a1bb91F8F82740fcfABDa0F940843";
+    const PAIR_ADDRESS = "0xF55Abd9674b7faEF659cA7b01467324CFb731D6d";
+
+    const USDC_ICON = "https://cryptologos.cc/logos/usd-coin-usdc-logo.png";
+    const GAMEOVER_ICON = "https://cdn-icons-png.flaticon.com/512/686/686589.png";
 
     const ERC20_ABI = [
       "function approve(address spender, uint256 amount) returns (bool)",
@@ -328,7 +399,8 @@ const PAIR_ADDRESS = "0xF55Abd9674b7faEF659cA7b01467324CFb731D6d";
     let provider;
     let signer;
     let userAddress = null;
-    let direction = "USDC_TO_GAMEOVER"; // ou GAMEOVER_TO_USDC
+    let direction = "USDC_TO_GAMEOVER";
+    let slippagePercent = 1;
 
     function getTokenInAddress() {
       return direction === "USDC_TO_GAMEOVER" ? USDC_ADDRESS : GAMEOVER_ADDRESS;
@@ -346,6 +418,14 @@ const PAIR_ADDRESS = "0xF55Abd9674b7faEF659cA7b01467324CFb731D6d";
       return direction === "USDC_TO_GAMEOVER" ? "GAMEOVER" : "USDC";
     }
 
+    function getTokenInIcon() {
+      return direction === "USDC_TO_GAMEOVER" ? USDC_ICON : GAMEOVER_ICON;
+    }
+
+    function getTokenOutIcon() {
+      return direction === "USDC_TO_GAMEOVER" ? GAMEOVER_ICON : USDC_ICON;
+    }
+
     async function getTokenDecimals(tokenAddress) {
       const token = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
       return await token.decimals();
@@ -360,10 +440,14 @@ const PAIR_ADDRESS = "0xF55Abd9674b7faEF659cA7b01467324CFb731D6d";
     }
 
     function updateDirectionUI() {
-      document.getElementById("tokenInBtn").innerText = getTokenInLabel();
-      document.getElementById("tokenOutBtn").innerText = getTokenOutLabel();
+      document.getElementById("tokenInText").innerText = getTokenInLabel();
+      document.getElementById("tokenOutText").innerText = getTokenOutLabel();
+      document.getElementById("tokenInIcon").src = getTokenInIcon();
+      document.getElementById("tokenOutIcon").src = getTokenOutIcon();
       document.getElementById("amountIn").placeholder = "0.0";
       document.getElementById("amountOut").value = "";
+      document.getElementById("priceStatus").innerText = "-";
+      document.getElementById("minReceivedStatus").innerText = "-";
       updateSwapButton();
       if (userAddress) {
         refreshBalances();
@@ -390,6 +474,60 @@ const PAIR_ADDRESS = "0xF55Abd9674b7faEF659cA7b01467324CFb731D6d";
       btn.innerText = `Swap ${getTokenInLabel()} for ${getTokenOutLabel()}`;
     }
 
+    function setSlippage(value) {
+      slippagePercent = value;
+      document.getElementById("slippageStatus").innerText = `${value}%`;
+
+      document.querySelectorAll(".slippage-btn").forEach((btn) => {
+        btn.classList.remove("active");
+      });
+
+      if (value === 1) document.getElementById("slippage1").classList.add("active");
+      if (value === 0.5) document.getElementById("slippage05").classList.add("active");
+      if (value === 2) document.getElementById("slippage2").classList.add("active");
+
+      handleAmountInput();
+    }
+
+    async function switchToArc() {
+      if (!window.ethereum) {
+        alert("Abra no navegador da MetaMask.");
+        return;
+      }
+
+      try {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: ARC_CHAIN_ID_HEX }]
+        });
+      } catch (switchError) {
+        if (switchError.code === 4902) {
+          try {
+            await window.ethereum.request({
+              method: "wallet_addEthereumChain",
+              params: [{
+                chainId: ARC_CHAIN_ID_HEX,
+                chainName: "Arc Testnet",
+                nativeCurrency: {
+                  name: "USDC",
+                  symbol: "USDC",
+                  decimals: 18
+                },
+                rpcUrls: ["https://rpc.testnet.arc.network"],
+                blockExplorerUrls: ["https://testnet.arcscan.app"]
+              }]
+            });
+          } catch (addError) {
+            console.error(addError);
+            setStatus("Não foi possível adicionar a Arc Testnet.");
+          }
+        } else {
+          console.error(switchError);
+          setStatus("Não foi possível trocar para a Arc Testnet.");
+        }
+      }
+    }
+
     async function connectWallet() {
       if (!window.ethereum) {
         alert("Abra no navegador da MetaMask.");
@@ -404,7 +542,9 @@ const PAIR_ADDRESS = "0xF55Abd9674b7faEF659cA7b01467324CFb731D6d";
 
         const network = await provider.getNetwork();
         document.getElementById("networkStatus").innerText =
-          `${network.name || "Arc Testnet"} (${network.chainId})`;
+          Number(network.chainId) === ARC_CHAIN_ID
+            ? "Arc Testnet"
+            : `${network.name || "Unknown"} (${network.chainId})`;
 
         document.getElementById("walletStatus").innerText = shortAddress(userAddress);
         document.getElementById("walletBtn").innerText = shortAddress(userAddress);
@@ -414,6 +554,7 @@ const PAIR_ADDRESS = "0xF55Abd9674b7faEF659cA7b01467324CFb731D6d";
 
         await refreshBalances();
         updateSwapButton();
+        await handleAmountInput();
         setStatus("Wallet conectada.");
       } catch (err) {
         console.error(err);
@@ -466,6 +607,8 @@ const PAIR_ADDRESS = "0xF55Abd9674b7faEF659cA7b01467324CFb731D6d";
 
       if (!amountText || Number(amountText) <= 0 || !provider) {
         output.value = "";
+        document.getElementById("priceStatus").innerText = "-";
+        document.getElementById("minReceivedStatus").innerText = "-";
         return;
       }
 
@@ -479,13 +622,32 @@ const PAIR_ADDRESS = "0xF55Abd9674b7faEF659cA7b01467324CFb731D6d";
 
         const decOut = await getTokenDecimals(getTokenOutAddress());
         const amountOut = ethers.utils.formatUnits(amountOutRaw, decOut);
+        const amountOutNum = Number(amountOut);
+        const amountInNum = Number(amountText);
 
-        output.value = Number(amountOut).toLocaleString("pt-BR", {
+        output.value = amountOutNum.toLocaleString("pt-BR", {
           maximumFractionDigits: 6
         });
+
+        if (amountInNum > 0 && amountOutNum > 0) {
+          const price = amountOutNum / amountInNum;
+          const minReceived = amountOutNum * (1 - slippagePercent / 100);
+
+          document.getElementById("priceStatus").innerText =
+            `1 ${getTokenInLabel()} = ${price.toLocaleString("pt-BR", {
+              maximumFractionDigits: 6
+            })} ${getTokenOutLabel()}`;
+
+          document.getElementById("minReceivedStatus").innerText =
+            `${minReceived.toLocaleString("pt-BR", {
+              maximumFractionDigits: 6
+            })} ${getTokenOutLabel()}`;
+        }
       } catch (err) {
         console.error(err);
         output.value = "";
+        document.getElementById("priceStatus").innerText = "-";
+        document.getElementById("minReceivedStatus").innerText = "-";
         setStatus("Não foi possível calcular o valor de saída.");
       }
     }
@@ -532,6 +694,8 @@ const PAIR_ADDRESS = "0xF55Abd9674b7faEF659cA7b01467324CFb731D6d";
         setStatus("Swap concluído com sucesso 🚀");
         document.getElementById("amountIn").value = "";
         document.getElementById("amountOut").value = "";
+        document.getElementById("priceStatus").innerText = "-";
+        document.getElementById("minReceivedStatus").innerText = "-";
         await refreshBalances();
         updateSwapButton();
       } catch (err) {
@@ -550,6 +714,8 @@ const PAIR_ADDRESS = "0xF55Abd9674b7faEF659cA7b01467324CFb731D6d";
           document.getElementById("balanceIn").innerText = "Balance: -";
           document.getElementById("balanceOut").innerText = "Balance: -";
           document.getElementById("amountOut").value = "";
+          document.getElementById("priceStatus").innerText = "-";
+          document.getElementById("minReceivedStatus").innerText = "-";
           updateSwapButton();
           setStatus("Wallet desconectada.");
           return;
@@ -571,4 +737,4 @@ const PAIR_ADDRESS = "0xF55Abd9674b7faEF659cA7b01467324CFb731D6d";
     updateDirectionUI();
   </script>
 </body>
-                                            </html>
+  </html>
