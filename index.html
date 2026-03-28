@@ -87,12 +87,22 @@
 
 
 .brand {
-  font-size: 26px;
+  font-size: 25px;
   font-weight: 800;
   line-height: 0.95;
   letter-spacing: 0.2px;
-  color: var(--text-main);
 }
+
+.brand-retro {
+  color: #eef4ff;
+  text-shadow: 0 0 10px rgba(89, 183, 255, 0.08);
+}
+
+.brand-dex {
+  color: #59b7ff;
+  text-shadow: 0 0 12px rgba(89, 183, 255, 0.14);
+}
+
 .sub {
   font-size: 13px;
   color: var(--text-soft);
@@ -333,7 +343,7 @@
   <div class="brand-wrap">
     <div class="brand-line">
       <img src="./retro-face.png" alt="Retro DEX" class="brand-face" />
-      <div class="brand">Retro DEX</div>
+      <div class="brand"><span class="brand-retro">Retro</span> <span class="brand-dex">DEX</span></div>
     </div>
     <div class="sub">USDC ⇄ GAMEOVER · Arc Testnet</div>
   </div>
