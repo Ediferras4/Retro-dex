@@ -199,8 +199,16 @@
       justify-content: space-between;
     }
 
-    .amount-input {
+    .amount-side {
       flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .amount-input {
+      width: 100%;
       min-width: 0;
       border: none;
       outline: none;
@@ -208,10 +216,42 @@
       color: var(--text-main);
       font-size: 34px;
       font-weight: 700;
+      padding: 0;
+      margin: 0;
     }
 
     .amount-input::placeholder {
       color: #7385af;
+    }
+
+    .quick-amounts {
+      display: none;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .quick-amounts.show {
+      display: flex;
+    }
+
+    .quick-btn {
+      border: 1px solid rgba(119, 170, 255, 0.16);
+      background: linear-gradient(180deg, rgba(25, 38, 76, 0.98), rgba(18, 29, 58, 0.98));
+      color: #e6eeff;
+      border-radius: 999px;
+      padding: 7px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      transition: all 0.15s ease;
+    }
+
+    .quick-btn:active {
+      transform: scale(0.97);
+    }
+
+    .quick-btn:hover {
+      box-shadow: 0 0 14px rgba(79, 134, 255, 0.18);
     }
 
     .token-pill {
@@ -388,14 +428,26 @@
         </div>
 
         <div class="amount-row">
-          <input
-            id="amountIn"
-            class="amount-input"
-            type="number"
-            inputmode="decimal"
-            placeholder="0.0"
-            oninput="handleAmountInput()"
-          />
+          <div class="amount-side">
+            <input
+              id="amountIn"
+              class="amount-input"
+              type="number"
+              inputmode="decimal"
+              placeholder="0.0"
+              oninput="handleAmountInput()"
+              onfocus="updateQuickAmountsVisibility()"
+              onblur="handleAmountBlur()"
+            />
+
+            <div class="quick-amounts" id="quickAmounts">
+              <button class="quick-btn" type="button" onclick="setPercentageAmount(25)">25%</button>
+              <button class="quick-btn" type="button" onclick="setPercentageAmount(50)">50%</button>
+              <button class="quick-btn" type="button" onclick="setPercentageAmount(75)">75%</button>
+              <button class="quick-btn" type="button" onclick="setPercentageAmount(100)">Máx.</button>
+            </div>
+          </div>
+
           <button class="token-pill" id="tokenInBtn" onclick="toggleDirection()">
             <img id="tokenInIcon" class="token-icon" src="./Usdc.png" alt="USDC">
             <span id="tokenInText">USDC</span>
@@ -542,6 +594,66 @@
       btn.innerText = userAddress ? "Disconnect" : "Connect Wallet";
     }
 
+    function updateQuickAmountsVisibility() {
+      const input = document.getElementById("amountIn");
+      const quick = document.getElementById("quickAmounts");
+      const hasFocus = document.activeElement === input;
+      const hasValue = input.value && Number(input.value) > 0;
+
+      if (hasFocus || hasValue) {
+        quick.classList.add("show");
+      } else {
+        quick.classList.remove("show");
+      }
+    }
+
+    function handleAmountBlur() {
+      setTimeout(() => {
+        updateQuickAmountsVisibility();
+      }, 120);
+    }
+
+    async function getTokenInBalance() {
+      if (!provider || !userAddress) return null;
+      const tokenIn = new ethers.Contract(getTokenInAddress(), ERC20_ABI, provider);
+      const [balInRaw, decIn] = await Promise.all([
+        tokenIn.balanceOf(userAddress),
+        tokenIn.decimals()
+      ]);
+      return {
+        raw: balInRaw,
+        decimals: decIn,
+        formatted: ethers.utils.formatUnits(balInRaw, decIn)
+      };
+    }
+
+    async function setPercentageAmount(percent) {
+      if (!provider || !userAddress) {
+        setStatus("Conecte a wallet primeiro.");
+        return;
+      }
+
+      try {
+        const balanceData = await getTokenInBalance();
+        if (!balanceData) return;
+
+        const balanceNum = Number(balanceData.formatted);
+        if (!balanceNum || balanceNum <= 0) {
+          document.getElementById("amountIn").value = "";
+          await handleAmountInput();
+          return;
+        }
+
+        const selectedAmount = (balanceNum * percent) / 100;
+        document.getElementById("amountIn").value = selectedAmount.toFixed(6).replace(/\.?0+$/, "");
+        await handleAmountInput();
+        document.getElementById("amountIn").focus();
+      } catch (err) {
+        console.error(err);
+        setStatus("Não foi possível preencher a porcentagem.");
+      }
+    }
+
     function clearWalletUI() {
       userAddress = null;
       signer = null;
@@ -556,6 +668,7 @@
       document.getElementById("minReceivedStatus").innerText = "-";
       document.getElementById("networkStatus").innerText = "-";
       document.getElementById("networkWarning").style.display = "none";
+      updateQuickAmountsVisibility();
       updateSwapButton();
       setStatus("Wallet desconectada.");
     }
@@ -576,6 +689,7 @@
       document.getElementById("amountOut").value = "";
       document.getElementById("priceStatus").innerText = "-";
       document.getElementById("minReceivedStatus").innerText = "-";
+      updateQuickAmountsVisibility();
       updateSwapButton();
       if (userAddress) {
         refreshBalances();
@@ -712,6 +826,8 @@
 
         document.getElementById("balanceOut").innerText =
           `Balance: ${balOut.toLocaleString("pt-BR", { maximumFractionDigits: 4 })} ${getTokenOutLabel()}`;
+
+        updateQuickAmountsVisibility();
       } catch (err) {
         console.error(err);
         setStatus("Erro ao ler saldos.");
@@ -729,6 +845,7 @@
 
     async function handleAmountInput() {
       updateSwapButton();
+      updateQuickAmountsVisibility();
 
       const amountText = document.getElementById("amountIn").value;
       const output = document.getElementById("amountOut");
@@ -824,6 +941,7 @@
         document.getElementById("amountOut").value = "";
         document.getElementById("priceStatus").innerText = "-";
         document.getElementById("minReceivedStatus").innerText = "-";
+        updateQuickAmountsVisibility();
         await refreshBalances();
         updateSwapButton();
       } catch (err) {
@@ -855,6 +973,7 @@
 
     updateDirectionUI();
     updateWalletButton();
+    updateQuickAmountsVisibility();
   </script>
 </body>
 </html>
