@@ -15,19 +15,10 @@
       --bg-top: #06122c;
       --bg-mid: #0a234f;
       --bg-bottom: #121a35;
-
       --card-bg: rgba(10, 16, 34, 0.92);
-      --box-bg: rgba(14, 22, 44, 0.96);
-      --box-border: rgba(117, 146, 212, 0.18);
-
       --text-main: #f3f7ff;
       --text-soft: #b8c6e6;
       --text-dim: #86a0d3;
-
-      --arc-blue: #2f6bff;
-      --arc-lilac: #9a8cff;
-
-      --shadow-blue: rgba(47, 107, 255, 0.28);
       --shadow-soft: rgba(9, 18, 38, 0.55);
     }
 
@@ -63,7 +54,6 @@
       flex-direction: column;
       align-items: flex-start;
       flex: 1;
-      margin-top: 0;
       margin-left: -2px;
     }
 
@@ -88,17 +78,14 @@
       font-weight: 800;
       line-height: 0.95;
       letter-spacing: 0.2px;
-      margin-top: 0;
     }
 
     .brand-retro {
       color: #eef4ff;
-      text-shadow: 0 0 10px rgba(89, 183, 255, 0.08);
     }
 
     .brand-dex {
       color: #59b7ff;
-      text-shadow: 0 0 12px rgba(89, 183, 255, 0.14);
     }
 
     .sub {
@@ -118,12 +105,7 @@
       cursor: pointer;
       box-shadow: 0 10px 22px rgba(47, 107, 255, 0.22);
       white-space: nowrap;
-      transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
       margin-top: 2px;
-    }
-
-    .wallet-btn:hover {
-      box-shadow: 0 12px 26px rgba(47, 107, 255, 0.28);
     }
 
     .wallet-btn:active {
@@ -162,16 +144,6 @@
       color: #fff;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 10px 22px rgba(255, 123, 114, 0.18);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .switch-network-btn:hover {
-      box-shadow: 0 12px 26px rgba(255, 123, 114, 0.24);
-    }
-
-    .switch-network-btn:active {
-      transform: scale(0.99);
     }
 
     .swap-box {
@@ -192,10 +164,15 @@
       font-size: 13px;
     }
 
+    .row-top-pay {
+      align-items: center;
+      justify-content: space-between;
+    }
+
     .amount-row {
       display: flex;
       gap: 12px;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
     }
 
@@ -204,7 +181,14 @@
       min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+    }
+
+    .token-side {
+      min-width: 152px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
     }
 
     .amount-input {
@@ -226,8 +210,9 @@
 
     .quick-amounts {
       display: none;
-      gap: 8px;
-      flex-wrap: wrap;
+      gap: 6px;
+      flex-wrap: nowrap;
+      align-items: center;
     }
 
     .quick-amounts.show {
@@ -235,23 +220,20 @@
     }
 
     .quick-btn {
-      border: 1px solid rgba(119, 170, 255, 0.16);
-      background: linear-gradient(180deg, rgba(25, 38, 76, 0.98), rgba(18, 29, 58, 0.98));
-      color: #e6eeff;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      background: rgba(255, 255, 255, 0.06);
+      color: #f3f7ff;
       border-radius: 999px;
-      padding: 7px 12px;
+      padding: 4px 10px;
+      height: 30px;
       cursor: pointer;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
-      transition: all 0.15s ease;
+      line-height: 1;
     }
 
     .quick-btn:active {
       transform: scale(0.97);
-    }
-
-    .quick-btn:hover {
-      box-shadow: 0 0 14px rgba(79, 134, 255, 0.18);
     }
 
     .token-pill {
@@ -279,6 +261,14 @@
       object-fit: cover;
       flex-shrink: 0;
       box-shadow: 0 0 12px rgba(79, 134, 255, 0.18);
+    }
+
+    .balance-under-token {
+      text-align: right;
+      display: block;
+      padding-right: 6px;
+      font-size: 12px;
+      color: var(--text-dim);
     }
 
     .switch-wrap {
@@ -354,21 +344,10 @@
       padding: 16px;
       font-size: 16px;
       font-weight: 800;
-      letter-spacing: 0.2px;
       cursor: pointer;
       color: #f7fbff;
-      text-shadow: 0 1px 10px rgba(255, 255, 255, 0.08);
       background: linear-gradient(135deg, #123fd5 0%, #1f59f3 36%, #3f87ff 72%, #6ba8ff 100%);
       box-shadow: 0 14px 30px rgba(29, 86, 242, 0.24);
-      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
-    }
-
-    .main-btn:hover {
-      box-shadow: 0 16px 34px rgba(29, 86, 242, 0.30);
-    }
-
-    .main-btn:active {
-      transform: scale(0.99);
     }
 
     .main-btn:disabled {
@@ -422,9 +401,15 @@
       </div>
 
       <div class="swap-box">
-        <div class="row-top">
+        <div class="row-top row-top-pay">
           <span>You pay</span>
-          <span class="mini" id="balanceIn">Balance: -</span>
+
+          <div class="quick-amounts" id="quickAmounts">
+            <button class="quick-btn" type="button" onclick="setPercentageAmount(25)">25%</button>
+            <button class="quick-btn" type="button" onclick="setPercentageAmount(50)">50%</button>
+            <button class="quick-btn" type="button" onclick="setPercentageAmount(75)">75%</button>
+            <button class="quick-btn" type="button" onclick="setPercentageAmount(100)">Máx.</button>
+          </div>
         </div>
 
         <div class="amount-row">
@@ -439,19 +424,15 @@
               onfocus="updateQuickAmountsVisibility()"
               onblur="handleAmountBlur()"
             />
-
-            <div class="quick-amounts" id="quickAmounts">
-              <button class="quick-btn" type="button" onclick="setPercentageAmount(25)">25%</button>
-              <button class="quick-btn" type="button" onclick="setPercentageAmount(50)">50%</button>
-              <button class="quick-btn" type="button" onclick="setPercentageAmount(75)">75%</button>
-              <button class="quick-btn" type="button" onclick="setPercentageAmount(100)">Máx.</button>
-            </div>
           </div>
 
-          <button class="token-pill" id="tokenInBtn" onclick="toggleDirection()">
-            <img id="tokenInIcon" class="token-icon" src="./Usdc.png" alt="USDC">
-            <span id="tokenInText">USDC</span>
-          </button>
+          <div class="token-side">
+            <button class="token-pill" id="tokenInBtn" onclick="toggleDirection()">
+              <img id="tokenInIcon" class="token-icon" src="./Usdc.png" alt="USDC">
+              <span id="tokenInText">USDC</span>
+            </button>
+            <span class="balance-under-token" id="balanceIn">Balance: -</span>
+          </div>
         </div>
       </div>
 
@@ -615,11 +596,13 @@
 
     async function getTokenInBalance() {
       if (!provider || !userAddress) return null;
+
       const tokenIn = new ethers.Contract(getTokenInAddress(), ERC20_ABI, provider);
       const [balInRaw, decIn] = await Promise.all([
         tokenIn.balanceOf(userAddress),
         tokenIn.decimals()
       ]);
+
       return {
         raw: balInRaw,
         decimals: decIn,
@@ -691,6 +674,7 @@
       document.getElementById("minReceivedStatus").innerText = "-";
       updateQuickAmountsVisibility();
       updateSwapButton();
+
       if (userAddress) {
         refreshBalances();
       }
@@ -976,4 +960,4 @@
     updateQuickAmountsVisibility();
   </script>
 </body>
-</html>
+  </html>
