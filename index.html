@@ -181,6 +181,7 @@
       padding: 15px;
       margin-bottom: 10px;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+      position: relative;
     }
 
     .row-top {
@@ -190,6 +191,46 @@
       margin-bottom: 10px;
       color: var(--text-soft);
       font-size: 13px;
+      gap: 10px;
+    }
+
+    .row-top-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .amount-quick-row {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .amount-quick-row.show {
+      display: flex;
+    }
+
+    .quick-btn {
+      border: 1px solid rgba(119, 170, 255, 0.16);
+      background: linear-gradient(180deg, rgba(25, 38, 76, 0.98), rgba(18, 29, 58, 0.98));
+      color: #e6eeff;
+      border-radius: 999px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+      transition: all 0.15s ease;
+    }
+
+    .quick-btn:hover,
+    .quick-btn:active {
+      background: linear-gradient(135deg, #245fff 0%, #4f86ff 55%, #7fa0ff 100%);
+      border-color: transparent;
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(79, 134, 255, 0.22);
     }
 
     .amount-row {
@@ -356,6 +397,17 @@
       font-size: 12px;
       color: var(--text-dim);
     }
+
+    @media (max-width: 430px) {
+      .amount-quick-row {
+        gap: 5px;
+      }
+
+      .quick-btn {
+        padding: 6px 9px;
+        font-size: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -381,9 +433,17 @@
         </button>
       </div>
 
-      <div class="swap-box">
+      <div class="swap-box" id="payBox">
         <div class="row-top">
-          <span>You pay</span>
+          <div class="row-top-left">
+            <span>You pay</span>
+          </div>
+          <div class="amount-quick-row" id="quickAmountRow">
+            <button class="quick-btn" onclick="setPercentageAmount(25)">25%</button>
+            <button class="quick-btn" onclick="setPercentageAmount(50)">50%</button>
+            <button class="quick-btn" onclick="setPercentageAmount(75)">75%</button>
+            <button class="quick-btn" onclick="setPercentageAmount(100)">Máx.</button>
+          </div>
           <span class="mini" id="balanceIn">Balance: -</span>
         </div>
 
@@ -395,6 +455,7 @@
             inputmode="decimal"
             placeholder="0.0"
             oninput="handleAmountInput()"
+            onfocus="showQuickAmounts()"
           />
           <button class="token-pill" id="tokenInBtn" onclick="toggleDirection()">
             <img id="tokenInIcon" class="token-icon" src="./Usdc.png" alt="USDC">
@@ -499,6 +560,8 @@
     let userAddress = null;
     let direction = "USDC_TO_GAMEOVER";
     let slippagePercent = 1;
+    let lastBalanceIn = null;
+    let lastDecimalsIn = null;
 
     function getTokenInAddress() {
       return direction === "USDC_TO_GAMEOVER" ? USDC_ADDRESS : GAMEOVER_ADDRESS;
@@ -542,319 +605,30 @@
       btn.innerText = userAddress ? "Disconnect" : "Connect Wallet";
     }
 
-    function clearWalletUI() {
-      userAddress = null;
-      signer = null;
-      provider = null;
-      document.getElementById("walletStatus").innerText = "-";
-      document.getElementById("walletBtn").innerText = "Connect Wallet";
-      document.getElementById("balanceIn").innerText = "Balance: -";
-      document.getElementById("balanceOut").innerText = "Balance: -";
-      document.getElementById("amountIn").value = "";
-      document.getElementById("amountOut").value = "";
-      document.getElementById("priceStatus").innerText = "-";
-      document.getElementById("minReceivedStatus").innerText = "-";
-      document.getElementById("networkStatus").innerText = "-";
-      document.getElementById("networkWarning").style.display = "none";
-      updateSwapButton();
-      setStatus("Wallet desconectada.");
+    function showQuickAmounts() {
+      document.getElementById("quickAmountRow").classList.add("show");
     }
 
-    async function handleWalletButton() {
-      if (userAddress) {
-        clearWalletUI();
-        return;
-      }
-      await connectWallet();
+    function hideQuickAmounts() {
+      document.getElementById("quickAmountRow").classList.remove("show");
     }
 
-    function updateDirectionUI() {
-      document.getElementById("tokenInText").innerText = getTokenInLabel();
-      document.getElementById("tokenOutText").innerText = getTokenOutLabel();
-      document.getElementById("tokenInIcon").src = getTokenInIcon();
-      document.getElementById("tokenOutIcon").src = getTokenOutIcon();
-      document.getElementById("amountOut").value = "";
-      document.getElementById("priceStatus").innerText = "-";
-      document.getElementById("minReceivedStatus").innerText = "-";
-      updateSwapButton();
-      if (userAddress) {
-        refreshBalances();
-      }
+    function trimTrailingZeros(value) {
+      if (!value.includes(".")) return value;
+      return value.replace(/\.?0+$/, "");
     }
 
-    function updateSwapButton() {
-      const amount = document.getElementById("amountIn").value;
-      const btn = document.getElementById("swapBtn");
-
-      if (!userAddress) {
-        btn.disabled = true;
-        btn.innerText = "Connect Wallet";
-        return;
-      }
-
-      if (!amount || Number(amount) <= 0) {
-        btn.disabled = true;
-        btn.innerText = "Enter amount";
-        return;
-      }
-
-      btn.disabled = false;
-      btn.innerText = `Swap ${getTokenInLabel()} for ${getTokenOutLabel()}`;
-    }
-
-    function setSlippage(value) {
-      slippagePercent = value;
-      document.getElementById("slippageStatus").innerText = `${value}%`;
-
-      document.querySelectorAll(".slippage-btn").forEach((btn) => {
-        btn.classList.remove("active");
-      });
-
-      if (value === 1) document.getElementById("slippage1").classList.add("active");
-      if (value === 0.5) document.getElementById("slippage05").classList.add("active");
-      if (value === 2) document.getElementById("slippage2").classList.add("active");
-
-      handleAmountInput();
-    }
-
-    async function switchToArc() {
-      if (!window.ethereum) {
-        alert("Abra no navegador da MetaMask.");
-        return;
-      }
+    async function setPercentageAmount(percent) {
+      if (!userAddress || lastBalanceIn === null || lastDecimalsIn === null) return;
 
       try {
-        await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: ARC_CHAIN_ID_HEX }]
-        });
-      } catch (switchError) {
-        if (switchError.code === 4902) {
-          try {
-            await window.ethereum.request({
-              method: "wallet_addEthereumChain",
-              params: [{
-                chainId: ARC_CHAIN_ID_HEX,
-                chainName: "Arc Testnet",
-                nativeCurrency: {
-                  name: "USDC",
-                  symbol: "USDC",
-                  decimals: 18
-                },
-                rpcUrls: ["https://rpc.testnet.arc.network"],
-                blockExplorerUrls: ["https://testnet.arcscan.app"]
-              }]
-            });
-          } catch (addError) {
-            console.error(addError);
-            setStatus("Não foi possível adicionar a Arc Testnet.");
-          }
+        let selectedRaw;
+
+        if (percent === 100) {
+          selectedRaw = lastBalanceIn;
         } else {
-          console.error(switchError);
-          setStatus("Não foi possível trocar para a Arc Testnet.");
-        }
-      }
-    }
-
-    async function connectWallet() {
-      if (!window.ethereum) {
-        alert("Abra no navegador da MetaMask.");
-        return;
-      }
-
-      try {
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        await provider.send("eth_requestAccounts", []);
-        signer = provider.getSigner();
-        userAddress = await signer.getAddress();
-
-        const network = await provider.getNetwork();
-        document.getElementById("networkStatus").innerText =
-          Number(network.chainId) === ARC_CHAIN_ID
-            ? "Arc Testnet"
-            : `${network.name || "Unknown"} (${network.chainId})`;
-
-        document.getElementById("walletStatus").innerText = shortAddress(userAddress);
-        updateWalletButton();
-
-        const isArc = Number(network.chainId) === ARC_CHAIN_ID;
-        document.getElementById("networkWarning").style.display = isArc ? "none" : "block";
-
-        await refreshBalances();
-        updateSwapButton();
-        await handleAmountInput();
-        setStatus("Wallet conectada.");
-      } catch (err) {
-        console.error(err);
-        setStatus("Erro ao conectar wallet.");
-      }
-    }
-
-    async function refreshBalances() {
-      if (!provider || !userAddress) return;
-
-      try {
-        const tokenIn = new ethers.Contract(getTokenInAddress(), ERC20_ABI, provider);
-        const tokenOut = new ethers.Contract(getTokenOutAddress(), ERC20_ABI, provider);
-
-        const [balInRaw, balOutRaw, decIn, decOut] = await Promise.all([
-          tokenIn.balanceOf(userAddress),
-          tokenOut.balanceOf(userAddress),
-          tokenIn.decimals(),
-          tokenOut.decimals()
-        ]);
-
-        const balIn = Number(ethers.utils.formatUnits(balInRaw, decIn));
-        const balOut = Number(ethers.utils.formatUnits(balOutRaw, decOut));
-
-        document.getElementById("balanceIn").innerText =
-          `Balance: ${balIn.toLocaleString("pt-BR", { maximumFractionDigits: 4 })} ${getTokenInLabel()}`;
-
-        document.getElementById("balanceOut").innerText =
-          `Balance: ${balOut.toLocaleString("pt-BR", { maximumFractionDigits: 4 })} ${getTokenOutLabel()}`;
-      } catch (err) {
-        console.error(err);
-        setStatus("Erro ao ler saldos.");
-      }
-    }
-
-    function toggleDirection() {
-      direction = direction === "USDC_TO_GAMEOVER"
-        ? "GAMEOVER_TO_USDC"
-        : "USDC_TO_GAMEOVER";
-
-      updateDirectionUI();
-      handleAmountInput();
-    }
-
-    async function handleAmountInput() {
-      updateSwapButton();
-
-      const amountText = document.getElementById("amountIn").value;
-      const output = document.getElementById("amountOut");
-
-      if (!amountText || Number(amountText) <= 0 || !provider) {
-        output.value = "";
-        document.getElementById("priceStatus").innerText = "-";
-        document.getElementById("minReceivedStatus").innerText = "-";
-        return;
-      }
-
-      try {
-        const pair = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, provider);
-        const tokenInAddress = getTokenInAddress();
-        const decIn = await getTokenDecimals(tokenInAddress);
-
-        const amountIn = ethers.utils.parseUnits(amountText, decIn);
-        const amountOutRaw = await pair.getAmountOut(tokenInAddress, amountIn);
-
-        const decOut = await getTokenDecimals(getTokenOutAddress());
-        const amountOut = ethers.utils.formatUnits(amountOutRaw, decOut);
-        const amountOutNum = Number(amountOut);
-        const amountInNum = Number(amountText);
-
-        output.value = amountOutNum.toLocaleString("pt-BR", {
-          maximumFractionDigits: 6
-        });
-
-        if (amountInNum > 0 && amountOutNum > 0) {
-          const price = amountOutNum / amountInNum;
-          const minReceived = amountOutNum * (1 - slippagePercent / 100);
-
-          document.getElementById("priceStatus").innerText =
-            `1 ${getTokenInLabel()} = ${price.toLocaleString("pt-BR", {
-              maximumFractionDigits: 6
-            })} ${getTokenOutLabel()}`;
-
-          document.getElementById("minReceivedStatus").innerText =
-            `${minReceived.toLocaleString("pt-BR", {
-              maximumFractionDigits: 6
-            })} ${getTokenOutLabel()}`;
-        }
-      } catch (err) {
-        console.error(err);
-        output.value = "";
-        document.getElementById("priceStatus").innerText = "-";
-        document.getElementById("minReceivedStatus").innerText = "-";
-        setStatus("Não foi possível calcular o valor de saída.");
-      }
-    }
-
-    async function executeSwap() {
-      if (!window.ethereum) {
-        alert("Abra no navegador da MetaMask.");
-        return;
-      }
-
-      if (!userAddress) {
-        await connectWallet();
-        return;
-      }
-
-      try {
-        const network = await provider.getNetwork();
-        if (Number(network.chainId) !== ARC_CHAIN_ID) {
-          alert("Troque para a Arc Testnet.");
-          return;
+          selectedRaw = lastBalanceIn.mul(percent).div(100);
         }
 
-        const amountText = document.getElementById("amountIn").value;
-        if (!amountText || Number(amountText) <= 0) {
-          alert("Digite um valor.");
-          return;
-        }
-
-        const tokenInAddress = getTokenInAddress();
-        const decIn = await getTokenDecimals(tokenInAddress);
-        const amountIn = ethers.utils.parseUnits(amountText, decIn);
-
-        const tokenIn = new ethers.Contract(tokenInAddress, ERC20_ABI, signer);
-        const pair = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, signer);
-
-        setStatus(`Aprovando ${getTokenInLabel()}...`);
-        const approveTx = await tokenIn.approve(PAIR_ADDRESS, amountIn);
-        await approveTx.wait();
-
-        setStatus(`Fazendo swap ${getTokenInLabel()} → ${getTokenOutLabel()}...`);
-        const swapTx = await pair.swap(tokenInAddress, amountIn);
-        await swapTx.wait();
-
-        setStatus("Swap concluído com sucesso 🚀");
-        document.getElementById("amountIn").value = "";
-        document.getElementById("amountOut").value = "";
-        document.getElementById("priceStatus").innerText = "-";
-        document.getElementById("minReceivedStatus").innerText = "-";
-        await refreshBalances();
-        updateSwapButton();
-      } catch (err) {
-        console.error(err);
-        setStatus("Erro no swap. Veja o console ou tente de novo.");
-        alert("Erro no swap.");
-      }
-    }
-
-    if (window.ethereum) {
-      window.ethereum.on("accountsChanged", async (accounts) => {
-        if (!accounts.length) {
-          clearWalletUI();
-          return;
-        }
-
-        userAddress = accounts[0];
-        signer = provider ? provider.getSigner() : null;
-        document.getElementById("walletStatus").innerText = shortAddress(userAddress);
-        updateWalletButton();
-        await refreshBalances();
-        await handleAmountInput();
-      });
-
-      window.ethereum.on("chainChanged", () => {
-        window.location.reload();
-      });
-    }
-
-    updateDirectionUI();
-    updateWalletButton();
-  </script>
-</body>
-</html>
+        const formatted = ethers.utils.formatUnits(selectedRaw, lastDecimalsIn);
+        const cleaned = trimTrailingZeros
