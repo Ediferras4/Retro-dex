@@ -434,7 +434,7 @@
           <img src="./retro-face.png" alt="Retro DEX" class="brand-face" />
           <div class="brand"><span class="brand-retro">Retro</span> <span class="brand-dex">DEX</span></div>
         </div>
-        <div class="sub">USDC ⇄ GAMEOVER · Arc Testnet</div>
+        <div class="sub">USDC ⇄ ORBIT · Arc Testnet</div>
       </div>
       <button class="wallet-btn" onclick="handleWalletButton()" id="walletBtn">
         Connect Wallet
@@ -504,8 +504,8 @@
             disabled
           />
           <button class="token-pill" id="tokenOutBtn" onclick="toggleDirection()">
-            <img id="tokenOutIcon" class="token-icon" src="./gameover.png" alt="GAMEOVER" />
-            <span id="tokenOutText">GAMEOVER</span>
+            <img id="tokenOutIcon" class="token-icon" src="./orbit.png" alt="ORBIT" />
+            <span id="tokenOutText">ORBIT</span>
           </button>
         </div>
       </div>
@@ -552,12 +552,13 @@
   <script>
     const ARC_CHAIN_ID = 5042002;
     const ARC_CHAIN_ID_HEX = "0x4cef52";
+
     const USDC_ADDRESS = "0x3600000000000000000000000000000000000000";
-    const GAMEOVER_ADDRESS = "0x706abf10e96a1bb91F8F82740fcfABDa0F940843";
-    const PAIR_ADDRESS = "0xF55Abd9674b7faEF659cA7b01467324CFb731D6d";
+    const ORBIT_ADDRESS = "0x56e2a33050D671CB1A9080feF7f7c15e5D4a9D26";
+    const PAIR_ADDRESS = "0xdc6DdD6aFA8FdEFf8e95b613730c2a0d95Fa27B8";
 
     const USDC_ICON = "./Usdc.png";
-    const GAMEOVER_ICON = "./gameover.png";
+    const ORBIT_ICON = "./orbit.png";
 
     const ERC20_ABI = [
       "function approve(address spender, uint256 amount) returns (bool)",
@@ -579,31 +580,31 @@
     let provider;
     let signer;
     let userAddress = null;
-    let direction = "USDC_TO_GAMEOVER";
+    let direction = "USDC_TO_ORBIT";
     let slippagePercent = 1;
 
     function getTokenInAddress() {
-      return direction === "USDC_TO_GAMEOVER" ? USDC_ADDRESS : GAMEOVER_ADDRESS;
+      return direction === "USDC_TO_ORBIT" ? USDC_ADDRESS : ORBIT_ADDRESS;
     }
 
     function getTokenOutAddress() {
-      return direction === "USDC_TO_GAMEOVER" ? GAMEOVER_ADDRESS : USDC_ADDRESS;
+      return direction === "USDC_TO_ORBIT" ? ORBIT_ADDRESS : USDC_ADDRESS;
     }
 
     function getTokenInLabel() {
-      return direction === "USDC_TO_GAMEOVER" ? "USDC" : "GAMEOVER";
+      return direction === "USDC_TO_ORBIT" ? "USDC" : "ORBIT";
     }
 
     function getTokenOutLabel() {
-      return direction === "USDC_TO_GAMEOVER" ? "GAMEOVER" : "USDC";
+      return direction === "USDC_TO_ORBIT" ? "ORBIT" : "USDC";
     }
 
     function getTokenInIcon() {
-      return direction === "USDC_TO_GAMEOVER" ? USDC_ICON : GAMEOVER_ICON;
+      return direction === "USDC_TO_ORBIT" ? USDC_ICON : ORBIT_ICON;
     }
 
     function getTokenOutIcon() {
-      return direction === "USDC_TO_GAMEOVER" ? GAMEOVER_ICON : USDC_ICON;
+      return direction === "USDC_TO_ORBIT" ? ORBIT_ICON : USDC_ICON;
     }
 
     async function getTokenDecimals(tokenAddress) {
@@ -619,21 +620,28 @@
       return addr ? addr.slice(0, 6) + "..." + addr.slice(-4) : "-";
     }
 
-    function formatPlainNumber(value, maxDecimals = 6) {
+    function formatDisplayNumber(value) {
       const num = Number(value);
 
-      if (!Number.isFinite(num)) return "";
+      if (!Number.isFinite(num)) return "-";
       if (num === 0) return "0";
 
-      let decimals = maxDecimals;
-
-      if (Math.abs(num) < 1) {
-        decimals = Math.max(maxDecimals, 8);
-      } else if (Math.abs(num) >= 1000) {
-        decimals = Math.min(maxDecimals, 4);
+      if (Math.abs(num) >= 1000) {
+        return num.toFixed(4).replace(/\.?0+$/, "");
       }
 
-      return num.toFixed(decimals).replace(/\.?0+$/, "");
+      if (Math.abs(num) >= 1) {
+        return num.toFixed(6).replace(/\.?0+$/, "");
+      }
+
+      return num.toFixed(8).replace(/\.?0+$/, "");
+    }
+
+    function formatBalanceNumber(value) {
+      const num = Number(value);
+
+      if (!Number.isFinite(num)) return "-";
+      return num.toLocaleString("pt-BR", { maximumFractionDigits: 4 });
     }
 
     function updateWalletButton() {
@@ -694,7 +702,7 @@
         }
 
         const selectedAmount = (balanceNum * percent) / 100;
-        document.getElementById("amountIn").value = formatPlainNumber(selectedAmount, 8);
+        document.getElementById("amountIn").value = formatDisplayNumber(selectedAmount);
         await handleAmountInput();
         document.getElementById("amountIn").focus();
       } catch (err) {
@@ -735,6 +743,8 @@
       document.getElementById("tokenOutText").innerText = getTokenOutLabel();
       document.getElementById("tokenInIcon").src = getTokenInIcon();
       document.getElementById("tokenOutIcon").src = getTokenOutIcon();
+      document.getElementById("tokenInIcon").alt = getTokenInLabel();
+      document.getElementById("tokenOutIcon").alt = getTokenOutLabel();
       document.getElementById("amountOut").value = "";
       document.getElementById("priceStatus").innerText = "-";
       document.getElementById("minReceivedStatus").innerText = "-";
@@ -803,7 +813,7 @@
                 nativeCurrency: {
                   name: "USDC",
                   symbol: "USDC",
-                  decimals: 18
+                  decimals: 6
                 },
                 rpcUrls: ["https://rpc.testnet.arc.network"],
                 blockExplorerUrls: ["https://testnet.arcscan.app"]
@@ -872,10 +882,10 @@
         const balOut = Number(ethers.utils.formatUnits(balOutRaw, decOut));
 
         document.getElementById("balanceIn").innerText =
-          `Balance: ${balIn.toLocaleString("pt-BR", { maximumFractionDigits: 4 })} ${getTokenInLabel()}`;
+          `Balance: ${formatBalanceNumber(balIn)} ${getTokenInLabel()}`;
 
         document.getElementById("balanceOut").innerText =
-          `Balance: ${balOut.toLocaleString("pt-BR", { maximumFractionDigits: 4 })} ${getTokenOutLabel()}`;
+          `Balance: ${formatBalanceNumber(balOut)} ${getTokenOutLabel()}`;
 
         updateQuickAmountsVisibility();
       } catch (err) {
@@ -885,9 +895,9 @@
     }
 
     function toggleDirection() {
-      direction = direction === "USDC_TO_GAMEOVER"
-        ? "GAMEOVER_TO_USDC"
-        : "USDC_TO_GAMEOVER";
+      direction = direction === "USDC_TO_ORBIT"
+        ? "ORBIT_TO_USDC"
+        : "USDC_TO_ORBIT";
 
       updateDirectionUI();
       handleAmountInput();
@@ -921,17 +931,17 @@
         const amountOutNum = Number(amountOut);
         const amountInNum = Number(amountText);
 
-        output.value = formatPlainNumber(amountOutNum, 8);
+        output.value = formatDisplayNumber(amountOutNum);
 
         if (amountInNum > 0 && amountOutNum > 0) {
           const price = amountOutNum / amountInNum;
           const minReceived = amountOutNum * (1 - slippagePercent / 100);
 
           document.getElementById("priceStatus").innerText =
-            `1 ${getTokenInLabel()} = ${formatPlainNumber(price, 8)} ${getTokenOutLabel()}`;
+            `1 ${getTokenInLabel()} = ${formatDisplayNumber(price)} ${getTokenOutLabel()}`;
 
           document.getElementById("minReceivedStatus").innerText =
-            `${formatPlainNumber(minReceived, 8)} ${getTokenOutLabel()}`;
+            `${formatDisplayNumber(minReceived)} ${getTokenOutLabel()}`;
 
           setStatus("");
         }
@@ -1023,4 +1033,4 @@
     updateQuickAmountsVisibility();
   </script>
 </body>
-</html>
+              </html>
