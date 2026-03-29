@@ -619,6 +619,23 @@
       return addr ? addr.slice(0, 6) + "..." + addr.slice(-4) : "-";
     }
 
+    function formatPlainNumber(value, maxDecimals = 6) {
+      const num = Number(value);
+
+      if (!Number.isFinite(num)) return "";
+      if (num === 0) return "0";
+
+      let decimals = maxDecimals;
+
+      if (Math.abs(num) < 1) {
+        decimals = Math.max(maxDecimals, 8);
+      } else if (Math.abs(num) >= 1000) {
+        decimals = Math.min(maxDecimals, 4);
+      }
+
+      return num.toFixed(decimals).replace(/\.?0+$/, "");
+    }
+
     function updateWalletButton() {
       const btn = document.getElementById("walletBtn");
       btn.innerText = userAddress ? "Disconnect" : "Connect Wallet";
@@ -677,7 +694,7 @@
         }
 
         const selectedAmount = (balanceNum * percent) / 100;
-        document.getElementById("amountIn").value = selectedAmount.toFixed(6).replace(/\.?0+$/, "");
+        document.getElementById("amountIn").value = formatPlainNumber(selectedAmount, 8);
         await handleAmountInput();
         document.getElementById("amountIn").focus();
       } catch (err) {
@@ -887,6 +904,7 @@
         output.value = "";
         document.getElementById("priceStatus").innerText = "-";
         document.getElementById("minReceivedStatus").innerText = "-";
+        setStatus("");
         return;
       }
 
@@ -903,23 +921,19 @@
         const amountOutNum = Number(amountOut);
         const amountInNum = Number(amountText);
 
-        output.value = amountOutNum.toLocaleString("pt-BR", {
-          maximumFractionDigits: 6
-        });
+        output.value = formatPlainNumber(amountOutNum, 8);
 
         if (amountInNum > 0 && amountOutNum > 0) {
           const price = amountOutNum / amountInNum;
           const minReceived = amountOutNum * (1 - slippagePercent / 100);
 
           document.getElementById("priceStatus").innerText =
-            `1 ${getTokenInLabel()} = ${price.toLocaleString("pt-BR", {
-              maximumFractionDigits: 6
-            })} ${getTokenOutLabel()}`;
+            `1 ${getTokenInLabel()} = ${formatPlainNumber(price, 8)} ${getTokenOutLabel()}`;
 
           document.getElementById("minReceivedStatus").innerText =
-            `${minReceived.toLocaleString("pt-BR", {
-              maximumFractionDigits: 6
-            })} ${getTokenOutLabel()}`;
+            `${formatPlainNumber(minReceived, 8)} ${getTokenOutLabel()}`;
+
+          setStatus("");
         }
       } catch (err) {
         console.error(err);
