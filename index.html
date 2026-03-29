@@ -120,17 +120,25 @@
 }
 
     .wallet-btn {
-  border: none;
+  border: 1px solid rgba(130, 170, 255, 0.18);
   border-radius: 16px;
   padding: 11px 15px;
-  background: linear-gradient(135deg, var(--arc-blue), var(--arc-lilac));
-  color: #fff;
+  background: linear-gradient(135deg, #2e63ff, #7a8dff);
+  color: #f8fbff;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 10px 24px var(--shadow-blue);
+  box-shadow: 0 10px 22px rgba(46, 99, 255, 0.24);
   white-space: nowrap;
-  transition: transform 0.15s ease, opacity 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
   margin-top: 0;
+}
+
+.wallet-btn:active {
+  transform: scale(0.98);
+}
+
+.wallet-btn:hover {
+  box-shadow: 0 12px 26px rgba(46, 99, 255, 0.30);
 }
 
     .wallet-btn:active {
@@ -284,37 +292,57 @@
       flex-wrap: wrap;
     }
 
-    .slippage-btn {
-      border: 1px solid rgba(122, 150, 220, 0.18);
-      background: rgba(26, 37, 74, 0.95);
-      color: var(--text-main);
-      border-radius: 999px;
-      padding: 9px 14px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 700;
-      transition: all 0.15s ease;
-    }
+    
+.slippage-btn {
+  border: 1px solid rgba(122, 150, 220, 0.18);
+  background: linear-gradient(180deg, rgba(24, 37, 74, 0.98), rgba(17, 28, 59, 0.98));
+  color: #dfe8ff;
+  border-radius: 999px;
+  padding: 9px 14px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.15s ease;
+}
 
+.slippage-btn.active {
+  background: linear-gradient(135deg, #2f6bff, #7a8dff);
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(79, 134, 255, 0.24);
+}
     .slippage-btn.active {
       background: linear-gradient(135deg, var(--arc-blue), var(--arc-lilac));
       border-color: transparent;
       box-shadow: 0 0 16px rgba(79, 134, 255, 0.22);
     }
 
-    .main-btn {
-      width: 100%;
-      margin-top: 14px;
-      border: none;
-      border-radius: 18px;
-      padding: 16px;
-      font-size: 16px;
-      font-weight: 800;
-      cursor: pointer;
-      color: #fff;
-      background: linear-gradient(135deg, var(--arc-blue), var(--arc-lilac));
-      box-shadow: 0 12px 28px rgba(47, 107, 255, 0.28);
-    }
+    
+.switch-network-btn {
+  margin-top: 10px;
+  width: 100%;
+  border: none;
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, #ff7b72, #ffb26b);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(255, 123, 114, 0.18);
+}
+.main-btn:hover {
+  box-shadow: 0 16px 34px rgba(47, 107, 255, 0.34);
+}
+
+.main-btn:active {
+  transform: scale(0.99);
+}
+
+.main-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
 
     .main-btn:disabled {
       opacity: 0.55;
