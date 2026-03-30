@@ -17,10 +17,16 @@
       --bg-bottom: #121a35;
       --card-bg: rgba(10, 16, 34, 0.92);
       --box-bg: rgba(14, 22, 44, 0.96);
+      --panel-bg: rgba(13, 21, 43, 0.98);
       --text-main: #f3f7ff;
       --text-soft: #b8c6e6;
       --text-dim: #86a0d3;
       --shadow-soft: rgba(9, 18, 38, 0.55);
+      --arc-blue-1: #123fd5;
+      --arc-blue-2: #1f59f3;
+      --arc-blue-3: #3f87ff;
+      --arc-blue-4: #6ba8ff;
+      --line-soft: rgba(117, 146, 212, 0.16);
     }
 
     body {
@@ -42,43 +48,52 @@
       max-width: 430px;
     }
 
-    .header {
+    .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin-bottom: 10px;
+      padding: 12px 12px 12px 14px;
+      border-radius: 22px;
+      margin-bottom: 12px;
+      background: rgba(10, 16, 34, 0.78);
+      border: 1px solid rgba(98, 127, 197, 0.18);
+      box-shadow:
+        0 18px 34px rgba(9, 18, 38, 0.45),
+        inset 0 1px 0 rgba(255,255,255,0.04);
+      backdrop-filter: blur(12px);
     }
 
     .brand-wrap {
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      flex: 1;
-      margin-left: -2px;
-    }
-
-    .brand-line {
-      display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
     }
 
     .brand-face {
-      width: 104px;
-      height: 104px;
+      width: 68px;
+      height: 68px;
       object-fit: contain;
       display: block;
-      margin-right: -3px;
-      margin-top: -10px;
+      flex-shrink: 0;
       filter: drop-shadow(0 0 14px rgba(86, 160, 255, 0.28));
     }
 
+    .brand-copy {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
     .brand {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 800;
       line-height: 0.95;
       letter-spacing: 0.2px;
+      white-space: nowrap;
     }
 
     .brand-retro {
@@ -90,27 +105,53 @@
     }
 
     .sub {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--text-soft);
-      margin-top: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .menu-btn,
     .wallet-btn {
       border: 1px solid rgba(116, 186, 255, 0.16);
-      border-radius: 15px;
-      padding: 10px 14px;
-      background: linear-gradient(135deg, #1d56f2 0%, #3a78ff 52%, #63a8ff 100%);
-      color: #ffffff;
+      color: #fff;
       font-weight: 700;
-      font-size: 14px;
       cursor: pointer;
-      box-shadow: 0 10px 22px rgba(47, 107, 255, 0.22);
-      white-space: nowrap;
-      margin-top: 2px;
       transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
     }
 
-    .wallet-btn:active {
+    .menu-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: rgba(27, 39, 76, 0.9);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .wallet-btn {
+      border-radius: 15px;
+      padding: 10px 14px;
+      background: linear-gradient(135deg, var(--arc-blue-1) 0%, var(--arc-blue-2) 52%, var(--arc-blue-4) 100%);
+      font-size: 14px;
+      box-shadow: 0 10px 22px rgba(47, 107, 255, 0.22);
+      white-space: nowrap;
+    }
+
+    .wallet-btn:active,
+    .menu-btn:active {
       transform: scale(0.98);
     }
 
@@ -121,6 +162,14 @@
     .wallet-btn:disabled {
       opacity: 0.7;
       cursor: not-allowed;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
     }
 
     .card {
@@ -176,8 +225,6 @@
     }
 
     .row-top-pay {
-      align-items: center;
-      justify-content: space-between;
       min-height: 28px;
     }
 
@@ -391,7 +438,7 @@
       font-weight: 800;
       cursor: pointer;
       color: #f7fbff;
-      background: linear-gradient(135deg, #123fd5 0%, #1f59f3 36%, #3f87ff 72%, #6ba8ff 100%);
+      background: linear-gradient(135deg, var(--arc-blue-1) 0%, var(--arc-blue-2) 36%, var(--arc-blue-3) 72%, var(--arc-blue-4) 100%);
       box-shadow: 0 14px 30px rgba(29, 86, 242, 0.24);
       transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
     }
@@ -429,129 +476,446 @@
       font-size: 12px;
       color: var(--text-dim);
     }
+
+    .token-page-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .token-page-heading {
+      font-size: 20px;
+      font-weight: 800;
+      color: #eef4ff;
+    }
+
+    .token-page-sub {
+      font-size: 12px;
+      color: var(--text-soft);
+      margin-top: 3px;
+    }
+
+    .token-main-card {
+      background: var(--box-bg);
+      border: 1px solid rgba(117, 146, 212, 0.18);
+      border-radius: 24px;
+      padding: 18px;
+      margin-bottom: 12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+    }
+
+    .token-main-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .token-main-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 999px;
+      object-fit: cover;
+      flex-shrink: 0;
+      box-shadow: 0 0 18px rgba(79, 134, 255, 0.20);
+    }
+
+    .token-main-name {
+      font-size: 20px;
+      font-weight: 800;
+      color: #eef4ff;
+    }
+
+    .token-main-symbol {
+      font-size: 13px;
+      color: var(--text-soft);
+      margin-top: 2px;
+    }
+
+    .token-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .info-card {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(117, 146, 212, 0.10);
+      border-radius: 18px;
+      padding: 12px;
+    }
+
+    .info-label {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+
+    .info-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f3f7ff;
+      word-break: break-word;
+    }
+
+    .address-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .small-btn {
+      border: 1px solid rgba(119, 170, 255, 0.16);
+      background: rgba(255,255,255,0.05);
+      color: #e6eeff;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .coming-soon {
+      text-align: center;
+      padding: 26px 16px;
+    }
+
+    .coming-title {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .coming-text {
+      color: var(--text-soft);
+      font-size: 14px;
+    }
+
+    .sheet-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(1, 6, 20, 0.55);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease;
+      z-index: 70;
+    }
+
+    .sheet-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bottom-sheet {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%) translateY(110%);
+      width: min(100%, 430px);
+      padding: 12px 14px calc(14px + env(safe-area-inset-bottom));
+      background: var(--panel-bg);
+      border: 1px solid rgba(117, 146, 212, 0.18);
+      border-bottom: none;
+      border-radius: 24px 24px 0 0;
+      box-shadow: 0 -18px 40px rgba(0,0,0,0.30);
+      transition: transform 0.22s ease;
+      z-index: 80;
+    }
+
+    .bottom-sheet.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .sheet-handle {
+      width: 44px;
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.16);
+      margin: 0 auto 14px;
+    }
+
+    .sheet-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .sheet-item {
+      border: 1px solid rgba(117, 146, 212, 0.14);
+      background: rgba(255,255,255,0.04);
+      border-radius: 18px;
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+    }
+
+    .sheet-item:active {
+      transform: scale(0.98);
+    }
+
+    .sheet-item.active {
+      border-color: rgba(106, 168, 255, 0.34);
+      background: rgba(56, 116, 255, 0.10);
+    }
+
+    .sheet-item-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #f3f7ff;
+    }
+
+    .sheet-item-sub {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 5px;
+    }
+
+    @media (min-width: 768px) {
+      .app {
+        max-width: 560px;
+      }
+
+      .bottom-sheet {
+        width: min(100%, 560px);
+      }
+
+      .card {
+        padding: 20px;
+        border-radius: 32px;
+      }
+
+      .token-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="app">
-    <div class="header">
+    <div class="topbar">
       <div class="brand-wrap">
-        <div class="brand-line">
-          <img src="./retro-face.png" alt="Retro DEX" class="brand-face" />
+        <img src="./retro-face.png" alt="Retro DEX" class="brand-face" id="topLogo" />
+        <div class="brand-copy">
           <div class="brand"><span class="brand-retro">Retro</span> <span class="brand-dex">DEX</span></div>
+          <div class="sub" id="topSub">USDC ⇄ ORBIT · Arc Testnet</div>
         </div>
-        <div class="sub">USDC ⇄ ORBIT · Arc Testnet</div>
       </div>
-      <button class="wallet-btn" onclick="handleWalletButton()" id="walletBtn">
-        Connect Wallet
-      </button>
-    </div>
 
-    <div class="card">
-      <div class="network-warning" id="networkWarning">
-        Você está na rede errada.
-        <button class="switch-network-btn" onclick="switchToArc()">
-          Switch to Arc Testnet
+      <div class="top-actions">
+        <button class="menu-btn" id="menuBtn" onclick="toggleBottomSheet()">☰</button>
+        <button class="wallet-btn" onclick="handleWalletButton()" id="walletBtn">
+          Connect Wallet
         </button>
       </div>
-
-      <div class="swap-box">
-        <div class="row-top row-top-pay">
-          <span>You pay</span>
-
-          <div class="quick-amounts" id="quickAmounts">
-            <button class="quick-btn" type="button" onclick="setPercentageAmount(25)">25%</button>
-            <button class="quick-btn" type="button" onclick="setPercentageAmount(50)">50%</button>
-            <button class="quick-btn" type="button" onclick="setPercentageAmount(75)">75%</button>
-            <button class="quick-btn" type="button" onclick="setPercentageAmount(100)">Máx.</button>
-          </div>
-        </div>
-
-        <div class="amount-row">
-          <div class="amount-side">
-            <input
-              id="amountIn"
-              class="amount-input"
-              type="number"
-              inputmode="decimal"
-              placeholder="0.0"
-              oninput="handleAmountInput()"
-              onfocus="updateQuickAmountsVisibility()"
-              onblur="handleAmountBlur()"
-            />
-          </div>
-
-          <div class="token-side">
-            <button class="token-pill" id="tokenInBtn" onclick="toggleDirection()">
-              <img id="tokenInIcon" class="token-icon" src="./Usdc.png" alt="USDC" />
-              <span id="tokenInText">USDC</span>
-            </button>
-            <span class="balance-under-token mini" id="balanceIn">Balance: -</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="switch-wrap">
-        <button class="switch-btn" onclick="toggleDirection()">⇅</button>
-      </div>
-
-      <div class="swap-box">
-        <div class="row-top">
-          <span>You receive</span>
-          <span class="mini" id="balanceOut">Balance: -</span>
-        </div>
-
-        <div class="amount-row">
-          <input
-            id="amountOut"
-            class="amount-input"
-            type="text"
-            placeholder="0.0"
-            disabled
-          />
-          <button class="token-pill" id="tokenOutBtn" onclick="toggleDirection()">
-            <img id="tokenOutIcon" class="token-icon" src="./orbit.png" alt="ORBIT" />
-            <span id="tokenOutText">ORBIT</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="details">
-        <div class="details-row">
-          <span>Wallet</span>
-          <span id="walletStatus">-</span>
-        </div>
-        <div class="details-row">
-          <span>Network</span>
-          <span id="networkStatus">-</span>
-        </div>
-        <div class="details-row">
-          <span>Price</span>
-          <span id="priceStatus">-</span>
-        </div>
-        <div class="details-row">
-          <span>Slippage</span>
-          <span id="slippageStatus">1%</span>
-        </div>
-        <div class="details-row">
-          <span>Minimum received</span>
-          <span id="minReceivedStatus">-</span>
-        </div>
-
-        <div class="slippage-row">
-          <button class="slippage-btn active" onclick="setSlippage(1)" id="slippage1">1%</button>
-          <button class="slippage-btn" onclick="setSlippage(0.5)" id="slippage05">0.5%</button>
-          <button class="slippage-btn" onclick="setSlippage(2)" id="slippage2">2%</button>
-        </div>
-      </div>
-
-      <button class="main-btn" id="swapBtn" onclick="executeSwap()" disabled>
-        Enter amount
-      </button>
-
-      <div class="status" id="statusText"></div>
     </div>
 
-    <div class="footer">retro-dex-two.vercel.app</div>
+    <div class="screen active" id="swapScreen">
+      <div class="card">
+        <div class="network-warning" id="networkWarning">
+          Você está na rede errada.
+          <button class="switch-network-btn" onclick="switchToArc()">
+            Switch to Arc Testnet
+          </button>
+        </div>
+
+        <div class="swap-box">
+          <div class="row-top row-top-pay">
+            <span>You pay</span>
+
+            <div class="quick-amounts" id="quickAmounts">
+              <button class="quick-btn" type="button" onclick="setPercentageAmount(25)">25%</button>
+              <button class="quick-btn" type="button" onclick="setPercentageAmount(50)">50%</button>
+              <button class="quick-btn" type="button" onclick="setPercentageAmount(75)">75%</button>
+              <button class="quick-btn" type="button" onclick="setPercentageAmount(100)">Máx.</button>
+            </div>
+          </div>
+
+          <div class="amount-row">
+            <div class="amount-side">
+              <input
+                id="amountIn"
+                class="amount-input"
+                type="number"
+                inputmode="decimal"
+                placeholder="0.0"
+                oninput="handleAmountInput()"
+                onfocus="updateQuickAmountsVisibility()"
+                onblur="handleAmountBlur()"
+              />
+            </div>
+
+            <div class="token-side">
+              <button class="token-pill" id="tokenInBtn" onclick="toggleDirection()">
+                <img id="tokenInIcon" class="token-icon" src="./Usdc.png" alt="USDC" />
+                <span id="tokenInText">USDC</span>
+              </button>
+              <span class="balance-under-token mini" id="balanceIn">Balance: -</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="switch-wrap">
+          <button class="switch-btn" onclick="toggleDirection()">⇅</button>
+        </div>
+
+        <div class="swap-box">
+          <div class="row-top">
+            <span>You receive</span>
+            <span class="mini" id="balanceOut">Balance: -</span>
+          </div>
+
+          <div class="amount-row">
+            <input
+              id="amountOut"
+              class="amount-input"
+              type="text"
+              placeholder="0.0"
+              disabled
+            />
+            <button class="token-pill" id="tokenOutBtn" onclick="toggleDirection()">
+              <img id="tokenOutIcon" class="token-icon" src="./orbit.png" alt="ORBIT" />
+              <span id="tokenOutText">ORBIT</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="details">
+          <div class="details-row">
+            <span>Wallet</span>
+            <span id="walletStatus">-</span>
+          </div>
+          <div class="details-row">
+            <span>Network</span>
+            <span id="networkStatus">-</span>
+          </div>
+          <div class="details-row">
+            <span>Price</span>
+            <span id="priceStatus">-</span>
+          </div>
+          <div class="details-row">
+            <span>Slippage</span>
+            <span id="slippageStatus">1%</span>
+          </div>
+          <div class="details-row">
+            <span>Minimum received</span>
+            <span id="minReceivedStatus">-</span>
+          </div>
+
+          <div class="slippage-row">
+            <button class="slippage-btn active" onclick="setSlippage(1)" id="slippage1">1%</button>
+            <button class="slippage-btn" onclick="setSlippage(0.5)" id="slippage05">0.5%</button>
+            <button class="slippage-btn" onclick="setSlippage(2)" id="slippage2">2%</button>
+          </div>
+        </div>
+
+        <button class="main-btn" id="swapBtn" onclick="executeSwap()" disabled>
+          Enter amount
+        </button>
+
+        <div class="status" id="statusText"></div>
+      </div>
+
+      <div class="footer">retro-dex-two.vercel.app</div>
+    </div>
+
+    <div class="screen" id="tokensScreen">
+      <div class="card">
+        <div class="token-page-title">
+          <div>
+            <div class="token-page-heading">Orbit Token</div>
+            <div class="token-page-sub">Informações do token da Retro DEX</div>
+          </div>
+        </div>
+
+        <div class="token-main-card">
+          <div class="token-main-head">
+            <img src="./orbit.png" alt="Orbit" class="token-main-icon" />
+            <div>
+              <div class="token-main-name">Orbit</div>
+              <div class="token-main-symbol">ORBIT / Arc Testnet</div>
+            </div>
+          </div>
+
+          <div class="token-grid">
+            <div class="info-card">
+              <div class="info-label">Your Balance</div>
+              <div class="info-value" id="tokenPageBalance">-</div>
+            </div>
+
+            <div class="info-card">
+              <div class="info-label">Price</div>
+              <div class="info-value" id="tokenPagePrice">-</div>
+            </div>
+
+            <div class="info-card">
+              <div class="info-label">Token Contract</div>
+              <div class="info-value" id="tokenContractText">0x56e2...9D26</div>
+              <div class="address-actions">
+                <button class="small-btn" onclick="copyText(ORBIT_ADDRESS)">Copy</button>
+                <button class="small-btn" onclick="openExplorerToken()">ArcScan</button>
+              </div>
+            </div>
+
+            <div class="info-card">
+              <div class="info-label">Pair Contract</div>
+              <div class="info-value" id="pairContractText">0xdc6D...27B8</div>
+              <div class="address-actions">
+                <button class="small-btn" onclick="copyText(PAIR_ADDRESS)">Copy</button>
+                <button class="small-btn" onclick="openExplorerPair()">ArcScan</button>
+              </div>
+            </div>
+
+            <div class="info-card">
+              <div class="info-label">Swap Pair</div>
+              <div class="info-value">USDC ⇄ ORBIT</div>
+            </div>
+
+            <div class="info-card">
+              <div class="info-label">Token Status</div>
+              <div class="info-value">Live on Retro DEX</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="status" id="tokenStatusText"></div>
+      </div>
+    </div>
+
+    <div class="screen" id="stakeScreen">
+      <div class="card">
+        <div class="coming-soon">
+          <div class="coming-title">Stake</div>
+          <div class="coming-text">Coming soon 🚀</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeBottomSheet()"></div>
+
+  <div class="bottom-sheet" id="bottomSheet">
+    <div class="sheet-handle"></div>
+
+    <div class="sheet-grid">
+      <div class="sheet-item active" id="navSwap" onclick="switchScreen('swap')">
+        <div class="sheet-item-title">Swap</div>
+        <div class="sheet-item-sub">Main view</div>
+      </div>
+
+      <div class="sheet-item" id="navTokens" onclick="switchScreen('tokens')">
+        <div class="sheet-item-title">Tokens</div>
+        <div class="sheet-item-sub">Orbit info</div>
+      </div>
+
+      <div class="sheet-item" id="navStake" onclick="switchScreen('stake')">
+        <div class="sheet-item-title">Stake</div>
+        <div class="sheet-item-sub">Coming soon</div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -561,6 +925,7 @@
     const USDC_ADDRESS = "0x3600000000000000000000000000000000000000";
     const ORBIT_ADDRESS = "0x56e2a33050D671CB1A9080feF7f7c15e5D4a9D26";
     const PAIR_ADDRESS = "0xdc6DdD6aFA8FdEFf8e95b613730c2a0d95Fa27B8";
+    const ARC_EXPLORER = "https://testnet.arcscan.app";
 
     const USDC_ICON = "./Usdc.png";
     const ORBIT_ICON = "./orbit.png";
@@ -589,6 +954,7 @@
     let slippagePercent = 1;
     let isConnecting = false;
     let isProcessingSwap = false;
+    let currentScreen = "swap";
 
     function getTokenInAddress() {
       return direction === "USDC_TO_ORBIT" ? USDC_ADDRESS : ORBIT_ADDRESS;
@@ -614,6 +980,50 @@
       return direction === "USDC_TO_ORBIT" ? ORBIT_ICON : USDC_ICON;
     }
 
+    function toggleBottomSheet() {
+      const sheet = document.getElementById("bottomSheet");
+      const backdrop = document.getElementById("sheetBackdrop");
+      const show = !sheet.classList.contains("show");
+
+      sheet.classList.toggle("show", show);
+      backdrop.classList.toggle("show", show);
+    }
+
+    function closeBottomSheet() {
+      document.getElementById("bottomSheet").classList.remove("show");
+      document.getElementById("sheetBackdrop").classList.remove("show");
+    }
+
+    function switchScreen(screen) {
+      currentScreen = screen;
+
+      document.getElementById("swapScreen").classList.remove("active");
+      document.getElementById("tokensScreen").classList.remove("active");
+      document.getElementById("stakeScreen").classList.remove("active");
+
+      document.getElementById("navSwap").classList.remove("active");
+      document.getElementById("navTokens").classList.remove("active");
+      document.getElementById("navStake").classList.remove("active");
+
+      if (screen === "swap") {
+        document.getElementById("swapScreen").classList.add("active");
+        document.getElementById("navSwap").classList.add("active");
+      }
+
+      if (screen === "tokens") {
+        document.getElementById("tokensScreen").classList.add("active");
+        document.getElementById("navTokens").classList.add("active");
+        refreshTokenPage();
+      }
+
+      if (screen === "stake") {
+        document.getElementById("stakeScreen").classList.add("active");
+        document.getElementById("navStake").classList.add("active");
+      }
+
+      closeBottomSheet();
+    }
+
     async function getTokenDecimals(tokenAddress) {
       const token = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
       return await token.decimals();
@@ -621,6 +1031,10 @@
 
     function setStatus(text) {
       document.getElementById("statusText").innerText = text || "";
+    }
+
+    function setTokenStatus(text) {
+      document.getElementById("tokenStatusText").innerText = text || "";
     }
 
     function shortAddress(addr) {
@@ -646,40 +1060,8 @@
 
     function formatBalanceNumber(value) {
       const num = Number(value);
-
       if (!Number.isFinite(num)) return "-";
       return num.toLocaleString("pt-BR", { maximumFractionDigits: 4 });
-    }
-
-    function floorToDecimals(value, decimals) {
-      const num = Number(value);
-      if (!Number.isFinite(num)) return 0;
-      const factor = 10 ** decimals;
-      return Math.floor(num * factor) / factor;
-    }
-
-    function updateWalletButton() {
-      const btn = document.getElementById("walletBtn");
-      btn.innerText = userAddress ? "Disconnect" : "Connect Wallet";
-    }
-
-    function updateQuickAmountsVisibility() {
-      const input = document.getElementById("amountIn");
-      const quick = document.getElementById("quickAmounts");
-      const hasFocus = document.activeElement === input;
-      const hasValue = input.value && Number(input.value) > 0;
-
-      if (hasFocus || hasValue) {
-        quick.classList.add("show");
-      } else {
-        quick.classList.remove("show");
-      }
-    }
-
-    function handleAmountBlur() {
-      setTimeout(() => {
-        updateQuickAmountsVisibility();
-      }, 120);
     }
 
     async function getTokenInBalance() {
@@ -720,54 +1102,54 @@
     }
 
     async function setPercentageAmount(percent) {
-  if (!provider || !userAddress) {
-    setStatus("Conecte a wallet primeiro.");
-    return;
-  }
-
-  try {
-    const balanceData = await getTokenInBalance();
-    if (!balanceData) return;
-
-    const balanceNum = Number(balanceData.formatted);
-    if (!balanceNum || balanceNum <= 0) {
-      document.getElementById("amountIn").value = "";
-      await handleAmountInput();
-      return;
-    }
-
-    let selectedAmount;
-
-    if (percent === 100) {
-      if (balanceData.decimals <= 6) {
-        selectedAmount = Math.floor(balanceNum * 10000) / 10000;
-      } else {
-        selectedAmount = Math.floor(balanceNum * 1000000) / 1000000;
+      if (!provider || !userAddress) {
+        setStatus("Conecte a wallet primeiro.");
+        return;
       }
-    } else {
-      const rawAmount = (balanceNum * percent) / 100;
 
-      if (balanceData.decimals <= 6) {
-        selectedAmount = Math.floor(rawAmount * 10000) / 10000;
-      } else {
-        selectedAmount = Math.floor(rawAmount * 1000000) / 1000000;
+      try {
+        const balanceData = await getTokenInBalance();
+        if (!balanceData) return;
+
+        const balanceNum = Number(balanceData.formatted);
+        if (!balanceNum || balanceNum <= 0) {
+          document.getElementById("amountIn").value = "";
+          await handleAmountInput();
+          return;
+        }
+
+        let selectedAmount;
+
+        if (percent === 100) {
+          if (balanceData.decimals <= 6) {
+            selectedAmount = Math.floor(balanceNum * 10000) / 10000;
+          } else {
+            selectedAmount = Math.floor(balanceNum * 1000000) / 1000000;
+          }
+        } else {
+          const rawAmount = (balanceNum * percent) / 100;
+
+          if (balanceData.decimals <= 6) {
+            selectedAmount = Math.floor(rawAmount * 10000) / 10000;
+          } else {
+            selectedAmount = Math.floor(rawAmount * 1000000) / 1000000;
+          }
+        }
+
+        if (selectedAmount <= 0) {
+          document.getElementById("amountIn").value = "";
+          await handleAmountInput();
+          return;
+        }
+
+        document.getElementById("amountIn").value = formatDisplayNumber(selectedAmount);
+        await handleAmountInput();
+        document.getElementById("amountIn").focus();
+      } catch (err) {
+        console.error(err);
+        setStatus("Não foi possível preencher a porcentagem.");
       }
     }
-
-    if (selectedAmount <= 0) {
-      document.getElementById("amountIn").value = "";
-      await handleAmountInput();
-      return;
-    }
-
-    document.getElementById("amountIn").value = formatDisplayNumber(selectedAmount);
-    await handleAmountInput();
-    document.getElementById("amountIn").focus();
-  } catch (err) {
-    console.error(err);
-    setStatus("Não foi possível preencher a porcentagem.");
-  }
-}
 
     function clearWalletUI() {
       userAddress = null;
@@ -775,6 +1157,7 @@
       provider = null;
       isConnecting = false;
       isProcessingSwap = false;
+
       document.getElementById("walletStatus").innerText = "-";
       document.getElementById("walletBtn").innerText = "Connect Wallet";
       document.getElementById("balanceIn").innerText = "Balance: -";
@@ -785,9 +1168,13 @@
       document.getElementById("minReceivedStatus").innerText = "-";
       document.getElementById("networkStatus").innerText = "-";
       document.getElementById("networkWarning").style.display = "none";
+      document.getElementById("tokenPageBalance").innerText = "-";
+      document.getElementById("tokenPagePrice").innerText = "-";
+
       updateQuickAmountsVisibility();
       updateSwapButton();
       setStatus("Wallet desconectada.");
+      setTokenStatus("");
     }
 
     async function handleWalletButton() {
@@ -907,7 +1294,7 @@
                   decimals: 6
                 },
                 rpcUrls: ["https://rpc.testnet.arc.network"],
-                blockExplorerUrls: ["https://testnet.arcscan.app"]
+                blockExplorerUrls: [ARC_EXPLORER]
               }]
             });
           } catch (addError) {
@@ -953,6 +1340,7 @@
 
         await refreshBalances();
         await handleAmountInput();
+        await refreshTokenPage();
         setStatus("Wallet conectada.");
       } catch (err) {
         console.error(err);
@@ -991,6 +1379,35 @@
       } catch (err) {
         console.error(err);
         setStatus("Erro ao ler saldos.");
+      }
+    }
+
+    async function refreshTokenPage() {
+      try {
+        if (!provider || !userAddress) {
+          document.getElementById("tokenPageBalance").innerText = "-";
+          document.getElementById("tokenPagePrice").innerText = "-";
+          return;
+        }
+
+        const orbit = new ethers.Contract(ORBIT_ADDRESS, ERC20_ABI, provider);
+        const pair = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, provider);
+
+        const [balRaw, dec, quoteRaw, usdcDec] = await Promise.all([
+          orbit.balanceOf(userAddress),
+          orbit.decimals(),
+          pair.getAmountOut(ORBIT_ADDRESS, ethers.utils.parseUnits("1", 18)),
+          getTokenDecimals(USDC_ADDRESS)
+        ]);
+
+        const bal = Number(ethers.utils.formatUnits(balRaw, dec));
+        const quote = Number(ethers.utils.formatUnits(quoteRaw, usdcDec));
+
+        document.getElementById("tokenPageBalance").innerText = `${formatBalanceNumber(bal)} ORBIT`;
+        document.getElementById("tokenPagePrice").innerText = `1 ORBIT = ${formatDisplayNumber(quote)} USDC`;
+      } catch (err) {
+        console.error(err);
+        setTokenStatus("Não foi possível carregar informações do token.");
       }
     }
 
@@ -1122,6 +1539,7 @@
         document.getElementById("minReceivedStatus").innerText = "-";
         updateQuickAmountsVisibility();
         await refreshBalances();
+        await refreshTokenPage();
       } catch (err) {
         console.error(err);
 
@@ -1149,6 +1567,23 @@
       }
     }
 
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        setTokenStatus("Copiado.");
+      } catch {
+        setTokenStatus("Não foi possível copiar.");
+      }
+    }
+
+    function openExplorerToken() {
+      window.open(`${ARC_EXPLORER}/token/${ORBIT_ADDRESS}`, "_blank");
+    }
+
+    function openExplorerPair() {
+      window.open(`${ARC_EXPLORER}/address/${PAIR_ADDRESS}`, "_blank");
+    }
+
     if (window.ethereum) {
       window.ethereum.on("accountsChanged", async (accounts) => {
         if (!accounts.length) {
@@ -1162,6 +1597,7 @@
         updateWalletButton();
         await refreshBalances();
         await handleAmountInput();
+        await refreshTokenPage();
       });
 
       window.ethereum.on("chainChanged", () => {
