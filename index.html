@@ -55,7 +55,7 @@
       gap: 10px;
       padding: 12px 12px 12px 14px;
       border-radius: 22px;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       background: rgba(10, 16, 34, 0.78);
       border: 1px solid rgba(98, 127, 197, 0.18);
       box-shadow:
@@ -81,37 +81,6 @@
       filter: drop-shadow(0 0 14px rgba(86, 160, 255, 0.28));
     }
 
-    .brand-copy {
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .brand {
-      font-size: 22px;
-      font-weight: 800;
-      line-height: 0.95;
-      letter-spacing: 0.2px;
-      white-space: nowrap;
-    }
-
-    .brand-retro {
-      color: #eef4ff;
-    }
-
-    .brand-dex {
-      color: #59b7ff;
-    }
-
-    .sub {
-      font-size: 12px;
-      color: var(--text-soft);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
     .top-actions {
       display: flex;
       align-items: center;
@@ -119,35 +88,43 @@
       flex-shrink: 0;
     }
 
-    .menu-btn,
     .wallet-btn {
       border: 1px solid rgba(116, 186, 255, 0.16);
       color: #fff;
       font-weight: 700;
       cursor: pointer;
       transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
-    }
-
-    .menu-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      background: rgba(27, 39, 76, 0.9);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
-      font-size: 20px;
-      line-height: 1;
-    }
-
-    .wallet-btn {
       border-radius: 15px;
       padding: 10px 14px;
       background: linear-gradient(135deg, var(--arc-blue-1) 0%, var(--arc-blue-2) 52%, var(--arc-blue-4) 100%);
       font-size: 14px;
       box-shadow: 0 10px 22px rgba(47, 107, 255, 0.22);
       white-space: nowrap;
+    }
+
+    .menu-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(31, 49, 97, 0.95), rgba(18, 30, 61, 0.95));
+      border: 1px solid rgba(120, 160, 255, 0.18);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.03),
+        0 8px 18px rgba(12, 22, 46, 0.30);
+      font-size: 16px;
+      line-height: 1;
+      color: #dfeaff;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    }
+
+    .menu-btn:hover {
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 10px 22px rgba(12, 22, 46, 0.36);
     }
 
     .wallet-btn:active,
@@ -162,6 +139,16 @@
     .wallet-btn:disabled {
       opacity: 0.7;
       cursor: not-allowed;
+    }
+
+    .welcome-line {
+      text-align: center;
+      margin: 6px 0 16px;
+      color: #9fc2ff;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      text-shadow: 0 0 14px rgba(79, 134, 255, 0.18);
     }
 
     .screen {
@@ -674,6 +661,13 @@
       margin-top: 5px;
     }
 
+    @media (max-width: 480px) {
+      .welcome-line {
+        font-size: 19px;
+        margin: 4px 0 14px;
+      }
+    }
+
     @media (min-width: 768px) {
       .app {
         max-width: 560px;
@@ -698,11 +692,7 @@
   <div class="app">
     <div class="topbar">
       <div class="brand-wrap">
-        <img src="./retro-face.png" alt="Retro DEX" class="brand-face" id="topLogo" />
-        <div class="brand-copy">
-          <div class="brand"><span class="brand-retro">Retro</span> <span class="brand-dex">DEX</span></div>
-          <div class="sub" id="topSub">USDC ⇄ ORBIT · Arc Testnet</div>
-        </div>
+        <img src="./retro-face1.png" alt="Retro DEX" class="brand-face" id="topLogo" />
       </div>
 
       <div class="top-actions">
@@ -712,6 +702,8 @@
         </button>
       </div>
     </div>
+
+    <div class="welcome-line">Welcome to Arc Testnet</div>
 
     <div class="screen active" id="swapScreen">
       <div class="card">
@@ -1610,4 +1602,4 @@
     updateQuickAmountsVisibility();
   </script>
 </body>
-                  </html>
+  </html>
