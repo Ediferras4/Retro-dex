@@ -26,7 +26,6 @@
       --arc-blue-2: #1f59f3;
       --arc-blue-3: #3f87ff;
       --arc-blue-4: #6ba8ff;
-      --line-soft: rgba(117, 146, 212, 0.16);
     }
 
     body {
@@ -48,6 +47,16 @@
       max-width: 430px;
     }
 
+    .welcome-line {
+      text-align: center;
+      margin: 0 0 8px;
+      color: #cfe1ff;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      text-shadow: 0 0 18px rgba(111, 170, 255, 0.30);
+    }
+
     .topbar {
       display: flex;
       align-items: center;
@@ -55,7 +64,7 @@
       gap: 10px;
       padding: 12px 12px 12px 14px;
       border-radius: 22px;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
       background: rgba(10, 16, 34, 0.78);
       border: 1px solid rgba(98, 127, 197, 0.18);
       box-shadow:
@@ -138,16 +147,6 @@
     .wallet-btn:disabled {
       opacity: 0.7;
       cursor: not-allowed;
-    }
-
-    .welcome-line {
-      text-align: center;
-      margin: 6px 0 16px;
-      color: #9fc2ff;
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: 0.4px;
-      text-shadow: 0 0 14px rgba(79, 134, 255, 0.18);
     }
 
     .screen {
@@ -385,30 +384,27 @@
       margin: 7px 0;
     }
 
-    .slippage-row {
+    .slippage-row-main {
       display: flex;
-      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
       margin-top: 12px;
-      flex-wrap: wrap;
+      padding-top: 4px;
     }
 
-    .slippage-btn {
+    .slippage-open-btn {
       border: 1px solid rgba(119, 170, 255, 0.16);
       background: linear-gradient(180deg, rgba(25, 38, 76, 0.98), rgba(18, 29, 58, 0.98));
       color: #e6eeff;
       border-radius: 999px;
-      padding: 9px 14px;
+      padding: 10px 14px;
       cursor: pointer;
       font-size: 12px;
       font-weight: 700;
-      transition: all 0.15s ease;
-    }
-
-    .slippage-btn.active {
-      background: linear-gradient(135deg, #245fff 0%, #4f86ff 55%, #7fa0ff 100%);
-      border-color: transparent;
-      color: #ffffff;
-      box-shadow: 0 0 16px rgba(79, 134, 255, 0.24);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .main-btn {
@@ -577,7 +573,8 @@
       font-size: 14px;
     }
 
-    .sheet-backdrop {
+    .sheet-backdrop,
+    .slippage-backdrop {
       position: fixed;
       inset: 0;
       background: rgba(1, 6, 20, 0.55);
@@ -587,12 +584,14 @@
       z-index: 70;
     }
 
-    .sheet-backdrop.show {
+    .sheet-backdrop.show,
+    .slippage-backdrop.show {
       opacity: 1;
       pointer-events: auto;
     }
 
-    .bottom-sheet {
+    .bottom-sheet,
+    .slippage-sheet {
       position: fixed;
       left: 50%;
       bottom: 0;
@@ -608,7 +607,8 @@
       z-index: 80;
     }
 
-    .bottom-sheet.show {
+    .bottom-sheet.show,
+    .slippage-sheet.show {
       transform: translateX(-50%) translateY(0);
     }
 
@@ -657,10 +657,61 @@
       margin-top: 5px;
     }
 
+    .slippage-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .slippage-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #eef4ff;
+    }
+
+    .slippage-close {
+      border: none;
+      background: transparent;
+      color: #dfeaff;
+      font-size: 28px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .slippage-options {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .slippage-option {
+      border: 1px solid rgba(117, 146, 212, 0.16);
+      background: rgba(255,255,255,0.04);
+      color: #e6eeff;
+      border-radius: 16px;
+      padding: 14px 8px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .slippage-option.active {
+      background: linear-gradient(135deg, #7f6fe8 0%, #b5a8ff 100%);
+      color: #1b1238;
+      border-color: transparent;
+    }
+
     @media (max-width: 480px) {
       .welcome-line {
         font-size: 19px;
-        margin: 4px 0 14px;
+        margin: 0 0 8px;
+      }
+
+      .slippage-options {
+        grid-template-columns: repeat(2, 1fr);
       }
     }
 
@@ -669,7 +720,8 @@
         max-width: 560px;
       }
 
-      .bottom-sheet {
+      .bottom-sheet,
+      .slippage-sheet {
         width: min(100%, 560px);
       }
 
@@ -686,6 +738,8 @@
 </head>
 <body>
   <div class="app">
+    <div class="welcome-line">Welcome to Arc Testnet</div>
+
     <div class="topbar">
       <div class="brand-wrap">
         <img src="./retro-face1.png" alt="Retro DEX" class="brand-face" id="topLogo" />
@@ -698,8 +752,6 @@
         </button>
       </div>
     </div>
-
-    <div class="welcome-line">Welcome to Arc Testnet</div>
 
     <div class="screen active" id="swapScreen">
       <div class="card">
@@ -784,17 +836,19 @@
           </div>
           <div class="details-row">
             <span>Slippage</span>
-            <span id="slippageStatus">1%</span>
+            <span id="slippageStatus">Auto</span>
           </div>
           <div class="details-row">
             <span>Minimum received</span>
             <span id="minReceivedStatus">-</span>
           </div>
 
-          <div class="slippage-row">
-            <button class="slippage-btn active" onclick="setSlippage(1)" id="slippage1">1%</button>
-            <button class="slippage-btn" onclick="setSlippage(0.5)" id="slippage05">0.5%</button>
-            <button class="slippage-btn" onclick="setSlippage(2)" id="slippage2">2%</button>
+          <div class="slippage-row-main">
+            <span class="mini">Slippage settings</span>
+            <button class="slippage-open-btn" type="button" onclick="openSlippageSheet()">
+              <span id="slippageButtonLabel">Auto</span>
+              <span>✎</span>
+            </button>
           </div>
         </div>
 
@@ -882,6 +936,7 @@
   </div>
 
   <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeBottomSheet()"></div>
+  <div class="slippage-backdrop" id="slippageBackdrop" onclick="closeSlippageSheet()"></div>
 
   <div class="bottom-sheet" id="bottomSheet">
     <div class="sheet-handle"></div>
@@ -901,6 +956,22 @@
         <div class="sheet-item-title">Stake</div>
         <div class="sheet-item-sub">Coming soon</div>
       </div>
+    </div>
+  </div>
+
+  <div class="slippage-sheet" id="slippageSheet">
+    <div class="sheet-handle"></div>
+
+    <div class="slippage-head">
+      <div class="slippage-title">Slippage Setting</div>
+      <button class="slippage-close" type="button" onclick="closeSlippageSheet()">×</button>
+    </div>
+
+    <div class="slippage-options">
+      <button class="slippage-option active" id="slippageAutoOption" onclick="setSlippageMode('auto')">Auto</button>
+      <button class="slippage-option" id="slippage05Option" onclick="setSlippageMode(0.5)">0.5%</button>
+      <button class="slippage-option" id="slippage1Option" onclick="setSlippageMode(1)">1%</button>
+      <button class="slippage-option" id="slippage2Option" onclick="setSlippageMode(2)">2%</button>
     </div>
   </div>
 
@@ -937,7 +1008,8 @@
     let signer;
     let userAddress = null;
     let direction = "USDC_TO_ORBIT";
-    let slippagePercent = 1;
+    let slippagePercent = 0.5;
+    let slippageMode = "auto";
     let isConnecting = false;
     let isProcessingSwap = false;
     let currentScreen = "swap";
@@ -972,6 +1044,7 @@
     }
 
     function toggleBottomSheet() {
+      closeSlippageSheet();
       const sheet = document.getElementById("bottomSheet");
       const backdrop = document.getElementById("sheetBackdrop");
       const show = !sheet.classList.contains("show");
@@ -983,6 +1056,53 @@
     function closeBottomSheet() {
       document.getElementById("bottomSheet").classList.remove("show");
       document.getElementById("sheetBackdrop").classList.remove("show");
+    }
+
+    function openSlippageSheet() {
+      closeBottomSheet();
+      document.getElementById("slippageSheet").classList.add("show");
+      document.getElementById("slippageBackdrop").classList.add("show");
+    }
+
+    function closeSlippageSheet() {
+      document.getElementById("slippageSheet").classList.remove("show");
+      document.getElementById("slippageBackdrop").classList.remove("show");
+    }
+
+    function updateSlippageUI() {
+      const status = document.getElementById("slippageStatus");
+      const label = document.getElementById("slippageButtonLabel");
+
+      document.getElementById("slippageAutoOption").classList.remove("active");
+      document.getElementById("slippage05Option").classList.remove("active");
+      document.getElementById("slippage1Option").classList.remove("active");
+      document.getElementById("slippage2Option").classList.remove("active");
+
+      if (slippageMode === "auto") {
+        status.innerText = "Auto";
+        label.innerText = "Auto · 0.5%";
+        document.getElementById("slippageAutoOption").classList.add("active");
+      } else {
+        status.innerText = `${slippagePercent}%`;
+        label.innerText = `${slippagePercent}%`;
+        if (slippagePercent === 0.5) document.getElementById("slippage05Option").classList.add("active");
+        if (slippagePercent === 1) document.getElementById("slippage1Option").classList.add("active");
+        if (slippagePercent === 2) document.getElementById("slippage2Option").classList.add("active");
+      }
+    }
+
+    function setSlippageMode(value) {
+      if (value === "auto") {
+        slippageMode = "auto";
+        slippagePercent = 0.5;
+      } else {
+        slippageMode = "manual";
+        slippagePercent = value;
+      }
+
+      updateSlippageUI();
+      closeSlippageSheet();
+      handleAmountInput();
     }
 
     function switchScreen(screen) {
@@ -1139,14 +1259,6 @@
       }
     }
 
-    function updateQuickAmountsVisibility() {
-      return;
-    }
-
-    function handleAmountBlur() {
-      return;
-    }
-
     function clearWalletUI() {
       userAddress = null;
       signer = null;
@@ -1246,21 +1358,6 @@
 
       btn.disabled = false;
       btn.innerText = `Swap ${getTokenInLabel()} for ${getTokenOutLabel()}`;
-    }
-
-    function setSlippage(value) {
-      slippagePercent = value;
-      document.getElementById("slippageStatus").innerText = `${value}%`;
-
-      document.querySelectorAll(".slippage-btn").forEach((btn) => {
-        btn.classList.remove("active");
-      });
-
-      if (value === 1) document.getElementById("slippage1").classList.add("active");
-      if (value === 0.5) document.getElementById("slippage05").classList.add("active");
-      if (value === 2) document.getElementById("slippage2").classList.add("active");
-
-      handleAmountInput();
     }
 
     async function switchToArc() {
@@ -1597,6 +1694,7 @@
 
     updateDirectionUI();
     updateWalletButton();
+    updateSlippageUI();
   </script>
 </body>
-</html>
+            </html>
