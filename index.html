@@ -651,6 +651,13 @@
       return num.toLocaleString("pt-BR", { maximumFractionDigits: 4 });
     }
 
+    function floorToDecimals(value, decimals) {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return 0;
+      const factor = 10 ** decimals;
+      return Math.floor(num * factor) / factor;
+    }
+
     function updateWalletButton() {
       const btn = document.getElementById("walletBtn");
       btn.innerText = userAddress ? "Disconnect" : "Connect Wallet";
@@ -729,7 +736,15 @@
           return;
         }
 
-        const selectedAmount = (balanceNum * percent) / 100;
+        const safeDecimals = balanceData.decimals === 6 ? 4 : 8;
+        let selectedAmount = (balanceNum * percent) / 100;
+
+        if (percent === 100) {
+          selectedAmount = floorToDecimals(balanceNum, safeDecimals);
+        } else {
+          selectedAmount = floorToDecimals(selectedAmount, safeDecimals);
+        }
+
         document.getElementById("amountIn").value = formatDisplayNumber(selectedAmount);
         await handleAmountInput();
         document.getElementById("amountIn").focus();
@@ -1058,11 +1073,18 @@
         await updateSwapButton();
 
         const tokenInAddress = getTokenInAddress();
-        const decIn = await getTokenDecimals(tokenInAddress);
-        const amountIn = ethers.utils.parseUnits(amountText, decIn);
-
         const tokenIn = new ethers.Contract(tokenInAddress, ERC20_ABI, signer);
         const pair = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, signer);
+
+        const decIn = await tokenIn.decimals();
+        const amountIn = ethers.utils.parseUnits(amountText, decIn);
+
+        const balanceRaw = await tokenIn.balanceOf(userAddress);
+        if (balanceRaw.lt(amountIn)) {
+          setStatus(`Saldo insuficiente de ${getTokenInLabel()}.`);
+          alert(`Saldo insuficiente de ${getTokenInLabel()}.`);
+          return;
+        }
 
         const currentAllowance = await tokenIn.allowance(userAddress, PAIR_ADDRESS);
 
@@ -1071,8 +1093,6 @@
           const approveTx = await tokenIn.approve(PAIR_ADDRESS, amountIn);
           await approveTx.wait();
           setStatus(`${getTokenInLabel()} aprovado. Toque em swap novamente.`);
-          isProcessingSwap = false;
-          await updateSwapButton();
           return;
         }
 
@@ -1090,13 +1110,23 @@
       } catch (err) {
         console.error(err);
 
-        const msg = (err?.data?.message || err?.message || "").toLowerCase();
+        const rawMessage =
+          err?.data?.message ||
+          err?.error?.message ||
+          err?.reason ||
+          err?.message ||
+          "";
+
+        const msg = rawMessage.toLowerCase();
 
         if (msg.includes("user rejected") || msg.includes("denied") || msg.includes("rejected")) {
           setStatus("Transação cancelada.");
+        } else if (msg.includes("transfer amount exceeds balance")) {
+          setStatus(`Saldo insuficiente de ${getTokenInLabel()}.`);
+          alert(`Saldo insuficiente de ${getTokenInLabel()}.`);
         } else {
-          setStatus("Erro no swap. Tente novamente.");
-          alert("Erro no swap.");
+          setStatus(rawMessage || "Erro no swap. Tente novamente.");
+          alert(rawMessage || "Erro no swap.");
         }
       } finally {
         isProcessingSwap = false;
@@ -1129,4 +1159,4 @@
     updateQuickAmountsVisibility();
   </script>
 </body>
-  </html>
+</html>
