@@ -67,14 +67,13 @@
     .brand-wrap {
       display: flex;
       align-items: center;
-      gap: 10px;
       min-width: 0;
       flex: 1;
     }
 
     .brand-face {
-      width: 68px;
-      height: 68px;
+      width: 72px;
+      height: 72px;
       object-fit: contain;
       display: block;
       flex-shrink: 0;
@@ -209,6 +208,7 @@
       margin-bottom: 10px;
       color: var(--text-soft);
       font-size: 13px;
+      gap: 8px;
     }
 
     .row-top-pay {
@@ -257,15 +257,11 @@
     }
 
     .quick-amounts {
-      display: none;
+      display: flex;
       gap: 4px;
       flex-wrap: nowrap;
       align-items: center;
       margin-top: -1px;
-    }
-
-    .quick-amounts.show {
-      display: flex;
     }
 
     .quick-btn {
@@ -735,8 +731,6 @@
                 inputmode="decimal"
                 placeholder="0.0"
                 oninput="handleAmountInput()"
-                onfocus="updateQuickAmountsVisibility()"
-                onblur="handleAmountBlur()"
               />
             </div>
 
@@ -948,6 +942,11 @@
     let isProcessingSwap = false;
     let currentScreen = "swap";
 
+    function updateWalletButton() {
+      const btn = document.getElementById("walletBtn");
+      btn.innerText = userAddress ? "Disconnect" : "Connect Wallet";
+    }
+
     function getTokenInAddress() {
       return direction === "USDC_TO_ORBIT" ? USDC_ADDRESS : ORBIT_ADDRESS;
     }
@@ -1056,6 +1055,13 @@
       return num.toLocaleString("pt-BR", { maximumFractionDigits: 4 });
     }
 
+    function trimMaxAmount(balanceNum, decimals) {
+      if (!Number.isFinite(balanceNum) || balanceNum <= 0) return 0;
+      const safeDecimals = decimals <= 6 ? 4 : 6;
+      const factor = 10 ** safeDecimals;
+      return Math.floor(balanceNum * factor) / factor;
+    }
+
     async function getTokenInBalance() {
       if (!provider || !userAddress) return null;
 
@@ -1113,19 +1119,10 @@
         let selectedAmount;
 
         if (percent === 100) {
-          if (balanceData.decimals <= 6) {
-            selectedAmount = Math.floor(balanceNum * 10000) / 10000;
-          } else {
-            selectedAmount = Math.floor(balanceNum * 1000000) / 1000000;
-          }
+          selectedAmount = trimMaxAmount(balanceNum, balanceData.decimals);
         } else {
           const rawAmount = (balanceNum * percent) / 100;
-
-          if (balanceData.decimals <= 6) {
-            selectedAmount = Math.floor(rawAmount * 10000) / 10000;
-          } else {
-            selectedAmount = Math.floor(rawAmount * 1000000) / 1000000;
-          }
+          selectedAmount = trimMaxAmount(rawAmount, balanceData.decimals);
         }
 
         if (selectedAmount <= 0) {
@@ -1136,11 +1133,18 @@
 
         document.getElementById("amountIn").value = formatDisplayNumber(selectedAmount);
         await handleAmountInput();
-        document.getElementById("amountIn").focus();
       } catch (err) {
         console.error(err);
         setStatus("Não foi possível preencher a porcentagem.");
       }
+    }
+
+    function updateQuickAmountsVisibility() {
+      return;
+    }
+
+    function handleAmountBlur() {
+      return;
     }
 
     function clearWalletUI() {
@@ -1151,7 +1155,6 @@
       isProcessingSwap = false;
 
       document.getElementById("walletStatus").innerText = "-";
-      document.getElementById("walletBtn").innerText = "Connect Wallet";
       document.getElementById("balanceIn").innerText = "Balance: -";
       document.getElementById("balanceOut").innerText = "Balance: -";
       document.getElementById("amountIn").value = "";
@@ -1163,8 +1166,8 @@
       document.getElementById("tokenPageBalance").innerText = "-";
       document.getElementById("tokenPagePrice").innerText = "-";
 
-      updateQuickAmountsVisibility();
       updateSwapButton();
+      updateWalletButton();
       setStatus("Wallet desconectada.");
       setTokenStatus("");
     }
@@ -1195,7 +1198,6 @@
       document.getElementById("amountOut").value = "";
       document.getElementById("priceStatus").innerText = "-";
       document.getElementById("minReceivedStatus").innerText = "-";
-      updateQuickAmountsVisibility();
       updateSwapButton();
 
       if (userAddress) {
@@ -1367,7 +1369,6 @@
         document.getElementById("balanceOut").innerText =
           `Balance: ${formatBalanceNumber(balOut)} ${getTokenOutLabel()}`;
 
-        updateQuickAmountsVisibility();
       } catch (err) {
         console.error(err);
         setStatus("Erro ao ler saldos.");
@@ -1415,8 +1416,6 @@
     }
 
     async function handleAmountInput() {
-      updateQuickAmountsVisibility();
-
       const amountText = document.getElementById("amountIn").value;
       const output = document.getElementById("amountOut");
 
@@ -1529,7 +1528,6 @@
         document.getElementById("amountOut").value = "";
         document.getElementById("priceStatus").innerText = "-";
         document.getElementById("minReceivedStatus").innerText = "-";
-        updateQuickAmountsVisibility();
         await refreshBalances();
         await refreshTokenPage();
       } catch (err) {
@@ -1599,7 +1597,6 @@
 
     updateDirectionUI();
     updateWalletButton();
-    updateQuickAmountsVisibility();
   </script>
 </body>
-              </html>
+</html>
