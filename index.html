@@ -720,39 +720,54 @@
     }
 
     async function setPercentageAmount(percent) {
-      if (!provider || !userAddress) {
-        setStatus("Conecte a wallet primeiro.");
-        return;
+  if (!provider || !userAddress) {
+    setStatus("Conecte a wallet primeiro.");
+    return;
+  }
+
+  try {
+    const balanceData = await getTokenInBalance();
+    if (!balanceData) return;
+
+    const balanceNum = Number(balanceData.formatted);
+    if (!balanceNum || balanceNum <= 0) {
+      document.getElementById("amountIn").value = "";
+      await handleAmountInput();
+      return;
+    }
+
+    let selectedAmount;
+
+    if (percent === 100) {
+      if (balanceData.decimals <= 6) {
+        selectedAmount = Math.floor(balanceNum * 10000) / 10000;
+      } else {
+        selectedAmount = Math.floor(balanceNum * 1000000) / 1000000;
       }
+    } else {
+      const rawAmount = (balanceNum * percent) / 100;
 
-      try {
-        const balanceData = await getTokenInBalance();
-        if (!balanceData) return;
-
-        const balanceNum = Number(balanceData.formatted);
-        if (!balanceNum || balanceNum <= 0) {
-          document.getElementById("amountIn").value = "";
-          await handleAmountInput();
-          return;
-        }
-
-        const safeDecimals = balanceData.decimals === 6 ? 4 : 8;
-        let selectedAmount = (balanceNum * percent) / 100;
-
-        if (percent === 100) {
-          selectedAmount = floorToDecimals(balanceNum, safeDecimals);
-        } else {
-          selectedAmount = floorToDecimals(selectedAmount, safeDecimals);
-        }
-
-        document.getElementById("amountIn").value = formatDisplayNumber(selectedAmount);
-        await handleAmountInput();
-        document.getElementById("amountIn").focus();
-      } catch (err) {
-        console.error(err);
-        setStatus("Não foi possível preencher a porcentagem.");
+      if (balanceData.decimals <= 6) {
+        selectedAmount = Math.floor(rawAmount * 10000) / 10000;
+      } else {
+        selectedAmount = Math.floor(rawAmount * 1000000) / 1000000;
       }
     }
+
+    if (selectedAmount <= 0) {
+      document.getElementById("amountIn").value = "";
+      await handleAmountInput();
+      return;
+    }
+
+    document.getElementById("amountIn").value = formatDisplayNumber(selectedAmount);
+    await handleAmountInput();
+    document.getElementById("amountIn").focus();
+  } catch (err) {
+    console.error(err);
+    setStatus("Não foi possível preencher a porcentagem.");
+  }
+}
 
     function clearWalletUI() {
       userAddress = null;
