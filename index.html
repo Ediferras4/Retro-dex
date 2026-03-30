@@ -65,14 +65,14 @@
     }
 
     .brand-face {
-  width: 104px;
-  height: 104px;
-  object-fit: contain;
-  display: block;
-  margin-right: -3px;
-  margin-top: -10px;
-  filter: drop-shadow(0 0 14px rgba(86, 160, 255, 0.28));
-}
+      width: 104px;
+      height: 104px;
+      object-fit: contain;
+      display: block;
+      margin-right: -3px;
+      margin-top: -10px;
+      filter: drop-shadow(0 0 14px rgba(86, 160, 255, 0.28));
+    }
 
     .brand {
       font-size: 24px;
@@ -116,6 +116,11 @@
 
     .wallet-btn:hover {
       box-shadow: 0 12px 26px rgba(47, 107, 255, 0.28);
+    }
+
+    .wallet-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
     }
 
     .card {
@@ -582,6 +587,8 @@
     let userAddress = null;
     let direction = "USDC_TO_ORBIT";
     let slippagePercent = 1;
+    let isConnecting = false;
+    let isProcessingSwap = false;
 
     function getTokenInAddress() {
       return direction === "USDC_TO_ORBIT" ? USDC_ADDRESS : ORBIT_ADDRESS;
@@ -684,6 +691,27 @@
       };
     }
 
+    async function getRequiredApprovalState() {
+      if (!provider || !userAddress) return { needsApproval: false, tokenLabel: null };
+
+      const amountText = document.getElementById("amountIn").value;
+      if (!amountText || Number(amountText) <= 0) {
+        return { needsApproval: false, tokenLabel: null };
+      }
+
+      const tokenInAddress = getTokenInAddress();
+      const tokenIn = new ethers.Contract(tokenInAddress, ERC20_ABI, provider);
+      const decIn = await tokenIn.decimals();
+      const amountIn = ethers.utils.parseUnits(amountText, decIn);
+      const currentAllowance = await tokenIn.allowance(userAddress, PAIR_ADDRESS);
+
+      return {
+        needsApproval: currentAllowance.lt(amountIn),
+        tokenLabel: getTokenInLabel(),
+        amountIn
+      };
+    }
+
     async function setPercentageAmount(percent) {
       if (!provider || !userAddress) {
         setStatus("Conecte a wallet primeiro.");
@@ -715,6 +743,8 @@
       userAddress = null;
       signer = null;
       provider = null;
+      isConnecting = false;
+      isProcessingSwap = false;
       document.getElementById("walletStatus").innerText = "-";
       document.getElementById("walletBtn").innerText = "Connect Wallet";
       document.getElementById("balanceIn").innerText = "Balance: -";
@@ -731,11 +761,19 @@
     }
 
     async function handleWalletButton() {
+      if (isConnecting) return;
+
       if (userAddress) {
         clearWalletUI();
         return;
       }
+
       await connectWallet();
+    }
+
+    function isWrongNetworkSync() {
+      const text = document.getElementById("networkStatus").innerText || "";
+      return text !== "-" && text !== "Arc Testnet";
     }
 
     function updateDirectionUI() {
@@ -756,9 +794,15 @@
       }
     }
 
-    function updateSwapButton() {
+    async function updateSwapButton() {
       const amount = document.getElementById("amountIn").value;
       const btn = document.getElementById("swapBtn");
+
+      if (isProcessingSwap) {
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+        return;
+      }
 
       if (!userAddress) {
         btn.disabled = true;
@@ -766,10 +810,27 @@
         return;
       }
 
+      if (isWrongNetworkSync()) {
+        btn.disabled = false;
+        btn.innerText = "Wrong network";
+        return;
+      }
+
       if (!amount || Number(amount) <= 0) {
         btn.disabled = true;
         btn.innerText = "Enter amount";
         return;
+      }
+
+      try {
+        const approvalState = await getRequiredApprovalState();
+        if (approvalState.needsApproval) {
+          btn.disabled = false;
+          btn.innerText = `Approve ${approvalState.tokenLabel}`;
+          return;
+        }
+      } catch (err) {
+        console.error(err);
       }
 
       btn.disabled = false;
@@ -836,6 +897,13 @@
         return;
       }
 
+      if (isConnecting) return;
+      isConnecting = true;
+
+      const walletBtn = document.getElementById("walletBtn");
+      walletBtn.disabled = true;
+      walletBtn.innerText = "Connecting...";
+
       try {
         provider = new ethers.providers.Web3Provider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
@@ -849,18 +917,20 @@
             : `${network.name || "Unknown"} (${network.chainId})`;
 
         document.getElementById("walletStatus").innerText = shortAddress(userAddress);
-        updateWalletButton();
 
         const isArc = Number(network.chainId) === ARC_CHAIN_ID;
         document.getElementById("networkWarning").style.display = isArc ? "none" : "block";
 
         await refreshBalances();
-        updateSwapButton();
         await handleAmountInput();
         setStatus("Wallet conectada.");
       } catch (err) {
         console.error(err);
         setStatus("Erro ao conectar wallet.");
+      } finally {
+        isConnecting = false;
+        walletBtn.disabled = false;
+        updateWalletButton();
       }
     }
 
@@ -895,6 +965,8 @@
     }
 
     function toggleDirection() {
+      if (isProcessingSwap) return;
+
       direction = direction === "USDC_TO_ORBIT"
         ? "ORBIT_TO_USDC"
         : "USDC_TO_ORBIT";
@@ -904,7 +976,6 @@
     }
 
     async function handleAmountInput() {
-      updateSwapButton();
       updateQuickAmountsVisibility();
 
       const amountText = document.getElementById("amountIn").value;
@@ -915,6 +986,7 @@
         document.getElementById("priceStatus").innerText = "-";
         document.getElementById("minReceivedStatus").innerText = "-";
         setStatus("");
+        await updateSwapButton();
         return;
       }
 
@@ -952,6 +1024,8 @@
         document.getElementById("minReceivedStatus").innerText = "-";
         setStatus("Não foi possível calcular o valor de saída.");
       }
+
+      await updateSwapButton();
     }
 
     async function executeSwap() {
@@ -959,6 +1033,8 @@
         alert("Abra no navegador da MetaMask.");
         return;
       }
+
+      if (isProcessingSwap) return;
 
       if (!userAddress) {
         await connectWallet();
@@ -968,7 +1044,7 @@
       try {
         const network = await provider.getNetwork();
         if (Number(network.chainId) !== ARC_CHAIN_ID) {
-          alert("Troque para a Arc Testnet.");
+          await switchToArc();
           return;
         }
 
@@ -978,6 +1054,9 @@
           return;
         }
 
+        isProcessingSwap = true;
+        await updateSwapButton();
+
         const tokenInAddress = getTokenInAddress();
         const decIn = await getTokenDecimals(tokenInAddress);
         const amountIn = ethers.utils.parseUnits(amountText, decIn);
@@ -985,9 +1064,17 @@
         const tokenIn = new ethers.Contract(tokenInAddress, ERC20_ABI, signer);
         const pair = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, signer);
 
-        setStatus(`Aprovando ${getTokenInLabel()}...`);
-        const approveTx = await tokenIn.approve(PAIR_ADDRESS, amountIn);
-        await approveTx.wait();
+        const currentAllowance = await tokenIn.allowance(userAddress, PAIR_ADDRESS);
+
+        if (currentAllowance.lt(amountIn)) {
+          setStatus(`Aprovando ${getTokenInLabel()}...`);
+          const approveTx = await tokenIn.approve(PAIR_ADDRESS, amountIn);
+          await approveTx.wait();
+          setStatus(`${getTokenInLabel()} aprovado. Toque em swap novamente.`);
+          isProcessingSwap = false;
+          await updateSwapButton();
+          return;
+        }
 
         setStatus(`Fazendo swap ${getTokenInLabel()} → ${getTokenOutLabel()}...`);
         const swapTx = await pair.swap(tokenInAddress, amountIn);
@@ -1000,11 +1087,20 @@
         document.getElementById("minReceivedStatus").innerText = "-";
         updateQuickAmountsVisibility();
         await refreshBalances();
-        updateSwapButton();
       } catch (err) {
         console.error(err);
-        setStatus("Erro no swap. Veja o console ou tente de novo.");
-        alert("Erro no swap.");
+
+        const msg = (err?.data?.message || err?.message || "").toLowerCase();
+
+        if (msg.includes("user rejected") || msg.includes("denied") || msg.includes("rejected")) {
+          setStatus("Transação cancelada.");
+        } else {
+          setStatus("Erro no swap. Tente novamente.");
+          alert("Erro no swap.");
+        }
+      } finally {
+        isProcessingSwap = false;
+        await updateSwapButton();
       }
     }
 
@@ -1033,4 +1129,4 @@
     updateQuickAmountsVisibility();
   </script>
 </body>
-              </html>
+  </html>
