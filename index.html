@@ -1641,80 +1641,96 @@
     }
 
     async function handleAmountInput() {
-      const input = document.getElementById("amountIn");
-      const amountText = input.value;
-      const output = document.getElementById("amountOut");
-      const balanceIn = document.getElementById("balanceIn");
+  const input = document.getElementById("amountIn");
+  const amountText = input.value.trim();
+  const output = document.getElementById("amountOut");
 
-      updateQuickAmountsVisibility();
+  updateQuickAmountsVisibility();
 
-      if (tokenInBalanceIsZero()) {
-        input.value = "";
-        output.value = "";
-        document.getElementById("priceStatus").innerText = "-";
-        document.getElementById("minReceivedStatus").innerText = "-";
-        balanceIn.innerText = getCurrentBalanceText();
-        setInputErrorState(false);
-        await updateSwapButton();
-        return;
-      }
+  if (tokenInBalanceIsZero()) {
+    input.value = "";
+    output.value = "";
+    document.getElementById("priceStatus").innerText = "-";
+    document.getElementById("minReceivedStatus").innerText = "-";
+    setInputErrorState(false);
+    await updateSwapButton();
+    return;
+  }
 
-      if (!amountText || Number(amountText) <= 0 || !provider) {
-        output.value = "";
-        document.getElementById("priceStatus").innerText = "-";
-        document.getElementById("minReceivedStatus").innerText = "-";
-        setInputErrorState(false);
-        setStatus("");
-        await updateSwapButton();
-        return;
-      }
+  if (amountText === "" || !provider) {
+    output.value = "";
+    document.getElementById("priceStatus").innerText = "-";
+    document.getElementById("minReceivedStatus").innerText = "-";
+    setInputErrorState(false);
+    setStatus("");
+    await updateSwapButton();
+    return;
+  }
 
-      const amountNum = Number(amountText);
-      const isInsufficient = Number.isFinite(amountNum) && amountNum > currentTokenInBalance;
-      setInputErrorState(isInsufficient);
+  const amountNum = Number(amountText);
 
-      if (isInsufficient) {
-        setStatus(getInsufficientLabel());
-      } else {
-        setStatus("");
-      }
+  if (!Number.isFinite(amountNum) || amountNum <= 0) {
+    output.value = "";
+    document.getElementById("priceStatus").innerText = "-";
+    document.getElementById("minReceivedStatus").innerText = "-";
+    setInputErrorState(false);
+    setStatus("");
+    await updateSwapButton();
+    return;
+  }
 
-      try {
-        const pair = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, provider);
-        const tokenInAddress = getTokenInAddress();
-        const decIn = await getTokenDecimals(tokenInAddress);
+  const isInsufficient = amountNum > currentTokenInBalance;
+  setInputErrorState(isInsufficient);
 
-        const amountIn = ethers.utils.parseUnits(amountText, decIn);
-        const amountOutRaw = await pair.getAmountOut(tokenInAddress, amountIn);
+  if (isInsufficient) {
+    setStatus(getInsufficientLabel());
+  } else {
+    setStatus("");
+  }
 
-        const decOut = await getTokenDecimals(getTokenOutAddress());
-        const amountOut = ethers.utils.formatUnits(amountOutRaw, decOut);
-        const amountOutNum = Number(amountOut);
+  try {
+    const pair = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, provider);
+    const tokenInAddress = getTokenInAddress();
+    const decIn = await getTokenDecimals(tokenInAddress);
 
-        output.value = formatDisplayNumber(amountOutNum);
+    const amountIn = ethers.utils.parseUnits(amountText, decIn);
+    const amountOutRaw = await pair.getAmountOut(tokenInAddress, amountIn);
 
-        if (amountNum > 0 && amountOutNum > 0) {
-          const price = amountOutNum / amountNum;
-          const minReceived = amountOutNum * (1 - slippagePercent / 100);
+    const decOut = await getTokenDecimals(getTokenOutAddress());
+    const amountOut = ethers.utils.formatUnits(amountOutRaw, decOut);
+    const amountOutNum = Number(amountOut);
 
-          document.getElementById("priceStatus").innerText =
-            `1 ${getTokenInLabel()} = ${formatDisplayNumber(price)} ${getTokenOutLabel()}`;
-
-          document.getElementById("minReceivedStatus").innerText =
-            `${formatDisplayNumber(minReceived)} ${getTokenOutLabel()}`;
-        }
-      } catch (err) {
-        console.error(err);
-        output.value = "";
-        document.getElementById("priceStatus").innerText = "-";
-        document.getElementById("minReceivedStatus").innerText = "-";
-        if (!isInsufficient) {
-          setStatus("Não foi possível calcular o valor de saída.");
-        }
-      }
-
+    if (!Number.isFinite(amountOutNum) || amountOutNum <= 0) {
+      output.value = "";
+      document.getElementById("priceStatus").innerText = "-";
+      document.getElementById("minReceivedStatus").innerText = "-";
       await updateSwapButton();
+      return;
     }
+
+    output.value = formatDisplayNumber(amountOutNum);
+
+    const price = amountOutNum / amountNum;
+    const minReceived = amountOutNum * (1 - slippagePercent / 100);
+
+    document.getElementById("priceStatus").innerText =
+      `1 ${getTokenInLabel()} = ${formatDisplayNumber(price)} ${getTokenOutLabel()}`;
+
+    document.getElementById("minReceivedStatus").innerText =
+      `${formatDisplayNumber(minReceived)} ${getTokenOutLabel()}`;
+  } catch (err) {
+    console.error(err);
+    output.value = "";
+    document.getElementById("priceStatus").innerText = "-";
+    document.getElementById("minReceivedStatus").innerText = "-";
+
+    if (!isInsufficient) {
+      setStatus("Não foi possível calcular o valor de saída.");
+    }
+  }
+
+  await updateSwapButton();
+}
 
     async function executeSwap() {
       if (!window.ethereum) {
