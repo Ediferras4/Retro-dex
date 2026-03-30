@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Retro Payments Concept</title>
+  <title>Retro Pay Request</title>
   <style>
     * {
       box-sizing: border-box;
@@ -18,11 +18,12 @@
       --cream: #f5ead7;
       --orange: #ff8a4c;
       --gold: #ffcf6b;
-      --ink: #07101f;
-      --card: rgba(7, 15, 31, 0.88);
-      --line: rgba(140, 180, 255, 0.18);
       --text: #edf4ff;
       --muted: #9eb3d9;
+      --line: rgba(140, 180, 255, 0.16);
+      --card: rgba(7, 15, 31, 0.9);
+      --card-2: rgba(10, 19, 39, 0.92);
+      --shadow: rgba(0, 0, 0, 0.35);
     }
 
     body {
@@ -31,11 +32,11 @@
       font-family: Inter, Arial, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at top, rgba(88, 216, 255, 0.14), transparent 28%),
-        radial-gradient(circle at 80% 20%, rgba(255, 138, 76, 0.10), transparent 22%),
-        linear-gradient(180deg, #051634 0%, #04122d 48%, #020817 100%);
-      overflow-x: hidden;
+        radial-gradient(circle at top, rgba(88, 216, 255, 0.16), transparent 26%),
+        radial-gradient(circle at 80% 15%, rgba(255, 138, 76, 0.12), transparent 22%),
+        linear-gradient(180deg, #051634 0%, #04122d 45%, #020817 100%);
       position: relative;
+      overflow-x: hidden;
     }
 
     body::before {
@@ -43,23 +44,22 @@
       position: fixed;
       inset: 0;
       pointer-events: none;
-      opacity: 0.11;
+      opacity: 0.10;
       background-image:
         repeating-linear-gradient(
           to right,
           rgba(255,255,255,0.06) 0,
           rgba(255,255,255,0.06) 1px,
           transparent 1px,
-          transparent 44px
+          transparent 42px
         ),
         repeating-linear-gradient(
           to bottom,
           rgba(255,255,255,0.05) 0,
           rgba(255,255,255,0.05) 1px,
           transparent 1px,
-          transparent 44px
+          transparent 42px
         );
-      mix-blend-mode: screen;
     }
 
     body::after {
@@ -67,56 +67,55 @@
       position: fixed;
       inset: 0;
       pointer-events: none;
-      opacity: 0.07;
-      background-image:
-        radial-gradient(rgba(255,255,255,0.9) 0.7px, transparent 0.7px);
+      opacity: 0.05;
+      background-image: radial-gradient(rgba(255,255,255,0.9) 0.7px, transparent 0.7px);
       background-size: 4px 4px;
     }
 
     .page {
       width: 100%;
-      max-width: 460px;
+      max-width: 470px;
       margin: 0 auto;
-      padding: 20px 16px 42px;
+      padding: 18px 16px 40px;
       position: relative;
       z-index: 1;
     }
 
-    .hero {
-      position: relative;
-      border: 1px solid rgba(255,255,255,0.08);
+    .shell {
       border-radius: 30px;
-      background:
-        linear-gradient(180deg, rgba(6, 18, 46, 0.92), rgba(3, 9, 23, 0.96));
-      overflow: hidden;
-      padding: 20px 18px 24px;
+      background: linear-gradient(180deg, rgba(6,18,46,0.9), rgba(4,10,24,0.96));
+      border: 1px solid rgba(255,255,255,0.06);
       box-shadow:
-        0 24px 60px rgba(0,0,0,0.34),
+        0 28px 70px var(--shadow),
         inset 0 1px 0 rgba(255,255,255,0.04);
+      overflow: hidden;
+      position: relative;
     }
 
-    .hero::before {
+    .shell::before {
       content: "";
       position: absolute;
       width: 240px;
       height: 240px;
+      top: -80px;
       right: -70px;
-      top: -70px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(88,216,255,0.24), transparent 68%);
-      filter: blur(4px);
+      background: radial-gradient(circle, rgba(88,216,255,0.20), transparent 68%);
+      filter: blur(5px);
+      pointer-events: none;
     }
 
-    .hero::after {
+    .shell::after {
       content: "";
       position: absolute;
       width: 220px;
       height: 220px;
-      left: -80px;
+      left: -90px;
       bottom: -90px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,138,76,0.16), transparent 68%);
-      filter: blur(2px);
+      background: radial-gradient(circle, rgba(255,138,76,0.14), transparent 68%);
+      filter: blur(3px);
+      pointer-events: none;
     }
 
     .topbar {
@@ -124,7 +123,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 22px;
+      padding: 18px 18px 12px;
       position: relative;
       z-index: 2;
     }
@@ -142,12 +141,13 @@
       border-radius: 14px;
       display: grid;
       place-items: center;
-      font-size: 22px;
       background: linear-gradient(135deg, var(--orange), var(--gold));
-      color: #1a1209;
+      color: #161108;
+      font-size: 21px;
+      font-weight: 900;
       box-shadow:
-        0 10px 24px rgba(255, 138, 76, 0.28),
-        inset 0 1px 0 rgba(255,255,255,0.35);
+        0 10px 22px rgba(255,138,76,0.24),
+        inset 0 1px 0 rgba(255,255,255,0.30);
     }
 
     .brand-copy {
@@ -157,103 +157,84 @@
     .brand-title {
       font-size: 17px;
       font-weight: 900;
-      letter-spacing: 0.8px;
       color: var(--cream);
+      letter-spacing: 0.7px;
     }
 
     .brand-sub {
       font-size: 11px;
       color: var(--arc-blue-soft);
-      letter-spacing: 0.6px;
       text-transform: uppercase;
+      letter-spacing: 0.7px;
     }
 
-    .status-pill {
-      border: 1px solid rgba(124,176,255,0.18);
+    .pill {
+      border: 1px solid rgba(88,216,255,0.14);
       border-radius: 999px;
-      padding: 9px 14px;
+      padding: 9px 12px;
+      background: rgba(255,255,255,0.03);
+      color: var(--arc-cyan);
       font-size: 11px;
       font-weight: 800;
-      color: var(--arc-cyan);
-      background: rgba(255,255,255,0.03);
       white-space: nowrap;
     }
 
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 18px;
+    .hero {
+      padding: 6px 18px 18px;
       position: relative;
       z-index: 2;
     }
 
-    .poster-card {
+    .hero-card {
+      border-radius: 26px;
+      padding: 16px;
+      background: linear-gradient(180deg, rgba(7,14,31,0.86), rgba(5,9,21,0.95));
+      border: 1px solid rgba(255,255,255,0.05);
+      min-height: 320px;
       position: relative;
-      border-radius: 28px;
-      padding: 18px;
-      background:
-        linear-gradient(180deg, rgba(7,14,31,0.80), rgba(5,10,22,0.94));
-      border: 1px solid rgba(255,255,255,0.06);
       overflow: hidden;
-      min-height: 360px;
     }
 
-    .poster-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      opacity: 0.15;
-      background:
-        radial-gradient(circle at 50% 22%, rgba(88,216,255,0.24), transparent 18%),
-        radial-gradient(circle at 50% 68%, rgba(255,138,76,0.18), transparent 22%);
-      pointer-events: none;
-    }
-
-    .poster-head {
+    .hero-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin-bottom: 16px;
-      position: relative;
-      z-index: 2;
+      margin-bottom: 14px;
     }
 
-    .poster-mini {
+    .hero-mini {
       font-size: 11px;
-      letter-spacing: 4px;
       color: var(--gold);
+      letter-spacing: 4px;
       text-transform: uppercase;
     }
 
-    .poster-kanji {
+    .hero-kanji {
       font-size: 18px;
       font-weight: 900;
       color: var(--cream);
-      letter-spacing: 2px;
     }
 
     .daruma-wrap {
       display: flex;
       justify-content: center;
       align-items: center;
-      margin: 8px 0 10px;
+      margin-top: 8px;
       position: relative;
-      z-index: 2;
     }
 
     .daruma {
-      width: 215px;
-      height: 215px;
+      width: 205px;
+      height: 205px;
       border-radius: 50% 50% 46% 46%;
       position: relative;
-      background:
-        linear-gradient(180deg, #ff955b 0%, #ff7a42 52%, #e95f2f 100%);
+      background: linear-gradient(180deg, #ff955b 0%, #ff7a42 52%, #e95f2f 100%);
       box-shadow:
-        0 24px 36px rgba(0,0,0,0.30),
-        inset 0 -16px 30px rgba(0,0,0,0.18),
-        inset 0 8px 18px rgba(255,255,255,0.20);
-      border: 4px solid rgba(245, 234, 215, 0.9);
+        0 22px 34px rgba(0,0,0,0.32),
+        inset 0 -14px 28px rgba(0,0,0,0.16),
+        inset 0 8px 14px rgba(255,255,255,0.18);
+      border: 4px solid rgba(245, 234, 215, 0.92);
       overflow: hidden;
     }
 
@@ -263,44 +244,25 @@
       left: 50%;
       top: 14px;
       transform: translateX(-50%);
-      width: 150px;
-      height: 96px;
+      width: 144px;
+      height: 92px;
       border-radius: 50% 50% 44% 44%;
       background: var(--cream);
-      border: 4px solid #142037;
-      box-shadow: inset 0 -10px 16px rgba(0,0,0,0.05);
-    }
-
-    .daruma::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at 24% 62%, rgba(255,255,255,0.18), transparent 18%),
-        radial-gradient(circle at 78% 76%, rgba(255,255,255,0.08), transparent 16%);
-      pointer-events: none;
+      border: 4px solid #16203a;
     }
 
     .eye {
       position: absolute;
-      top: 58px;
-      width: 52px;
-      height: 32px;
+      top: 56px;
+      width: 50px;
+      height: 30px;
       border-radius: 50%;
-      background: #0e1730;
-      border: 3px solid #0e1730;
-      z-index: 3;
+      background: #101930;
+      z-index: 2;
     }
 
-    .eye.left {
-      left: 46px;
-      transform: rotate(-8deg);
-    }
-
-    .eye.right {
-      right: 46px;
-      transform: rotate(8deg);
-    }
+    .eye.left { left: 44px; }
+    .eye.right { right: 44px; }
 
     .eye::before {
       content: "";
@@ -309,236 +271,206 @@
       top: 50%;
       width: 12px;
       height: 12px;
-      background: var(--cream);
       border-radius: 50%;
+      background: var(--cream);
       transform: translate(-50%, -50%);
     }
 
     .brow {
       position: absolute;
-      top: 44px;
-      width: 62px;
-      height: 20px;
-      border-top: 5px solid #10182f;
-      border-radius: 50%;
-      z-index: 3;
-    }
-
-    .brow.left {
-      left: 38px;
-      transform: rotate(-8deg);
-    }
-
-    .brow.right {
-      right: 38px;
-      transform: rotate(8deg);
-    }
-
-    .moustache {
-      position: absolute;
-      top: 92px;
-      width: 48px;
+      top: 42px;
+      width: 58px;
       height: 18px;
-      border-bottom: 4px solid #10182f;
+      border-top: 5px solid #101930;
       border-radius: 50%;
-      z-index: 3;
+      z-index: 2;
     }
 
-    .moustache.left {
-      left: 56px;
-      transform: rotate(9deg);
-    }
-
-    .moustache.right {
-      right: 56px;
-      transform: rotate(-9deg);
-    }
+    .brow.left { left: 40px; transform: rotate(-8deg); }
+    .brow.right { right: 40px; transform: rotate(8deg); }
 
     .wave-band {
       position: absolute;
-      left: -10px;
-      right: -10px;
-      bottom: 28px;
-      height: 74px;
-      z-index: 2;
+      left: -6px;
+      right: -6px;
+      bottom: 30px;
+      height: 68px;
       background:
-        radial-gradient(circle at 8% 100%, transparent 34px, #53d6ff 35px 47px, transparent 48px),
-        radial-gradient(circle at 24% 100%, transparent 30px, #eaf7ff 31px 44px, transparent 45px),
-        radial-gradient(circle at 42% 100%, transparent 34px, #53d6ff 35px 49px, transparent 50px),
-        radial-gradient(circle at 59% 100%, transparent 28px, #eaf7ff 29px 41px, transparent 42px),
-        radial-gradient(circle at 77% 100%, transparent 33px, #53d6ff 34px 48px, transparent 49px),
-        radial-gradient(circle at 93% 100%, transparent 29px, #eaf7ff 30px 43px, transparent 44px);
+        radial-gradient(circle at 9% 100%, transparent 30px, #58d8ff 31px 43px, transparent 44px),
+        radial-gradient(circle at 25% 100%, transparent 28px, #eff8ff 29px 40px, transparent 41px),
+        radial-gradient(circle at 44% 100%, transparent 30px, #58d8ff 31px 44px, transparent 45px),
+        radial-gradient(circle at 63% 100%, transparent 27px, #eff8ff 28px 39px, transparent 40px),
+        radial-gradient(circle at 82% 100%, transparent 31px, #58d8ff 32px 45px, transparent 46px);
       opacity: 0.98;
-      filter: drop-shadow(0 -4px 0 rgba(12, 34, 70, 0.9));
     }
 
     .coin {
       position: absolute;
-      width: 54px;
-      height: 54px;
+      width: 52px;
+      height: 52px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #ffd56c, #e4a93e);
-      border: 3px solid rgba(14, 19, 32, 0.92);
-      box-shadow: 0 10px 18px rgba(0,0,0,0.26);
-      z-index: 2;
+      background: linear-gradient(135deg, #ffd56c, #e6aa3f);
+      border: 3px solid rgba(13,18,30,0.94);
       display: grid;
       place-items: center;
-      color: #1a1508;
       font-size: 18px;
       font-weight: 900;
+      color: #1b1509;
+      box-shadow: 0 10px 18px rgba(0,0,0,0.25);
     }
 
-    .coin.one {
-      right: 14px;
-      top: 118px;
-    }
+    .coin.one { left: 12px; top: 74px; }
+    .coin.two { right: 14px; top: 104px; }
 
-    .coin.two {
-      left: 18px;
-      bottom: 84px;
-    }
-
-    .rope {
-      position: absolute;
-      bottom: 34px;
-      left: 50%;
-      width: 164px;
-      height: 44px;
-      border: 4px solid var(--cream);
-      border-top: none;
-      border-radius: 0 0 100px 100px;
-      transform: translateX(-50%);
-      z-index: 3;
-      opacity: 0.88;
-    }
-
-    .poster-title {
-      margin: 12px 0 0;
+    .hero-title {
       text-align: center;
+      margin: 14px 0 0;
       font-size: 34px;
-      font-weight: 900;
       line-height: 0.95;
-      letter-spacing: 1px;
+      font-weight: 900;
       color: var(--cream);
-      position: relative;
-      z-index: 2;
     }
 
-    .poster-title span {
+    .hero-title span {
       color: var(--arc-cyan);
-      text-shadow: 0 0 18px rgba(88,216,255,0.24);
     }
 
-    .poster-copy {
+    .hero-text {
       margin: 10px 0 0;
       text-align: center;
-      color: #bdd3f7;
       font-size: 13px;
       line-height: 1.5;
+      color: #c0d4f5;
+    }
+
+    .section {
+      padding: 0 18px 18px;
       position: relative;
       z-index: 2;
     }
 
-    .info-card {
+    .payment-card {
       border-radius: 24px;
-      padding: 18px;
-      background:
-        linear-gradient(180deg, rgba(7,15,31,0.88), rgba(4,10,24,0.95));
-      border: 1px solid rgba(255,255,255,0.06);
+      background: linear-gradient(180deg, rgba(8,16,34,0.92), rgba(5,10,22,0.98));
+      border: 1px solid rgba(255,255,255,0.05);
+      padding: 16px;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
     }
 
-    .info-top {
+    .section-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
-    .info-kicker {
+    .section-kicker {
       font-size: 11px;
-      color: var(--orange);
-      letter-spacing: 2.4px;
+      letter-spacing: 2.6px;
       text-transform: uppercase;
+      color: var(--orange);
       font-weight: 800;
     }
 
-    .info-chip {
+    .section-chip {
       padding: 8px 12px;
       border-radius: 999px;
-      border: 1px solid rgba(88,216,255,0.16);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(88,216,255,0.12);
       color: var(--arc-cyan);
       font-size: 11px;
       font-weight: 800;
-      background: rgba(255,255,255,0.03);
     }
 
-    .info-title {
-      font-size: 24px;
+    .section-title {
+      font-size: 26px;
       font-weight: 900;
       line-height: 1.05;
       margin: 0 0 10px;
       color: var(--cream);
     }
 
-    .info-text {
-      margin: 0 0 18px;
+    .section-text {
+      margin: 0 0 16px;
       color: var(--muted);
       font-size: 14px;
       line-height: 1.55;
     }
 
-    .feature-list {
+    .form-grid {
       display: grid;
-      gap: 10px;
-      margin-bottom: 18px;
+      gap: 12px;
+      margin-bottom: 14px;
     }
 
-    .feature {
-      border-radius: 18px;
-      padding: 12px 14px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.05);
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
+    .field {
+      display: grid;
+      gap: 7px;
     }
 
-    .feature-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      margin-top: 5px;
-      flex-shrink: 0;
-      background: linear-gradient(135deg, var(--gold), var(--orange));
-      box-shadow: 0 0 12px rgba(255,138,76,0.24);
-    }
-
-    .feature strong {
-      display: block;
-      color: var(--text);
-      font-size: 13px;
-      margin-bottom: 3px;
-    }
-
-    .feature span {
-      display: block;
-      color: var(--muted);
+    .field label {
       font-size: 12px;
-      line-height: 1.4;
+      font-weight: 700;
+      color: #bed0ee;
     }
 
-    .cta-row {
+    .field input,
+    .field textarea {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.06);
+      outline: none;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.035);
+      color: var(--text);
+      padding: 14px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      resize: none;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: #7690bc;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      border-color: rgba(88,216,255,0.28);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 112px;
+      gap: 10px;
+    }
+
+    .currency-pill {
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.04);
+      color: var(--cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 900;
+      min-height: 48px;
+    }
+
+    .button-row {
       display: flex;
       gap: 10px;
+      margin-top: 4px;
     }
 
     .btn {
       flex: 1;
       border: none;
       border-radius: 18px;
-      padding: 14px 14px;
+      padding: 15px 14px;
       font-size: 14px;
       font-weight: 900;
       cursor: pointer;
@@ -552,45 +484,208 @@
     .btn-primary {
       background: linear-gradient(135deg, var(--arc-blue), var(--arc-cyan));
       color: #07111f;
-      box-shadow: 0 12px 28px rgba(79,134,255,0.22);
+      box-shadow: 0 12px 26px rgba(79,134,255,0.22);
     }
 
     .btn-secondary {
       background: rgba(255,255,255,0.05);
       color: var(--cream);
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .preview-card {
+      margin-top: 16px;
+      border-radius: 22px;
+      padding: 16px;
+      background:
+        linear-gradient(180deg, rgba(8,17,36,0.92), rgba(6,11,24,0.96));
+      border: 1px solid rgba(255,255,255,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .preview-card::before {
+      content: "";
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      top: -50px;
+      right: -50px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(79,134,255,0.16), transparent 70%);
+      pointer-events: none;
+    }
+
+    .preview-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .preview-title {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .status-badge {
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(88,216,255,0.10);
+      border: 1px solid rgba(88,216,255,0.14);
+      color: var(--arc-cyan);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .amount-big {
+      font-size: 36px;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--cream);
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .preview-list {
+      display: grid;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .preview-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    .preview-row span:first-child {
+      color: var(--muted);
+    }
+
+    .preview-row span:last-child {
+      color: var(--text);
+      text-align: right;
+      max-width: 58%;
+      word-break: break-word;
+    }
+
+    .preview-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .action-btn {
+      flex: 1;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.04);
+      color: var(--cream);
+      border-radius: 16px;
+      padding: 13px 12px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .mini-info {
+      margin-top: 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .mini-card {
+      border-radius: 18px;
+      padding: 13px 14px;
+      background: rgba(255,255,255,0.035);
+      border: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .mini-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-top: 5px;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, var(--gold), var(--orange));
+      box-shadow: 0 0 12px rgba(255,138,76,0.24);
+    }
+
+    .mini-card strong {
+      display: block;
+      font-size: 13px;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+
+    .mini-card span {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
     }
 
     .footer-note {
-      margin-top: 18px;
+      padding: 0 18px 20px;
       text-align: center;
       color: #87a0c9;
       font-size: 11px;
       letter-spacing: 1.2px;
       text-transform: uppercase;
+      position: relative;
+      z-index: 2;
+    }
+
+    @media (max-width: 480px) {
+      .hero-title {
+        font-size: 30px;
+      }
+
+      .section-title {
+        font-size: 23px;
+      }
+
+      .amount-big {
+        font-size: 31px;
+      }
     }
   </style>
 </head>
 <body>
   <main class="page">
-    <section class="hero">
+    <section class="shell">
       <div class="topbar">
         <div class="brand">
           <div class="brand-mark">◉</div>
           <div class="brand-copy">
             <div class="brand-title">RETRO PAY</div>
-            <div class="brand-sub">arc-inspired concept</div>
+            <div class="brand-sub">ARC-INSPIRED CONCEPT</div>
           </div>
         </div>
 
-        <div class="status-pill">Visual Test</div>
+        <div class="pill">Payment Test</div>
       </div>
 
-      <div class="hero-grid">
-        <div class="poster-card">
-          <div class="poster-head">
-            <div class="poster-mini">Arc Testnet Flow</div>
-            <div class="poster-kanji">達磨</div>
+      <div class="hero">
+        <div class="hero-card">
+          <div class="hero-head">
+            <div class="hero-mini">Arc Payment Flow</div>
+            <div class="hero-kanji">達磨</div>
           </div>
 
           <div class="daruma-wrap">
@@ -599,75 +694,130 @@
               <div class="brow right"></div>
               <div class="eye left"></div>
               <div class="eye right"></div>
-              <div class="moustache left"></div>
-              <div class="moustache right"></div>
               <div class="wave-band"></div>
-              <div class="rope"></div>
             </div>
 
-            <div class="coin one">円</div>
-            <div class="coin two">$</div>
+            <div class="coin one">$</div>
+            <div class="coin two">円</div>
           </div>
 
-          <h1 class="poster-title">
-            Arc <span>Payment</span>
-          </h1>
-
-          <p class="poster-copy">
-            Uma direção visual mais artística para testar uma página separada
-            de pagamentos, mistura de poster retrô japonês com identidade azul da Arc.
+          <h1 class="hero-title">Arc <span>Payment</span></h1>
+          <p class="hero-text">
+            Uma página separada para testar o módulo de pagamento da Retro DEX,
+            com visual artístico e foco em USDC na Arc Testnet.
           </p>
-        </div>
-
-        <div class="info-card">
-          <div class="info-top">
-            <div class="info-kicker">Concept Module</div>
-            <div class="info-chip">Prototype</div>
-          </div>
-
-          <h2 class="info-title">Página visual para payments</h2>
-
-          <p class="info-text">
-            Essa versão é só um teste de atmosfera. A ideia é observar como
-            o estilo ilustrado, com textura de poster e contraste forte,
-            conversa com uma futura página separada da Retro DEX.
-          </p>
-
-          <div class="feature-list">
-            <div class="feature">
-              <div class="feature-dot"></div>
-              <div>
-                <strong>Paleta forte</strong>
-                <span>Azul escuro, creme, laranja e ciano para dar presença.</span>
-              </div>
-            </div>
-
-            <div class="feature">
-              <div class="feature-dot"></div>
-              <div>
-                <strong>Textura premium</strong>
-                <span>Grid leve e granulação para parecer poster impresso.</span>
-              </div>
-            </div>
-
-            <div class="feature">
-              <div class="feature-dot"></div>
-              <div>
-                <strong>Uso futuro</strong>
-                <span>Boa base para uma página de request payment ou pay with swap.</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="cta-row">
-            <button class="btn btn-primary">Testar estilo</button>
-            <button class="btn btn-secondary">Voltar depois</button>
-          </div>
-
-          <div class="footer-note">retro dex concept study</div>
         </div>
       </div>
+
+      <div class="section">
+        <div class="payment-card">
+          <div class="section-top">
+            <div class="section-kicker">Payment Request</div>
+            <div class="section-chip">Prototype</div>
+          </div>
+
+          <h2 class="section-title">Crie um pedido de pagamento</h2>
+          <p class="section-text">
+            Preencha os campos abaixo para visualizar como ficaria um request
+            de pagamento em USDC dentro do universo da Retro DEX.
+          </p>
+
+          <div class="form-grid">
+            <div class="field">
+              <label>Recipient / To</label>
+              <input type="text" value="0x58...1d7E" placeholder="Wallet address" />
+            </div>
+
+            <div class="field">
+              <label>Amount</label>
+              <div class="split">
+                <input type="text" value="10.00" placeholder="0.00" />
+                <div class="currency-pill">USDC</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Title</label>
+              <input type="text" value="Retro Design Work" placeholder="Payment title" />
+            </div>
+
+            <div class="field">
+              <label>Description</label>
+              <textarea rows="3" placeholder="Write a short note">Concept payment request for Arc Testnet.</textarea>
+            </div>
+          </div>
+
+          <div class="button-row">
+            <button class="btn btn-primary">Create Request</button>
+            <button class="btn btn-secondary">Preview</button>
+          </div>
+
+          <div class="preview-card">
+            <div class="preview-top">
+              <div class="preview-title">Payment Request</div>
+              <div class="status-badge">Pending</div>
+            </div>
+
+            <div class="amount-big">10 USDC</div>
+
+            <div class="preview-list">
+              <div class="preview-row">
+                <span>For</span>
+                <span>Retro Design Work</span>
+              </div>
+
+              <div class="preview-row">
+                <span>Recipient</span>
+                <span>0x58...1d7E</span>
+              </div>
+
+              <div class="preview-row">
+                <span>Network</span>
+                <span>Arc Testnet</span>
+              </div>
+
+              <div class="preview-row">
+                <span>Description</span>
+                <span>Concept payment request for Arc Testnet.</span>
+              </div>
+            </div>
+
+            <div class="preview-actions">
+              <button class="action-btn">Pay now</button>
+              <button class="action-btn">Copy request</button>
+            </div>
+          </div>
+
+          <div class="mini-info">
+            <div class="mini-card">
+              <div class="mini-dot"></div>
+              <div>
+                <strong>USDC-native flow</strong>
+                <span>Focado em pagamento simples, direto e alinhado com a Arc.</span>
+              </div>
+            </div>
+
+            <div class="mini-card">
+              <div class="mini-dot"></div>
+              <div>
+                <strong>Boa base pra integrar depois</strong>
+                <span>Quando esse conceito estiver bom, dá pra integrar no projeto maior.</span>
+              </div>
+            </div>
+
+            <div class="mini-card">
+              <div class="mini-dot"></div>
+              <div>
+                <strong>Visual + utilidade</strong>
+                <span>Mais forte do que uma página só bonita: já mostra uma função clara.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-note">retro dex payment module test</div>
     </section>
   </main>
 </body>
-</html>
+                </html>
