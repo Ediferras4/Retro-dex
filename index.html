@@ -802,7 +802,7 @@
               <input
                 id="amountIn"
                 class="amount-input"
-                type="number"
+                type="text"
                 inputmode="decimal"
                 placeholder="0.0"
                 oninput="handleAmountInput()"
@@ -1212,10 +1212,24 @@
       return Math.floor(balanceNum * factor) / factor;
     }
 
+    function normalizeAmountInput(raw) {
+      let value = String(raw || "").replace(",", ".").replace(/[^\d.]/g, "");
+
+      const firstDot = value.indexOf(".");
+      if (firstDot !== -1) {
+        value =
+          value.slice(0, firstDot + 1) +
+          value.slice(firstDot + 1).replace(/\./g, "");
+      }
+
+      return value;
+    }
+
     function updateQuickAmountsVisibility() {
       const quick = document.getElementById("quickAmounts");
       const input = document.getElementById("amountIn");
-      const hasValue = !!input.value && Number(input.value) > 0;
+      const normalized = normalizeAmountInput(input.value);
+      const hasValue = normalized !== "" && Number(normalized) > 0;
       const shouldShow = amountInputFocused || hasValue;
 
       quick.classList.toggle("show", shouldShow);
@@ -1297,7 +1311,7 @@
     async function getRequiredApprovalState() {
       if (!provider || !userAddress) return { needsApproval: false, tokenLabel: null };
 
-      const amountText = document.getElementById("amountIn").value;
+      const amountText = normalizeAmountInput(document.getElementById("amountIn").value);
       if (!amountText || Number(amountText) <= 0) {
         return { needsApproval: false, tokenLabel: null };
       }
@@ -1427,7 +1441,7 @@
     }
 
     async function updateSwapButton() {
-      const amount = document.getElementById("amountIn").value;
+      const amount = normalizeAmountInput(document.getElementById("amountIn").value);
       const btn = document.getElementById("swapBtn");
 
       if (isProcessingSwap) {
@@ -1641,96 +1655,101 @@
     }
 
     async function handleAmountInput() {
-  const input = document.getElementById("amountIn");
-  const amountText = input.value.trim();
-  const output = document.getElementById("amountOut");
+      const input = document.getElementById("amountIn");
+      const normalizedValue = normalizeAmountInput(input.value);
+      const output = document.getElementById("amountOut");
 
-  updateQuickAmountsVisibility();
+      if (input.value !== normalizedValue) {
+        input.value = normalizedValue;
+      }
 
-  if (tokenInBalanceIsZero()) {
-    input.value = "";
-    output.value = "";
-    document.getElementById("priceStatus").innerText = "-";
-    document.getElementById("minReceivedStatus").innerText = "-";
-    setInputErrorState(false);
-    await updateSwapButton();
-    return;
-  }
+      updateQuickAmountsVisibility();
 
-  if (amountText === "" || !provider) {
-    output.value = "";
-    document.getElementById("priceStatus").innerText = "-";
-    document.getElementById("minReceivedStatus").innerText = "-";
-    setInputErrorState(false);
-    setStatus("");
-    await updateSwapButton();
-    return;
-  }
+      if (tokenInBalanceIsZero()) {
+        input.value = "";
+        output.value = "";
+        document.getElementById("priceStatus").innerText = "-";
+        document.getElementById("minReceivedStatus").innerText = "-";
+        document.getElementById("balanceIn").innerText = getCurrentBalanceText();
+        setInputErrorState(false);
+        await updateSwapButton();
+        return;
+      }
 
-  const amountNum = Number(amountText);
+      if (!provider || normalizedValue === "") {
+        output.value = "";
+        document.getElementById("priceStatus").innerText = "-";
+        document.getElementById("minReceivedStatus").innerText = "-";
+        setInputErrorState(false);
+        setStatus("");
+        await updateSwapButton();
+        return;
+      }
 
-  if (!Number.isFinite(amountNum) || amountNum <= 0) {
-    output.value = "";
-    document.getElementById("priceStatus").innerText = "-";
-    document.getElementById("minReceivedStatus").innerText = "-";
-    setInputErrorState(false);
-    setStatus("");
-    await updateSwapButton();
-    return;
-  }
+      const amountNum = Number(normalizedValue);
 
-  const isInsufficient = amountNum > currentTokenInBalance;
-  setInputErrorState(isInsufficient);
+      if (!Number.isFinite(amountNum) || amountNum <= 0) {
+        output.value = "";
+        document.getElementById("priceStatus").innerText = "-";
+        document.getElementById("minReceivedStatus").innerText = "-";
+        setInputErrorState(false);
+        setStatus("");
+        await updateSwapButton();
+        return;
+      }
 
-  if (isInsufficient) {
-    setStatus(getInsufficientLabel());
-  } else {
-    setStatus("");
-  }
+      const isInsufficient = amountNum > currentTokenInBalance;
+      setInputErrorState(isInsufficient);
 
-  try {
-    const pair = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, provider);
-    const tokenInAddress = getTokenInAddress();
-    const decIn = await getTokenDecimals(tokenInAddress);
+      if (isInsufficient) {
+        setStatus(getInsufficientLabel());
+      } else {
+        setStatus("");
+      }
 
-    const amountIn = ethers.utils.parseUnits(amountText, decIn);
-    const amountOutRaw = await pair.getAmountOut(tokenInAddress, amountIn);
+      try {
+        const pair = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, provider);
+        const tokenInAddress = getTokenInAddress();
+        const decIn = await getTokenDecimals(tokenInAddress);
 
-    const decOut = await getTokenDecimals(getTokenOutAddress());
-    const amountOut = ethers.utils.formatUnits(amountOutRaw, decOut);
-    const amountOutNum = Number(amountOut);
+        const amountIn = ethers.utils.parseUnits(normalizedValue, decIn);
+        const amountOutRaw = await pair.getAmountOut(tokenInAddress, amountIn);
 
-    if (!Number.isFinite(amountOutNum) || amountOutNum <= 0) {
-      output.value = "";
-      document.getElementById("priceStatus").innerText = "-";
-      document.getElementById("minReceivedStatus").innerText = "-";
+        const decOut = await getTokenDecimals(getTokenOutAddress());
+        const amountOut = ethers.utils.formatUnits(amountOutRaw, decOut);
+        const amountOutNum = Number(amountOut);
+
+        if (!Number.isFinite(amountOutNum) || amountOutNum <= 0) {
+          output.value = "";
+          document.getElementById("priceStatus").innerText = "-";
+          document.getElementById("minReceivedStatus").innerText = "-";
+          await updateSwapButton();
+          return;
+        }
+
+        output.value = formatDisplayNumber(amountOutNum);
+
+        const price = amountOutNum / amountNum;
+        const minReceived = amountOutNum * (1 - slippagePercent / 100);
+
+        document.getElementById("priceStatus").innerText =
+          `1 ${getTokenInLabel()} = ${formatDisplayNumber(price)} ${getTokenOutLabel()}`;
+
+        document.getElementById("minReceivedStatus").innerText =
+          `${formatDisplayNumber(minReceived)} ${getTokenOutLabel()}`;
+      } catch (err) {
+        console.error(err);
+        output.value = "";
+        document.getElementById("priceStatus").innerText = "-";
+        document.getElementById("minReceivedStatus").innerText = "-";
+
+        if (!isInsufficient) {
+          setStatus("Não foi possível calcular o valor de saída.");
+        }
+      }
+
       await updateSwapButton();
-      return;
     }
-
-    output.value = formatDisplayNumber(amountOutNum);
-
-    const price = amountOutNum / amountNum;
-    const minReceived = amountOutNum * (1 - slippagePercent / 100);
-
-    document.getElementById("priceStatus").innerText =
-      `1 ${getTokenInLabel()} = ${formatDisplayNumber(price)} ${getTokenOutLabel()}`;
-
-    document.getElementById("minReceivedStatus").innerText =
-      `${formatDisplayNumber(minReceived)} ${getTokenOutLabel()}`;
-  } catch (err) {
-    console.error(err);
-    output.value = "";
-    document.getElementById("priceStatus").innerText = "-";
-    document.getElementById("minReceivedStatus").innerText = "-";
-
-    if (!isInsufficient) {
-      setStatus("Não foi possível calcular o valor de saída.");
-    }
-  }
-
-  await updateSwapButton();
-}
 
     async function executeSwap() {
       if (!window.ethereum) {
@@ -1757,7 +1776,7 @@
           return;
         }
 
-        const amountText = document.getElementById("amountIn").value;
+        const amountText = normalizeAmountInput(document.getElementById("amountIn").value);
         if (!amountText || Number(amountText) <= 0) {
           alert("Digite um valor.");
           return;
@@ -1877,4 +1896,4 @@
     updateQuickAmountsVisibility();
   </script>
 </body>
-  </html>
+          </html>
