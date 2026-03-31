@@ -7,27 +7,38 @@
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     :root {
       --bg-top: #06122c;
       --bg-mid: #0a234f;
       --bg-bottom: #121a35;
+
       --card-bg: rgba(10, 16, 34, 0.92);
       --box-bg: rgba(14, 22, 44, 0.96);
       --panel-bg: rgba(13, 21, 43, 0.98);
+
       --text-main: #f3f7ff;
       --text-soft: #b8c6e6;
       --text-dim: #86a0d3;
+
       --shadow-soft: rgba(9, 18, 38, 0.55);
+
       --arc-blue-1: #123fd5;
       --arc-blue-2: #1f59f3;
       --arc-blue-3: #3f87ff;
       --arc-blue-4: #6ba8ff;
+
+      --gold-1: #f7c767;
+      --gold-2: #ffde8a;
+      --gold-3: #b98720;
+
       --danger: #ff6b7a;
       --danger-soft: #ffb7c0;
+
+      --cream: #eef4ff;
+      --cyan: #58d8ff;
+      --line-soft: rgba(117, 146, 212, 0.14);
     }
 
     body {
@@ -47,6 +58,7 @@
     .app {
       width: 100%;
       max-width: 430px;
+      position: relative;
     }
 
     .welcome-line {
@@ -60,19 +72,21 @@
     }
 
     .topbar {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       padding: 13px 13px 13px 15px;
       border-radius: 24px;
-      margin-bottom: 4px;
+      margin-bottom: 10px;
       background: rgba(10, 16, 34, 0.78);
       border: 1px solid rgba(98, 127, 197, 0.18);
       box-shadow:
         0 18px 34px rgba(9, 18, 38, 0.45),
         inset 0 1px 0 rgba(255,255,255,0.04);
       backdrop-filter: blur(12px);
+      z-index: 20;
     }
 
     .brand-wrap {
@@ -96,14 +110,32 @@
       align-items: center;
       gap: 10px;
       flex-shrink: 0;
+      position: relative;
     }
 
-    .wallet-btn {
+    .wallet-btn,
+    .gear-btn {
       border: 1px solid rgba(116, 186, 255, 0.16);
       color: #fff;
       font-weight: 700;
       cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease, background 0.15s ease;
+    }
+
+    .wallet-btn:active,
+    .gear-btn:active,
+    .seg-item:active,
+    .sheet-item:active,
+    .main-btn:active,
+    .secondary-btn:active,
+    .small-btn:active,
+    .switch-btn:active,
+    .slippage-open-btn:active,
+    .wallet-sheet-option:active {
+      transform: scale(0.98);
+    }
+
+    .wallet-btn {
       border-radius: 16px;
       padding: 10px 16px;
       background: linear-gradient(135deg, var(--arc-blue-1) 0%, var(--arc-blue-2) 52%, var(--arc-blue-4) 100%);
@@ -112,12 +144,23 @@
       white-space: nowrap;
     }
 
-    .menu-btn {
-      width: 34px;
-      height: 34px;
+    .wallet-btn.connected {
+      color: #2d1f00;
+      border-color: rgba(255, 222, 138, 0.22);
+      background: linear-gradient(135deg, var(--gold-1) 0%, var(--gold-2) 55%, #ffd057 100%);
+      box-shadow: 0 10px 24px rgba(255, 207, 107, 0.18);
+    }
+
+    .wallet-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .gear-btn {
+      width: 36px;
+      height: 36px;
       border-radius: 12px;
       background: linear-gradient(180deg, rgba(31, 49, 97, 0.95), rgba(18, 30, 61, 0.95));
-      border: 1px solid rgba(120, 160, 255, 0.16);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -127,31 +170,88 @@
       font-size: 15px;
       line-height: 1;
       color: #dfeaff;
-      cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
     }
 
-    .wallet-btn:active,
-    .menu-btn:active {
-      transform: scale(0.98);
-    }
-
-    .wallet-btn:hover {
-      box-shadow: 0 12px 26px rgba(47, 107, 255, 0.28);
-    }
-
-    .wallet-btn:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-
-    .screen {
+    .gear-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 170px;
+      background: rgba(13, 21, 43, 0.98);
+      border: 1px solid rgba(117, 146, 212, 0.18);
+      border-radius: 18px;
+      padding: 10px;
+      box-shadow: 0 18px 32px rgba(0,0,0,0.24);
       display: none;
+      z-index: 30;
     }
 
-    .screen.active {
-      display: block;
+    .gear-dropdown.show { display: block; }
+
+    .gear-title {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      font-weight: 800;
     }
+
+    .lang-btn {
+      width: 100%;
+      border: 1px solid rgba(119, 170, 255, 0.14);
+      background: rgba(255,255,255,0.04);
+      color: #e6eeff;
+      border-radius: 14px;
+      padding: 12px 12px;
+      cursor: default;
+      font-size: 13px;
+      font-weight: 800;
+      text-align: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+    }
+
+    .segbar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px;
+      margin-bottom: 12px;
+      border-radius: 22px;
+      background: rgba(10, 16, 34, 0.78);
+      border: 1px solid rgba(98, 127, 197, 0.16);
+      box-shadow:
+        0 14px 28px rgba(9, 18, 38, 0.38),
+        inset 0 1px 0 rgba(255,255,255,0.03);
+      backdrop-filter: blur(12px);
+    }
+
+    .seg-item {
+      flex: 1;
+      min-width: 0;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #d9e7ff;
+      border-radius: 16px;
+      padding: 12px 10px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    }
+
+    .seg-item.active {
+      border-color: rgba(96, 159, 255, 0.64);
+      background: linear-gradient(180deg, rgba(46, 106, 255, 0.18), rgba(30, 73, 176, 0.12));
+      box-shadow:
+        0 0 0 1px rgba(96, 159, 255, 0.22) inset,
+        0 0 16px rgba(63, 135, 255, 0.14);
+      color: #f4f8ff;
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
 
     .card {
       background: var(--card-bg);
@@ -227,7 +327,7 @@
     }
 
     .token-side {
-      min-width: 152px;
+      min-width: 154px;
       display: flex;
       flex-direction: column;
       align-items: flex-end;
@@ -248,17 +348,8 @@
       transition: color 0.15s ease;
     }
 
-    .amount-input::placeholder {
-      color: #7385af;
-    }
-
-    .amount-input.insufficient {
-      color: var(--danger);
-    }
-
-    .amount-input.blocked {
-      caret-color: transparent;
-    }
+    .amount-input::placeholder { color: #7385af; }
+    .amount-input.insufficient { color: var(--danger); }
 
     .quick-amounts {
       display: none;
@@ -283,21 +374,9 @@
       border-radius: 999px;
       padding: 3px 8px;
       height: 24px;
-      min-width: 0;
       cursor: pointer;
       font-size: 10px;
       font-weight: 700;
-      line-height: 1;
-      transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
-    }
-
-    .quick-btn:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.14);
-    }
-
-    .quick-btn:active {
-      transform: scale(0.97);
     }
 
     .token-pill {
@@ -308,7 +387,7 @@
       padding: 11px 16px;
       font-size: 14px;
       font-weight: 700;
-      min-width: 152px;
+      min-width: 154px;
       text-align: center;
       display: inline-flex;
       align-items: center;
@@ -319,13 +398,7 @@
       transition: transform 0.15s ease, border-color 0.15s ease;
     }
 
-    .token-pill:hover {
-      border-color: rgba(140, 170, 230, 0.24);
-    }
-
-    .token-pill:active {
-      transform: scale(0.985);
-    }
+    .token-pill:hover { border-color: rgba(140, 170, 230, 0.24); }
 
     .token-icon {
       width: 28px;
@@ -334,6 +407,11 @@
       object-fit: cover;
       flex-shrink: 0;
       box-shadow: 0 0 12px rgba(79, 134, 255, 0.18);
+    }
+
+    .token-icon.usdc-big {
+      width: 34px;
+      height: 34px;
     }
 
     .balance-under-token {
@@ -347,9 +425,7 @@
       transition: color 0.15s ease;
     }
 
-    .balance-under-token.insufficient {
-      color: var(--danger-soft);
-    }
+    .balance-under-token.insufficient { color: var(--danger-soft); }
 
     .switch-wrap {
       display: flex;
@@ -371,17 +447,6 @@
       box-shadow:
         0 8px 18px rgba(0,0,0,0.28),
         0 0 18px rgba(79, 134, 255, 0.18);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .switch-btn:hover {
-      box-shadow:
-        0 10px 20px rgba(0,0,0,0.32),
-        0 0 20px rgba(79, 134, 255, 0.24);
-    }
-
-    .switch-btn:active {
-      transform: scale(0.97);
     }
 
     .details {
@@ -402,9 +467,7 @@
       align-items: center;
     }
 
-    .details-row span:last-child {
-      text-align: right;
-    }
+    .details-row span:last-child { text-align: right; }
 
     .slippage-row-main {
       display: flex;
@@ -442,15 +505,6 @@
       color: #f7fbff;
       background: linear-gradient(135deg, var(--arc-blue-1) 0%, var(--arc-blue-2) 36%, var(--arc-blue-3) 72%, var(--arc-blue-4) 100%);
       box-shadow: 0 14px 30px rgba(29, 86, 242, 0.24);
-      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
-    }
-
-    .main-btn:hover {
-      box-shadow: 0 16px 34px rgba(29, 86, 242, 0.30);
-    }
-
-    .main-btn:active {
-      transform: scale(0.99);
     }
 
     .main-btn:disabled {
@@ -597,7 +651,8 @@
     }
 
     .sheet-backdrop,
-    .slippage-backdrop {
+    .slippage-backdrop,
+    .wallet-sheet-backdrop {
       position: fixed;
       inset: 0;
       background: rgba(1, 6, 20, 0.55);
@@ -608,13 +663,15 @@
     }
 
     .sheet-backdrop.show,
-    .slippage-backdrop.show {
+    .slippage-backdrop.show,
+    .wallet-sheet-backdrop.show {
       opacity: 1;
       pointer-events: auto;
     }
 
     .bottom-sheet,
-    .slippage-sheet {
+    .slippage-sheet,
+    .wallet-sheet {
       position: fixed;
       left: 50%;
       bottom: 0;
@@ -638,12 +695,14 @@
       justify-content: flex-start;
     }
 
-    .slippage-sheet {
+    .slippage-sheet,
+    .wallet-sheet {
       padding: 12px 14px calc(14px + env(safe-area-inset-bottom));
     }
 
     .bottom-sheet.show,
-    .slippage-sheet.show {
+    .slippage-sheet.show,
+    .wallet-sheet.show {
       transform: translateX(-50%) translateY(0);
     }
 
@@ -655,12 +714,69 @@
       margin: 0 auto 10px;
     }
 
-    .menu-sheet-title {
+    .menu-sheet-title,
+    .wallet-sheet-title {
       font-size: 18px;
       font-weight: 800;
       color: #eef4ff;
       text-align: center;
       margin: 2px 0 14px;
+    }
+
+    .wallet-sheet-sub {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-soft);
+      margin: -6px 0 14px;
+    }
+
+    .wallet-sheet-option {
+      width: 100%;
+      border: 1px solid rgba(117, 146, 212, 0.14);
+      background: rgba(255,255,255,0.04);
+      border-radius: 18px;
+      padding: 16px 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #f3f7ff;
+      transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+    }
+
+    .wallet-sheet-option:hover {
+      border-color: rgba(96, 159, 255, 0.34);
+      background: rgba(63, 135, 255, 0.10);
+    }
+
+    .wallet-sheet-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .wallet-sheet-copy {
+      text-align: left;
+      min-width: 0;
+    }
+
+    .wallet-sheet-copy strong {
+      display: block;
+      font-size: 15px;
+      color: #f7fbff;
+      margin-bottom: 4px;
+    }
+
+    .wallet-sheet-copy span {
+      display: block;
+      font-size: 12px;
+      color: var(--text-dim);
     }
 
     .sheet-grid {
@@ -682,10 +798,6 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-    }
-
-    .sheet-item:active {
-      transform: scale(0.98);
     }
 
     .sheet-item.active {
@@ -764,10 +876,6 @@
       transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
     }
 
-    .social-link:active .social-badge {
-      transform: scale(0.97);
-    }
-
     .social-link:hover .social-badge {
       border-color: rgba(96, 159, 255, 0.34);
       background: rgba(63, 135, 255, 0.10);
@@ -834,39 +942,380 @@
       border-color: transparent;
     }
 
+    /* Payment */
+    .payment-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(98, 127, 197, 0.14);
+      border-radius: 30px;
+      padding: 16px;
+      box-shadow:
+        0 20px 40px var(--shadow-soft),
+        inset 0 1px 0 rgba(255,255,255,0.03);
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .payment-card::before {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      top: -60px;
+      right: -60px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(88, 216, 255, 0.12), transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-mini {
+      text-align: center;
+      font-size: 11px;
+      letter-spacing: 2.8px;
+      text-transform: uppercase;
+      color: #ffcf6b;
+      font-weight: 900;
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-title {
+      text-align: center;
+      font-size: 29px;
+      line-height: 1.04;
+      font-weight: 900;
+      color: var(--cream);
+      margin: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-title span { color: var(--cyan); }
+
+    .hero-text {
+      text-align: center;
+      color: var(--text-soft);
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 9px auto 10px;
+      position: relative;
+      z-index: 1;
+      max-width: 300px;
+    }
+
+    .hero-illustration-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+      min-height: 110px;
+    }
+
+    .hero-illustration {
+      width: 74%;
+      max-width: 255px;
+      height: auto;
+      display: block;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.26));
+    }
+
+    .section-card {
+      background: var(--box-bg);
+      border: 1px solid var(--line-soft);
+      border-radius: 24px;
+      padding: 15px;
+      margin-bottom: 12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--cream);
+    }
+
+    .section-chip {
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(117, 146, 212, 0.12);
+      color: var(--cyan);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .field-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-soft);
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.06);
+      outline: none;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+      color: var(--text-main);
+      padding: 14px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      resize: none;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: #7891bc;
+    }
+
+    .recipient-input {
+      border-color: rgba(88, 216, 255, 0.16);
+      box-shadow: 0 0 0 1px rgba(88, 216, 255, 0.05) inset;
+    }
+
+    .split-row {
+      display: grid;
+      grid-template-columns: 1fr 112px;
+      gap: 10px;
+    }
+
+    .pay-token-pill {
+      border: 1px solid rgba(112, 140, 210, 0.13);
+      border-radius: 16px;
+      background: rgba(27, 39, 76, 0.95);
+      color: var(--text-main);
+      min-height: 50px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 800;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+      padding: 0 10px;
+    }
+
+    .token-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+
+    .token-dot.orbit {
+      background: radial-gradient(circle at 30% 30%, #ffe395, #f5ab2f 70%, #b66d08);
+      box-shadow: 0 0 12px rgba(255, 180, 60, 0.22);
+    }
+
+    .token-dot.usdc {
+      background: radial-gradient(circle at 30% 30%, #8fd0ff, #2b8fff 70%, #0f52c9);
+      box-shadow: 0 0 12px rgba(79, 134, 255, 0.22);
+    }
+
+    .quote-highlight {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .highlight-box {
+      border-radius: 18px;
+      padding: 13px 12px;
+      background: rgba(255,255,255,0.035);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .highlight-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 7px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+
+    .highlight-value {
+      font-size: 25px;
+      font-weight: 900;
+      color: var(--cream);
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .quote-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .quote-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .quote-row span:first-child { color: var(--text-dim); }
+    .quote-row span:last-child {
+      color: var(--text-main);
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .payment-flow {
+      margin-top: 12px;
+      border-radius: 18px;
+      padding: 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .flow-title {
+      font-size: 12px;
+      color: var(--text-soft);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .flow-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: nowrap;
+    }
+
+    .flow-pill {
+      flex: 1;
+      min-width: 0;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.05);
+      padding: 12px 10px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--cream);
+      white-space: nowrap;
+    }
+
+    .flow-arrow {
+      flex-shrink: 0;
+      font-size: 18px;
+      color: var(--cyan);
+      font-weight: 900;
+    }
+
+    .secondary-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .secondary-btn {
+      flex: 1;
+      border: 1px solid rgba(119, 170, 255, 0.14);
+      background: rgba(255,255,255,0.04);
+      color: #e6eeff;
+      border-radius: 16px;
+      padding: 13px 12px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .status-box {
+      margin-top: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.025);
+      padding: 13px;
+      border: 1px solid rgba(117, 146, 212, 0.08);
+    }
+
+    .status-title {
+      font-size: 12px;
+      color: #ffcf6b;
+      font-weight: 800;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 8px 0;
+      font-size: 13px;
+      align-items: flex-start;
+    }
+
+    .status-row span:first-child { color: var(--text-dim); }
+    .status-row span:last-child {
+      color: var(--text-main);
+      font-weight: 700;
+      text-align: right;
+      max-width: 58%;
+      word-break: break-word;
+    }
+
+    .summary-note {
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .bottom-note {
+      margin-top: 12px;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
     @media (max-width: 480px) {
-      .welcome-line {
-        font-size: 19px;
-        margin: 0 0 8px;
-      }
+      .welcome-line { font-size: 19px; }
+      .slippage-options { grid-template-columns: repeat(2, 1fr); }
+      .bottom-sheet { min-height: 60vh; }
+    }
 
-      .slippage-options {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .bottom-sheet {
-        min-height: 60vh;
-      }
+    @media (max-width: 420px) {
+      .quote-highlight { grid-template-columns: 1fr; }
+      .hero-illustration { width: 80%; }
     }
 
     @media (min-width: 768px) {
-      .app {
-        max-width: 560px;
-      }
-
-      .bottom-sheet,
-      .slippage-sheet {
-        width: min(100%, 560px);
-      }
-
-      .card {
-        padding: 20px;
-        border-radius: 32px;
-      }
-
-      .token-grid {
-        grid-template-columns: 1fr 1fr;
-      }
+      .app { max-width: 560px; }
+      .bottom-sheet, .slippage-sheet, .wallet-sheet { width: min(100%, 560px); }
+      .card, .payment-card { padding: 20px; border-radius: 32px; }
+      .token-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -880,11 +1329,23 @@
       </div>
 
       <div class="top-actions">
-        <button class="menu-btn" id="menuBtn" onclick="toggleBottomSheet()">☰</button>
+        <button class="gear-btn" id="gearBtn" onclick="toggleGearDropdown()">⚙</button>
+
         <button class="wallet-btn" onclick="handleWalletButton()" id="walletBtn">
           Connect Wallet
         </button>
+
+        <div class="gear-dropdown" id="gearDropdown">
+          <div class="gear-title">Language</div>
+          <div class="lang-btn">English only</div>
+        </div>
       </div>
+    </div>
+
+    <div class="segbar">
+      <button class="seg-item active" id="segSwap" onclick="activatePrimaryTab('swap')">Swap</button>
+      <button class="seg-item" id="segPayment" onclick="activatePrimaryTab('payment')">Payment</button>
+      <button class="seg-item" id="segMenu" onclick="activateMenuTab()">Menu</button>
     </div>
 
     <div class="screen active" id="swapScreen">
@@ -925,7 +1386,7 @@
 
             <div class="token-side">
               <button class="token-pill" id="tokenInBtn" onclick="toggleDirection()">
-                <img id="tokenInIcon" class="token-icon" src="./Usdc.png" alt="USDC" />
+                <img id="tokenInIcon" class="token-icon usdc-big" src="./Usdc.png" alt="USDC" />
                 <span id="tokenInText">USDC</span>
               </button>
               <span class="balance-under-token mini" id="balanceIn">Balance: -</span>
@@ -998,6 +1459,152 @@
       </div>
 
       <div class="footer">retro-dex-two.vercel.app</div>
+    </div>
+
+    <div class="screen" id="paymentScreen">
+      <div class="payment-card">
+        <div class="hero-mini">Payments</div>
+        <h1 class="hero-title">Pay with <span>ORBIT</span></h1>
+        <p class="hero-text">
+          Send a payment using ORBIT while the recipient receives USDC on Arc Testnet.
+        </p>
+
+        <div class="hero-illustration-wrap">
+          <img src="./retrodexpay1.png" alt="Retro Pay illustration" class="hero-illustration" />
+        </div>
+
+        <div class="section-card">
+          <div class="section-top">
+            <div class="section-title">Payment Details</div>
+            <div class="section-chip">USDC Settlement</div>
+          </div>
+
+          <div class="field-grid">
+            <div class="field">
+              <label>Recipient Wallet</label>
+              <input id="payRecipient" class="recipient-input" type="text" placeholder="0x..." />
+            </div>
+
+            <div class="field">
+              <label>Recipient gets</label>
+              <div class="split-row">
+                <input id="payUsdcAmount" type="text" inputmode="decimal" placeholder="0.00" oninput="updatePaymentPreview()" />
+                <div class="pay-token-pill">
+                  <span class="token-dot usdc"></span>
+                  <span>USDC</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Paying with ORBIT</label>
+              <div class="pay-token-pill">
+                <span class="token-dot orbit"></span>
+                <span>ORBIT</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Note</label>
+              <textarea id="payNote" rows="3" placeholder="Payment note" oninput="updatePaymentPreview()">Retro payment on Arc Testnet.</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-top">
+            <div class="section-title">Conversion Preview</div>
+            <div class="section-chip">Estimated</div>
+          </div>
+
+          <div class="quote-highlight">
+            <div class="highlight-box">
+              <div class="highlight-label">Recipient gets</div>
+              <div class="highlight-value" id="previewRecipientGets">0 USDC</div>
+            </div>
+
+            <div class="highlight-box">
+              <div class="highlight-label">You pay</div>
+              <div class="highlight-value" id="previewYouPay">0 ORBIT</div>
+            </div>
+          </div>
+
+          <div class="quote-grid">
+            <div class="quote-row">
+              <span>Rate</span>
+              <span id="previewRate">-</span>
+            </div>
+
+            <div class="quote-row">
+              <span>Slippage</span>
+              <span id="previewSlippage">Auto · 0.5%</span>
+            </div>
+
+            <div class="quote-row">
+              <span>Estimated buffer</span>
+              <span id="previewBuffer">-</span>
+            </div>
+          </div>
+
+          <div class="payment-flow">
+            <div class="flow-title">Flow</div>
+            <div class="flow-line">
+              <div class="flow-pill">ORBIT in</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-pill">Swap</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-pill">USDC out</div>
+            </div>
+          </div>
+
+          <button class="main-btn" id="payBtn" onclick="executePayment()" disabled>Swap & Pay</button>
+
+          <div class="secondary-row">
+            <button class="secondary-btn" onclick="updatePaymentPreview()">Preview</button>
+            <button class="secondary-btn" onclick="clearPaymentForm()">Clear</button>
+          </div>
+        </div>
+
+        <div class="status-box">
+          <div class="status-title">Payment Summary</div>
+
+          <div class="status-row">
+            <span>Status</span>
+            <span id="paySummaryStatus">Pending</span>
+          </div>
+
+          <div class="status-row">
+            <span>Recipient</span>
+            <span id="paySummaryRecipient">-</span>
+          </div>
+
+          <div class="status-row">
+            <span>Recipient Receives</span>
+            <span id="paySummaryReceives">0 USDC</span>
+          </div>
+
+          <div class="status-row">
+            <span>You Spend</span>
+            <span id="paySummarySpends">0 ORBIT</span>
+          </div>
+
+          <div class="status-row">
+            <span>Settlement Asset</span>
+            <span>USDC</span>
+          </div>
+
+          <div class="status-row">
+            <span>Note</span>
+            <span class="summary-note" id="paySummaryNote">Retro payment on Arc Testnet.</span>
+          </div>
+        </div>
+
+        <div class="status" id="paymentStatusText"></div>
+
+        <div class="bottom-note">
+          Retro Pay · Arc Testnet
+        </div>
+      </div>
     </div>
 
     <div class="screen" id="tokensScreen">
@@ -1075,38 +1682,39 @@
 
   <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeBottomSheet()"></div>
   <div class="slippage-backdrop" id="slippageBackdrop" onclick="closeSlippageSheet()"></div>
+  <div class="wallet-sheet-backdrop" id="walletSheetBackdrop" onclick="closeWalletSheet()"></div>
 
   <div class="bottom-sheet" id="bottomSheet">
     <div class="sheet-handle"></div>
     <div class="menu-sheet-title">Explore</div>
 
     <div class="sheet-grid">
-      <div class="sheet-item active" id="navSwap" onclick="switchScreen('swap')">
+      <div class="sheet-item active" id="navSwap" onclick="switchMenuDestination('swap')">
         <div class="sheet-item-title">Swap</div>
         <div class="sheet-item-sub">Main view</div>
       </div>
 
-      <div class="sheet-item" id="navTokens" onclick="switchScreen('tokens')">
+      <div class="sheet-item" id="navTokens" onclick="switchMenuDestination('tokens')">
         <div class="sheet-item-title">Tokens</div>
         <div class="sheet-item-sub">Orbit info</div>
       </div>
 
-      <div class="sheet-item" id="navStake" onclick="switchScreen('stake')">
+      <div class="sheet-item" id="navStake" onclick="lockedMenuTap('Stake')">
         <div class="sheet-item-title">Stake</div>
         <div class="sheet-item-sub">Coming soon</div>
       </div>
 
-      <div class="sheet-item locked">
+      <div class="sheet-item" id="navNft" onclick="lockedMenuTap('NFT')">
         <div class="sheet-item-title">NFT</div>
         <div class="sheet-item-sub">Coming soon</div>
       </div>
 
-      <div class="sheet-item locked">
+      <div class="sheet-item locked" onclick="lockedMenuTap('Locked')">
         <div class="lock-icon">🔒</div>
         <div class="sheet-item-sub">Locked</div>
       </div>
 
-      <div class="sheet-item locked">
+      <div class="sheet-item locked" onclick="lockedMenuTap('Locked')">
         <div class="lock-icon">🔒</div>
         <div class="sheet-item-sub">Locked</div>
       </div>
@@ -1116,12 +1724,7 @@
       <div class="menu-divider"></div>
 
       <div class="social-row">
-        <a
-          class="social-link"
-          href="https://github.com/Ediferras4"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a class="social-link" href="https://github.com/Ediferras4" target="_blank" rel="noopener noreferrer">
           <span class="social-badge" aria-hidden="true">
             <svg viewBox="0 0 24 24">
               <path d="M12 2C6.48 2 2 6.58 2 12.24c0 4.53 2.87 8.37 6.84 9.73.5.09.66-.22.66-.49 0-.24-.01-.89-.01-1.74-2.78.62-3.37-1.38-3.37-1.38-.46-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.63.07-.63 1 .07 1.53 1.05 1.53 1.05.9 1.57 2.35 1.12 2.92.86.09-.67.35-1.12.63-1.37-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.04 1.03-2.76-.1-.26-.45-1.31.1-2.73 0 0 .84-.28 2.75 1.05A9.33 9.33 0 0 1 12 6.84c.85 0 1.71.12 2.51.36 1.91-1.33 2.75-1.05 2.75-1.05.55 1.42.2 2.47.1 2.73.64.72 1.03 1.64 1.03 2.76 0 3.93-2.34 4.79-4.57 5.04.36.32.68.95.68 1.92 0 1.38-.01 2.49-.01 2.83 0 .27.18.59.67.49A10.25 10.25 0 0 0 22 12.24C22 6.58 17.52 2 12 2Z"/>
@@ -1130,12 +1733,7 @@
           <span class="social-label">GitHub</span>
         </a>
 
-        <a
-          class="social-link"
-          href="https://x.com/crypto_edy"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a class="social-link" href="https://x.com/crypto_edy" target="_blank" rel="noopener noreferrer">
           <span class="social-badge" aria-hidden="true">
             <svg viewBox="0 0 24 24">
               <path d="M18.9 2H22l-6.77 7.74L23.2 22h-6.24l-4.89-6.86L6.06 22H3l7.24-8.28L.8 2h6.4l4.42 6.2L18.9 2Zm-1.1 18h1.73L6.26 3.9H4.4L17.8 20Z"/>
@@ -1154,6 +1752,20 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="wallet-sheet" id="walletSheet">
+    <div class="sheet-handle"></div>
+    <div class="wallet-sheet-title">Connect wallet</div>
+    <div class="wallet-sheet-sub">Conectar MetaMask</div>
+
+    <button class="wallet-sheet-option" onclick="connectWalletFromSheet()">
+      <span class="wallet-sheet-icon">🦊</span>
+      <span class="wallet-sheet-copy">
+        <strong>MetaMask</strong>
+        <span>Tap to connect MetaMask</span>
+      </span>
+    </button>
   </div>
 
   <div class="slippage-sheet" id="slippageSheet">
@@ -1188,7 +1800,8 @@
       "function allowance(address owner, address spender) view returns (uint256)",
       "function balanceOf(address owner) view returns (uint256)",
       "function decimals() view returns (uint8)",
-      "function symbol() view returns (string)"
+      "function symbol() view returns (string)",
+      "function transfer(address to, uint256 amount) returns (bool)"
     ];
 
     const PAIR_ABI = [
@@ -1208,14 +1821,69 @@
     let slippageMode = "auto";
     let isConnecting = false;
     let isProcessingSwap = false;
+    let isProcessingPayment = false;
     let currentScreen = "swap";
     let amountInputFocused = false;
     let currentTokenInBalance = 0;
     let currentTokenInDecimals = 18;
+    let currentOrbitToUsdcRate = 0;
+
+    function setStatus(text) {
+      document.getElementById("statusText").innerText = text || "";
+    }
+
+    function setTokenStatus(text) {
+      document.getElementById("tokenStatusText").innerText = text || "";
+    }
+
+    function setPaymentStatus(text) {
+      document.getElementById("paymentStatusText").innerText = text || "";
+    }
+
+    function shortAddress(addr) {
+      return addr ? addr.slice(0, 6) + "..." + addr.slice(-4) : "-";
+    }
+
+    function formatDisplayNumber(value) {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return "-";
+      if (num === 0) return "0";
+      if (Math.abs(num) >= 1000) return num.toFixed(4).replace(/\.?0+$/, "");
+      if (Math.abs(num) >= 1) return num.toFixed(6).replace(/\.?0+$/, "");
+      return num.toFixed(8).replace(/\.?0+$/, "");
+    }
+
+    function formatBalanceNumber(value) {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return "-";
+      return num.toLocaleString("pt-BR", { maximumFractionDigits: 4 });
+    }
+
+    function trimMaxAmount(balanceNum, decimals) {
+      if (!Number.isFinite(balanceNum) || balanceNum <= 0) return 0;
+      const safeDecimals = decimals <= 6 ? 4 : 6;
+      const factor = 10 ** safeDecimals;
+      return Math.floor(balanceNum * factor) / factor;
+    }
+
+    function normalizeAmountInput(raw) {
+      let value = String(raw || "").replace(",", ".").replace(/[^\d.]/g, "");
+      const firstDot = value.indexOf(".");
+      if (firstDot !== -1) {
+        value = value.slice(0, firstDot + 1) + value.slice(firstDot + 1).replace(/\./g, "");
+      }
+      return value;
+    }
 
     function updateWalletButton() {
       const btn = document.getElementById("walletBtn");
-      btn.innerText = userAddress ? "Disconnect" : "Connect Wallet";
+      if (userAddress) {
+        btn.innerText = "Disconnect";
+        btn.classList.add("connected");
+      } else {
+        btn.innerText = "Connect Wallet";
+        btn.classList.remove("connected");
+      }
     }
 
     function getTokenInAddress() {
@@ -1242,22 +1910,111 @@
       return direction === "USDC_TO_ORBIT" ? ORBIT_ICON : USDC_ICON;
     }
 
-    function toggleBottomSheet() {
+    function updatePrimaryTabs(active) {
+      document.getElementById("segSwap").classList.toggle("active", active === "swap");
+      document.getElementById("segPayment").classList.toggle("active", active === "payment");
+      document.getElementById("segMenu").classList.toggle("active", active === "menu");
+    }
+
+    function activatePrimaryTab(tab) {
+      closeBottomSheet();
+      closeGearDropdown();
+
+      if (tab === "swap") {
+        switchMainScreen("swap");
+        updatePrimaryTabs("swap");
+      }
+
+      if (tab === "payment") {
+        switchMainScreen("payment");
+        updatePrimaryTabs("payment");
+        updatePaymentPreview();
+      }
+    }
+
+    function activateMenuTab() {
+      closeGearDropdown();
+      const isOpen = document.getElementById("bottomSheet").classList.contains("show");
+      if (isOpen) {
+        closeBottomSheet();
+        updatePrimaryTabs(currentScreen === "payment" ? "payment" : "swap");
+      } else {
+        openBottomSheet();
+        updatePrimaryTabs("menu");
+      }
+    }
+
+    function switchMainScreen(screen) {
+      currentScreen = screen;
+
+      document.getElementById("swapScreen").classList.remove("active");
+      document.getElementById("paymentScreen").classList.remove("active");
+      document.getElementById("tokensScreen").classList.remove("active");
+      document.getElementById("stakeScreen").classList.remove("active");
+
+      if (screen === "swap") document.getElementById("swapScreen").classList.add("active");
+      if (screen === "payment") document.getElementById("paymentScreen").classList.add("active");
+      if (screen === "tokens") {
+        document.getElementById("tokensScreen").classList.add("active");
+        refreshTokenPage();
+      }
+      if (screen === "stake") document.getElementById("stakeScreen").classList.add("active");
+    }
+
+    function switchMenuDestination(screen) {
+      document.getElementById("navSwap").classList.toggle("active", screen === "swap");
+      document.getElementById("navTokens").classList.toggle("active", screen === "tokens");
+
+      if (screen === "swap") {
+        switchMainScreen("swap");
+        updatePrimaryTabs("swap");
+      }
+
+      if (screen === "tokens") {
+        switchMainScreen("tokens");
+        updatePrimaryTabs("menu");
+      }
+
+      closeBottomSheet();
+    }
+
+    function lockedMenuTap(name) {
+      setStatus(`${name} coming soon.`);
+      closeBottomSheet();
+      updatePrimaryTabs(currentScreen === "payment" ? "payment" : "swap");
+    }
+
+    function openBottomSheet() {
+      closeWalletSheet();
       closeSlippageSheet();
-      const sheet = document.getElementById("bottomSheet");
-      const backdrop = document.getElementById("sheetBackdrop");
-      const show = !sheet.classList.contains("show");
-      sheet.classList.toggle("show", show);
-      backdrop.classList.toggle("show", show);
+      document.getElementById("bottomSheet").classList.add("show");
+      document.getElementById("sheetBackdrop").classList.add("show");
     }
 
     function closeBottomSheet() {
       document.getElementById("bottomSheet").classList.remove("show");
       document.getElementById("sheetBackdrop").classList.remove("show");
+      if (currentScreen === "payment") updatePrimaryTabs("payment");
+      else updatePrimaryTabs("swap");
+    }
+
+    function openWalletSheet() {
+      closeBottomSheet();
+      closeSlippageSheet();
+      closeGearDropdown();
+      document.getElementById("walletSheet").classList.add("show");
+      document.getElementById("walletSheetBackdrop").classList.add("show");
+    }
+
+    function closeWalletSheet() {
+      document.getElementById("walletSheet").classList.remove("show");
+      document.getElementById("walletSheetBackdrop").classList.remove("show");
     }
 
     function openSlippageSheet() {
       closeBottomSheet();
+      closeWalletSheet();
+      closeGearDropdown();
       document.getElementById("slippageSheet").classList.add("show");
       document.getElementById("slippageBackdrop").classList.add("show");
     }
@@ -1267,9 +2024,28 @@
       document.getElementById("slippageBackdrop").classList.remove("show");
     }
 
+    function toggleGearDropdown() {
+      closeBottomSheet();
+      closeWalletSheet();
+      const el = document.getElementById("gearDropdown");
+      el.classList.toggle("show");
+    }
+
+    function closeGearDropdown() {
+      document.getElementById("gearDropdown").classList.remove("show");
+    }
+
+    document.addEventListener("click", (e) => {
+      const topbar = document.querySelector(".topbar");
+      if (topbar && !topbar.contains(e.target)) {
+        closeGearDropdown();
+      }
+    });
+
     function updateSlippageUI() {
       const status = document.getElementById("slippageStatus");
       const label = document.getElementById("slippageButtonLabel");
+      const payLabel = document.getElementById("previewSlippage");
 
       document.getElementById("slippageAutoOption").classList.remove("active");
       document.getElementById("slippage05Option").classList.remove("active");
@@ -1279,11 +2055,12 @@
       if (slippageMode === "auto") {
         status.innerText = "Auto";
         label.innerText = "Auto · 0.5%";
+        payLabel.innerText = "Auto · 0.5%";
         document.getElementById("slippageAutoOption").classList.add("active");
       } else {
         status.innerText = `${slippagePercent}%`;
         label.innerText = `${slippagePercent}%`;
-
+        payLabel.innerText = `${slippagePercent}%`;
         if (slippagePercent === 0.5) document.getElementById("slippage05Option").classList.add("active");
         if (slippagePercent === 1) document.getElementById("slippage1Option").classList.add("active");
         if (slippagePercent === 2) document.getElementById("slippage2Option").classList.add("active");
@@ -1302,91 +2079,12 @@
       updateSlippageUI();
       closeSlippageSheet();
       handleAmountInput();
-    }
-
-    function switchScreen(screen) {
-      currentScreen = screen;
-
-      document.getElementById("swapScreen").classList.remove("active");
-      document.getElementById("tokensScreen").classList.remove("active");
-      document.getElementById("stakeScreen").classList.remove("active");
-
-      document.getElementById("navSwap").classList.remove("active");
-      document.getElementById("navTokens").classList.remove("active");
-      document.getElementById("navStake").classList.remove("active");
-
-      if (screen === "swap") {
-        document.getElementById("swapScreen").classList.add("active");
-        document.getElementById("navSwap").classList.add("active");
-      }
-
-      if (screen === "tokens") {
-        document.getElementById("tokensScreen").classList.add("active");
-        document.getElementById("navTokens").classList.add("active");
-        refreshTokenPage();
-      }
-
-      if (screen === "stake") {
-        document.getElementById("stakeScreen").classList.add("active");
-        document.getElementById("navStake").classList.add("active");
-      }
-
-      closeBottomSheet();
+      updatePaymentPreview();
     }
 
     async function getTokenDecimals(tokenAddress) {
       const token = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
       return await token.decimals();
-    }
-
-    function setStatus(text) {
-      document.getElementById("statusText").innerText = text || "";
-    }
-
-    function setTokenStatus(text) {
-      document.getElementById("tokenStatusText").innerText = text || "";
-    }
-
-    function shortAddress(addr) {
-      return addr ? addr.slice(0, 6) + "..." + addr.slice(-4) : "-";
-    }
-
-    function formatDisplayNumber(value) {
-      const num = Number(value);
-      if (!Number.isFinite(num)) return "-";
-      if (num === 0) return "0";
-
-      if (Math.abs(num) >= 1000) {
-        return num.toFixed(4).replace(/\.?0+$/, "");
-      }
-
-      if (Math.abs(num) >= 1) {
-        return num.toFixed(6).replace(/\.?0+$/, "");
-      }
-
-      return num.toFixed(8).replace(/\.?0+$/, "");
-    }
-
-    function formatBalanceNumber(value) {
-      const num = Number(value);
-      if (!Number.isFinite(num)) return "-";
-      return num.toLocaleString("pt-BR", { maximumFractionDigits: 4 });
-    }
-
-    function trimMaxAmount(balanceNum, decimals) {
-      if (!Number.isFinite(balanceNum) || balanceNum <= 0) return 0;
-      const safeDecimals = decimals <= 6 ? 4 : 6;
-      const factor = 10 ** safeDecimals;
-      return Math.floor(balanceNum * factor) / factor;
-    }
-
-    function normalizeAmountInput(raw) {
-      let value = String(raw || "").replace(",", ".").replace(/[^\d.]/g, "");
-      const firstDot = value.indexOf(".");
-      if (firstDot !== -1) {
-        value = value.slice(0, firstDot + 1) + value.slice(firstDot + 1).replace(/\./g, "");
-      }
-      return value;
     }
 
     function updateQuickAmountsVisibility() {
@@ -1424,7 +2122,6 @@
     function handleAmountFocus() {
       amountInputFocused = true;
       updateQuickAmountsVisibility();
-
       if (tokenInBalanceIsZero()) {
         document.getElementById("amountIn").blur();
         setStatus(getZeroBalanceLabel());
@@ -1439,9 +2136,7 @@
     }
 
     function handleAmountClick() {
-      if (tokenInBalanceIsZero()) {
-        setStatus(getZeroBalanceLabel());
-      }
+      if (tokenInBalanceIsZero()) setStatus(getZeroBalanceLabel());
     }
 
     function handleAmountKeydown(event) {
@@ -1516,12 +2211,8 @@
 
         let selectedAmount;
 
-        if (percent === 100) {
-          selectedAmount = trimMaxAmount(balanceNum, balanceData.decimals);
-        } else {
-          const rawAmount = (balanceNum * percent) / 100;
-          selectedAmount = trimMaxAmount(rawAmount, balanceData.decimals);
-        }
+        if (percent === 100) selectedAmount = trimMaxAmount(balanceNum, balanceData.decimals);
+        else selectedAmount = trimMaxAmount((balanceNum * percent) / 100, balanceData.decimals);
 
         if (selectedAmount <= 0) {
           document.getElementById("amountIn").value = "";
@@ -1543,8 +2234,10 @@
       provider = null;
       isConnecting = false;
       isProcessingSwap = false;
+      isProcessingPayment = false;
       currentTokenInBalance = 0;
       currentTokenInDecimals = 18;
+      currentOrbitToUsdcRate = 0;
       amountInputFocused = false;
 
       document.getElementById("walletStatus").innerText = "-";
@@ -1565,6 +2258,8 @@
       updateWalletButton();
       setStatus("Wallet desconectada.");
       setTokenStatus("");
+      setPaymentStatus("Wallet disconnected.");
+      updatePaymentPreview();
     }
 
     async function handleWalletButton() {
@@ -1575,6 +2270,11 @@
         return;
       }
 
+      openWalletSheet();
+    }
+
+    async function connectWalletFromSheet() {
+      closeWalletSheet();
       await connectWallet();
     }
 
@@ -1584,12 +2284,21 @@
     }
 
     function updateDirectionUI() {
+      const tokenInIcon = document.getElementById("tokenInIcon");
+      const tokenOutIcon = document.getElementById("tokenOutIcon");
+
       document.getElementById("tokenInText").innerText = getTokenInLabel();
       document.getElementById("tokenOutText").innerText = getTokenOutLabel();
-      document.getElementById("tokenInIcon").src = getTokenInIcon();
-      document.getElementById("tokenOutIcon").src = getTokenOutIcon();
-      document.getElementById("tokenInIcon").alt = getTokenInLabel();
-      document.getElementById("tokenOutIcon").alt = getTokenOutLabel();
+
+      tokenInIcon.src = getTokenInIcon();
+      tokenOutIcon.src = getTokenOutIcon();
+
+      tokenInIcon.alt = getTokenInLabel();
+      tokenOutIcon.alt = getTokenOutLabel();
+
+      tokenInIcon.classList.toggle("usdc-big", getTokenInLabel() === "USDC");
+      tokenOutIcon.classList.toggle("usdc-big", getTokenOutLabel() === "USDC");
+
       document.getElementById("amountOut").value = "";
       document.getElementById("priceStatus").innerText = "-";
       document.getElementById("minReceivedStatus").innerText = "-";
@@ -1598,9 +2307,7 @@
       updateQuickAmountsVisibility();
       updateSwapButton();
 
-      if (userAddress) {
-        refreshBalances();
-      }
+      if (userAddress) refreshBalances();
     }
 
     async function updateSwapButton() {
@@ -1660,6 +2367,88 @@
       btn.innerText = `Swap ${getTokenInLabel()} for ${getTokenOutLabel()}`;
     }
 
+    async function updatePayButton() {
+      const btn = document.getElementById("payBtn");
+      const recipient = document.getElementById("payRecipient").value.trim();
+      const usdcAmountText = normalizeAmountInput(document.getElementById("payUsdcAmount").value);
+      const usdcAmount = Number(usdcAmountText);
+
+      if (isProcessingPayment) {
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+        return;
+      }
+
+      if (!userAddress) {
+        btn.disabled = true;
+        btn.innerText = "Connect Wallet";
+        return;
+      }
+
+      if (isWrongNetworkSync()) {
+        btn.disabled = false;
+        btn.innerText = "Wrong network";
+        return;
+      }
+
+      if (!recipient || !ethers.utils.isAddress(recipient)) {
+        btn.disabled = true;
+        btn.innerText = "Enter recipient";
+        return;
+      }
+
+      if (!Number.isFinite(usdcAmount) || usdcAmount <= 0) {
+        btn.disabled = true;
+        btn.innerText = "Enter USDC amount";
+        return;
+      }
+
+      if (!Number.isFinite(currentOrbitToUsdcRate) || currentOrbitToUsdcRate <= 0) {
+        btn.disabled = true;
+        btn.innerText = "No price";
+        return;
+      }
+
+      const estimatedOrbit = usdcAmount / currentOrbitToUsdcRate;
+      const bufferedOrbit = estimatedOrbit * (1 + slippagePercent / 100);
+
+      try {
+        if (!provider || !userAddress) {
+          btn.disabled = true;
+          btn.innerText = "Connect Wallet";
+          return;
+        }
+
+        const orbit = new ethers.Contract(ORBIT_ADDRESS, ERC20_ABI, provider);
+        const [orbitBalRaw, orbitDec] = await Promise.all([
+          orbit.balanceOf(userAddress),
+          orbit.decimals()
+        ]);
+
+        const orbitBal = Number(ethers.utils.formatUnits(orbitBalRaw, orbitDec));
+
+        if (bufferedOrbit > orbitBal) {
+          btn.disabled = true;
+          btn.innerText = "Insufficient ORBIT";
+          return;
+        }
+
+        const amountIn = ethers.utils.parseUnits(formatDisplayNumber(bufferedOrbit), orbitDec);
+        const allowance = await orbit.allowance(userAddress, PAIR_ADDRESS);
+
+        if (allowance.lt(amountIn)) {
+          btn.disabled = false;
+          btn.innerText = "Approve ORBIT";
+          return;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+
+      btn.disabled = false;
+      btn.innerText = "Swap & Pay";
+    }
+
     async function switchToArc() {
       if (!window.ethereum) {
         alert("Abra no navegador da MetaMask.");
@@ -1691,10 +2480,12 @@
           } catch (addError) {
             console.error(addError);
             setStatus("Não foi possível adicionar a Arc Testnet.");
+            setPaymentStatus("Could not add Arc Testnet.");
           }
         } else {
           console.error(switchError);
           setStatus("Não foi possível trocar para a Arc Testnet.");
+          setPaymentStatus("Could not switch to Arc Testnet.");
         }
       }
     }
@@ -1731,13 +2522,17 @@
         document.getElementById("networkWarning").style.display = isArc ? "none" : "block";
 
         await refreshBalances();
+        await loadOrbitRate();
         await handleAmountInput();
         await refreshTokenPage();
+        updatePaymentPreview();
 
         setStatus("Wallet conectada.");
+        setPaymentStatus("Wallet connected.");
       } catch (err) {
         console.error(err);
         setStatus("Erro ao conectar wallet.");
+        setPaymentStatus("Error connecting wallet.");
       } finally {
         isConnecting = false;
         walletBtn.disabled = false;
@@ -1780,6 +2575,26 @@
       }
     }
 
+    async function loadOrbitRate() {
+      try {
+        if (!provider) {
+          currentOrbitToUsdcRate = 0;
+          updatePaymentPreview();
+          return;
+        }
+
+        const pair = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, provider);
+        const usdcDec = await getTokenDecimals(USDC_ADDRESS);
+        const quoteRaw = await pair.getAmountOut(ORBIT_ADDRESS, ethers.utils.parseUnits("1", 18));
+        currentOrbitToUsdcRate = Number(ethers.utils.formatUnits(quoteRaw, usdcDec));
+        updatePaymentPreview();
+      } catch (err) {
+        console.error(err);
+        currentOrbitToUsdcRate = 0;
+        updatePaymentPreview();
+      }
+    }
+
     async function refreshTokenPage() {
       try {
         if (!provider || !userAddress) {
@@ -1812,10 +2627,7 @@
     function toggleDirection() {
       if (isProcessingSwap) return;
 
-      direction = direction === "USDC_TO_ORBIT"
-        ? "ORBIT_TO_USDC"
-        : "USDC_TO_ORBIT";
-
+      direction = direction === "USDC_TO_ORBIT" ? "ORBIT_TO_USDC" : "USDC_TO_ORBIT";
       updateDirectionUI();
       handleAmountInput();
     }
@@ -1825,9 +2637,7 @@
       const normalizedValue = normalizeAmountInput(input.value);
       const output = document.getElementById("amountOut");
 
-      if (input.value !== normalizedValue) {
-        input.value = normalizedValue;
-      }
+      if (input.value !== normalizedValue) input.value = normalizedValue;
 
       updateQuickAmountsVisibility();
 
@@ -1867,11 +2677,8 @@
       const isInsufficient = amountNum > currentTokenInBalance;
       setInputErrorState(isInsufficient);
 
-      if (isInsufficient) {
-        setStatus(getInsufficientLabel());
-      } else {
-        setStatus("");
-      }
+      if (isInsufficient) setStatus(getInsufficientLabel());
+      else setStatus("");
 
       try {
         const pair = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, provider);
@@ -1907,10 +2714,7 @@
         output.value = "";
         document.getElementById("priceStatus").innerText = "-";
         document.getElementById("minReceivedStatus").innerText = "-";
-
-        if (!isInsufficient) {
-          setStatus("Não foi possível calcular o valor de saída.");
-        }
+        if (!isInsufficient) setStatus("Não foi possível calcular o valor de saída.");
       }
 
       await updateSwapButton();
@@ -1925,7 +2729,7 @@
       if (isProcessingSwap) return;
 
       if (!userAddress) {
-        await connectWallet();
+        openWalletSheet();
         return;
       }
 
@@ -1950,7 +2754,6 @@
         }
 
         const amountNum = Number(amountText);
-
         if (amountNum > currentTokenInBalance) {
           setStatus(getInsufficientLabel());
           return;
@@ -1998,6 +2801,7 @@
 
         await refreshBalances();
         await refreshTokenPage();
+        await loadOrbitRate();
       } catch (err) {
         console.error(err);
 
@@ -2020,6 +2824,174 @@
       } finally {
         isProcessingSwap = false;
         await updateSwapButton();
+      }
+    }
+
+    function updatePaymentPreview() {
+      const recipient = document.getElementById("payRecipient").value.trim();
+      const usdcAmountText = normalizeAmountInput(document.getElementById("payUsdcAmount").value);
+      const note = document.getElementById("payNote").value.trim() || "Retro payment on Arc Testnet.";
+      const usdcAmount = Number(usdcAmountText);
+
+      document.getElementById("paySummaryRecipient").innerText = recipient ? shortAddress(recipient) : "-";
+      document.getElementById("paySummaryNote").innerText = note;
+      document.getElementById("paySummaryStatus").innerText = isProcessingPayment ? "Processing" : "Pending";
+
+      if (!Number.isFinite(usdcAmount) || usdcAmount <= 0 || !currentOrbitToUsdcRate) {
+        document.getElementById("previewRecipientGets").innerText = "0 USDC";
+        document.getElementById("previewYouPay").innerText = "0 ORBIT";
+        document.getElementById("previewRate").innerText = currentOrbitToUsdcRate ? `1 ORBIT = ${formatDisplayNumber(currentOrbitToUsdcRate)} USDC` : "-";
+        document.getElementById("previewBuffer").innerText = "-";
+        document.getElementById("paySummaryReceives").innerText = "0 USDC";
+        document.getElementById("paySummarySpends").innerText = "0 ORBIT";
+        updatePayButton();
+        return;
+      }
+
+      const estimatedOrbit = usdcAmount / currentOrbitToUsdcRate;
+      const bufferedOrbit = estimatedOrbit * (1 + slippagePercent / 100);
+
+      document.getElementById("previewRecipientGets").innerText = `${formatDisplayNumber(usdcAmount)} USDC`;
+      document.getElementById("previewYouPay").innerText = `${formatDisplayNumber(bufferedOrbit)} ORBIT`;
+      document.getElementById("previewRate").innerText = `1 ORBIT = ${formatDisplayNumber(currentOrbitToUsdcRate)} USDC`;
+      document.getElementById("previewBuffer").innerText = `+${formatDisplayNumber(slippagePercent)}%`;
+      document.getElementById("paySummaryReceives").innerText = `${formatDisplayNumber(usdcAmount)} USDC`;
+      document.getElementById("paySummarySpends").innerText = `${formatDisplayNumber(bufferedOrbit)} ORBIT`;
+
+      updatePayButton();
+    }
+
+    function clearPaymentForm() {
+      document.getElementById("payRecipient").value = "";
+      document.getElementById("payUsdcAmount").value = "";
+      document.getElementById("payNote").value = "Retro payment on Arc Testnet.";
+      setPaymentStatus("");
+      updatePaymentPreview();
+    }
+
+    async function executePayment() {
+      if (!window.ethereum) {
+        alert("Abra no navegador da MetaMask.");
+        return;
+      }
+
+      if (isProcessingPayment) return;
+
+      if (!userAddress) {
+        openWalletSheet();
+        return;
+      }
+
+      try {
+        const network = await provider.getNetwork();
+        if (Number(network.chainId) !== ARC_CHAIN_ID) {
+          await switchToArc();
+          return;
+        }
+
+        const recipient = document.getElementById("payRecipient").value.trim();
+        const usdcAmountText = normalizeAmountInput(document.getElementById("payUsdcAmount").value);
+        const usdcAmountNum = Number(usdcAmountText);
+
+        if (!ethers.utils.isAddress(recipient)) {
+          setPaymentStatus("Recipient wallet inválida.");
+          return;
+        }
+
+        if (!Number.isFinite(usdcAmountNum) || usdcAmountNum <= 0) {
+          setPaymentStatus("Digite o valor em USDC.");
+          return;
+        }
+
+        if (!currentOrbitToUsdcRate || currentOrbitToUsdcRate <= 0) {
+          setPaymentStatus("Preço indisponível.");
+          return;
+        }
+
+        isProcessingPayment = true;
+        updatePaymentPreview();
+        await updatePayButton();
+
+        const orbit = new ethers.Contract(ORBIT_ADDRESS, ERC20_ABI, signer);
+        const usdc = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, signer);
+        const pair = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, signer);
+
+        const orbitDec = await orbit.decimals();
+        const usdcDec = await usdc.decimals();
+
+        const estimatedOrbit = usdcAmountNum / currentOrbitToUsdcRate;
+        const bufferedOrbit = estimatedOrbit * (1 + slippagePercent / 100);
+        const orbitAmountIn = ethers.utils.parseUnits(formatDisplayNumber(bufferedOrbit), orbitDec);
+
+        const orbitBalBefore = await orbit.balanceOf(userAddress);
+        if (orbitBalBefore.lt(orbitAmountIn)) {
+          setPaymentStatus("Saldo insuficiente de ORBIT.");
+          return;
+        }
+
+        const allowance = await orbit.allowance(userAddress, PAIR_ADDRESS);
+        if (allowance.lt(orbitAmountIn)) {
+          setPaymentStatus("Aprovando ORBIT...");
+          const approveTx = await orbit.approve(PAIR_ADDRESS, orbitAmountIn);
+          await approveTx.wait();
+          setPaymentStatus("ORBIT aprovado. Toque em Swap & Pay novamente.");
+          return;
+        }
+
+        const usdcBefore = await usdc.balanceOf(userAddress);
+
+        setPaymentStatus("Fazendo swap ORBIT → USDC...");
+        const swapTx = await pair.swap(ORBIT_ADDRESS, orbitAmountIn);
+        await swapTx.wait();
+
+        const usdcAfter = await usdc.balanceOf(userAddress);
+        const receivedUsdcRaw = usdcAfter.sub(usdcBefore);
+        const desiredUsdcRaw = ethers.utils.parseUnits(usdcAmountText, usdcDec);
+
+        if (receivedUsdcRaw.lte(ethers.constants.Zero)) {
+          setPaymentStatus("Nenhum USDC recebido no swap.");
+          return;
+        }
+
+        const transferAmountRaw = receivedUsdcRaw.gte(desiredUsdcRaw) ? desiredUsdcRaw : receivedUsdcRaw;
+        const transferAmountNum = Number(ethers.utils.formatUnits(transferAmountRaw, usdcDec));
+
+        setPaymentStatus("Enviando USDC ao recipient...");
+        const transferTx = await usdc.transfer(recipient, transferAmountRaw);
+        await transferTx.wait();
+
+        if (receivedUsdcRaw.lt(desiredUsdcRaw)) {
+          setPaymentStatus(`Pagamento enviado, mas recebeu menos que o alvo: ${formatDisplayNumber(transferAmountNum)} USDC.`);
+          document.getElementById("paySummaryStatus").innerText = "Partial";
+        } else {
+          setPaymentStatus("Payment completed 🚀");
+          document.getElementById("paySummaryStatus").innerText = "Completed";
+        }
+
+        await refreshBalances();
+        await refreshTokenPage();
+        await loadOrbitRate();
+        updatePaymentPreview();
+      } catch (err) {
+        console.error(err);
+
+        const rawMessage =
+          err?.data?.message ||
+          err?.error?.message ||
+          err?.reason ||
+          err?.message ||
+          "";
+
+        const msg = rawMessage.toLowerCase();
+
+        if (msg.includes("user rejected") || msg.includes("denied") || msg.includes("rejected")) {
+          setPaymentStatus("Transação cancelada.");
+        } else {
+          setPaymentStatus(rawMessage || "Erro no pagamento.");
+        }
+      } finally {
+        isProcessingPayment = false;
+        await updatePayButton();
       }
     }
 
@@ -2053,8 +3025,10 @@
         updateWalletButton();
 
         await refreshBalances();
+        await loadOrbitRate();
         await handleAmountInput();
         await refreshTokenPage();
+        updatePaymentPreview();
       });
 
       window.ethereum.on("chainChanged", () => {
@@ -2066,6 +3040,7 @@
     updateWalletButton();
     updateSlippageUI();
     updateQuickAmountsVisibility();
+    updatePaymentPreview();
   </script>
 </body>
-          </html>
+  </html>
