@@ -191,7 +191,7 @@
     .hero-title {
       text-align: center;
       font-size: 28px;
-      line-height: 1;
+      line-height: 1.05;
       font-weight: 900;
       color: var(--cream);
       margin: 0;
@@ -207,28 +207,31 @@
       text-align: center;
       color: var(--text-soft);
       font-size: 13px;
-      line-height: 1.5;
+      line-height: 1.55;
       margin: 10px 0 12px;
       position: relative;
       z-index: 1;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .hero-illustration-wrap {
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
       position: relative;
       z-index: 1;
-      min-height: 90px;
+      min-height: 110px;
     }
 
     .hero-illustration {
-      width: 100%;
-      max-width: 170px;
-      height: 80px;
-      object-fit: contain;
+      width: 72%;
+      max-width: 250px;
+      height: auto;
       display: block;
+      object-fit: contain;
       filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.26));
     }
 
@@ -340,6 +343,36 @@
     .token-dot.usdc {
       background: radial-gradient(circle at 30% 30%, #8fd0ff, #2b8fff 70%, #0f52c9);
       box-shadow: 0 0 12px rgba(79, 134, 255, 0.22);
+    }
+
+    .quote-highlight {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .highlight-box {
+      border-radius: 18px;
+      padding: 12px;
+      background: rgba(255,255,255,0.035);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .highlight-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+
+    .highlight-value {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--cream);
+      line-height: 1;
     }
 
     .quote-grid {
@@ -486,6 +519,16 @@
       letter-spacing: 1px;
       text-transform: uppercase;
     }
+
+    @media (max-width: 420px) {
+      .quote-highlight {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-illustration {
+        width: 78%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -506,7 +549,7 @@
       <div class="hero-mini">Payments</div>
       <h1 class="hero-title">Pay with <span>ORBIT</span></h1>
       <p class="hero-text">
-        Use ORBIT as the input asset while the recipient receives USDC on Arc Testnet.
+        Send a payment using ORBIT while the recipient receives USDC on Arc Testnet.
       </p>
 
       <div class="hero-illustration-wrap">
@@ -526,7 +569,7 @@
           </div>
 
           <div class="field">
-            <label>Amount to Receive</label>
+            <label>Recipient gets</label>
             <div class="split-row">
               <input type="text" placeholder="0.00" value="10" />
               <div class="token-pill">
@@ -537,7 +580,7 @@
           </div>
 
           <div class="field">
-            <label>Input Token</label>
+            <label>Paying with ORBIT</label>
             <div class="token-pill">
               <span class="token-dot orbit"></span>
               <span>ORBIT</span>
@@ -557,17 +600,19 @@
           <div class="section-chip">Estimated</div>
         </div>
 
+        <div class="quote-highlight">
+          <div class="highlight-box">
+            <div class="highlight-label">Recipient gets</div>
+            <div class="highlight-value">10 USDC</div>
+          </div>
+
+          <div class="highlight-box">
+            <div class="highlight-label">You pay</div>
+            <div class="highlight-value">100 ORBIT</div>
+          </div>
+        </div>
+
         <div class="quote-grid">
-          <div class="quote-row">
-            <span>Recipient gets</span>
-            <span>10 USDC</span>
-          </div>
-
-          <div class="quote-row">
-            <span>You pay in ORBIT</span>
-            <span>100 ORBIT</span>
-          </div>
-
           <div class="quote-row">
             <span>Rate</span>
             <span>1 ORBIT = 0.10 USDC</span>
@@ -599,7 +644,7 @@
 
         <div class="secondary-row">
           <button class="secondary-btn">Preview</button>
-          <button class="secondary-btn">Reset</button>
+          <button class="secondary-btn">Clear</button>
         </div>
       </div>
 
@@ -617,16 +662,6 @@
         </div>
 
         <div class="status-row">
-          <span>Input Asset</span>
-          <span>ORBIT</span>
-        </div>
-
-        <div class="status-row">
-          <span>Settlement Asset</span>
-          <span>USDC</span>
-        </div>
-
-        <div class="status-row">
           <span>Recipient Receives</span>
           <span>10 USDC</span>
         </div>
@@ -634,6 +669,11 @@
         <div class="status-row">
           <span>You Spend</span>
           <span>100 ORBIT</span>
+        </div>
+
+        <div class="status-row">
+          <span>Settlement Asset</span>
+          <span>USDC</span>
         </div>
 
         <div class="status-row">
@@ -648,4 +688,4 @@
     </div>
   </div>
 </body>
-              </html>
+</html>
