@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Retro Pay</title>
+  <title>Retro DEX</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
   <style>
     * {
@@ -14,71 +15,48 @@
       --bg-top: #06122c;
       --bg-mid: #0a234f;
       --bg-bottom: #121a35;
-
       --card-bg: rgba(10, 16, 34, 0.92);
       --box-bg: rgba(14, 22, 44, 0.96);
-
+      --panel-bg: rgba(13, 21, 43, 0.98);
       --text-main: #f3f7ff;
       --text-soft: #b8c6e6;
       --text-dim: #86a0d3;
-
+      --shadow-soft: rgba(9, 18, 38, 0.55);
       --arc-blue-1: #123fd5;
       --arc-blue-2: #1f59f3;
       --arc-blue-3: #3f87ff;
       --arc-blue-4: #6ba8ff;
-
-      --cream: #eef4ff;
-      --gold: #ffcf6b;
-      --cyan: #58d8ff;
-
-      --line-soft: rgba(117, 146, 212, 0.14);
-      --shadow-soft: rgba(9, 18, 38, 0.55);
+      --danger: #ff6b7a;
+      --danger-soft: #ffb7c0;
     }
 
     body {
       margin: 0;
       min-height: 100vh;
       font-family: Inter, Arial, sans-serif;
-      color: var(--text-main);
       background:
-        radial-gradient(circle at top, rgba(130, 110, 255, 0.18) 0%, rgba(130, 110, 255, 0) 28%),
-        radial-gradient(circle at 85% 12%, rgba(88, 216, 255, 0.12) 0%, rgba(88, 216, 255, 0) 18%),
-        linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 44%, var(--bg-bottom) 100%);
+        radial-gradient(circle at top, rgba(130, 110, 255, 0.20) 0%, rgba(130, 110, 255, 0) 26%),
+        linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 42%, var(--bg-bottom) 100%);
+      color: var(--text-main);
       display: flex;
+      align-items: center;
       justify-content: center;
       padding: 18px;
-      position: relative;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0.08;
-      background-image:
-        repeating-linear-gradient(
-          to right,
-          rgba(255,255,255,0.05) 0,
-          rgba(255,255,255,0.05) 1px,
-          transparent 1px,
-          transparent 42px
-        ),
-        repeating-linear-gradient(
-          to bottom,
-          rgba(255,255,255,0.04) 0,
-          rgba(255,255,255,0.04) 1px,
-          transparent 1px,
-          transparent 42px
-        );
     }
 
     .app {
       width: 100%;
       max-width: 430px;
-      position: relative;
-      z-index: 1;
+    }
+
+    .welcome-line {
+      text-align: center;
+      margin: 0 0 8px;
+      color: #cfdeff;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      text-shadow: 0 0 15px rgba(111, 170, 255, 0.22);
     }
 
     .topbar {
@@ -86,9 +64,9 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 13px 14px;
+      padding: 13px 13px 13px 15px;
       border-radius: 24px;
-      margin-bottom: 10px;
+      margin-bottom: 4px;
       background: rgba(10, 16, 34, 0.78);
       border: 1px solid rgba(98, 127, 197, 0.18);
       box-shadow:
@@ -97,45 +75,27 @@
       backdrop-filter: blur(12px);
     }
 
-    .brand {
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .brand-face {
+      width: 76px;
+      height: 76px;
+      object-fit: contain;
+      display: block;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 14px rgba(86, 160, 255, 0.24));
+    }
+
+    .top-actions {
       display: flex;
       align-items: center;
       gap: 10px;
-      min-width: 0;
-    }
-
-    .brand-mark {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      font-size: 20px;
-      font-weight: 900;
-      color: #fff;
-      background: linear-gradient(135deg, var(--arc-blue-2), var(--arc-blue-4));
-      box-shadow: 0 10px 20px rgba(47, 107, 255, 0.25);
       flex-shrink: 0;
-    }
-
-    .brand-copy {
-      min-width: 0;
-    }
-
-    .brand-title {
-      font-size: 18px;
-      font-weight: 900;
-      color: var(--cream);
-      line-height: 1;
-      letter-spacing: 0.4px;
-    }
-
-    .brand-sub {
-      margin-top: 4px;
-      font-size: 11px;
-      color: var(--text-soft);
-      letter-spacing: 1px;
-      text-transform: uppercase;
     }
 
     .wallet-btn {
@@ -143,15 +103,57 @@
       color: #fff;
       font-weight: 700;
       cursor: pointer;
-      border-radius: 15px;
-      padding: 10px 14px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+      border-radius: 16px;
+      padding: 10px 16px;
       background: linear-gradient(135deg, var(--arc-blue-1) 0%, var(--arc-blue-2) 52%, var(--arc-blue-4) 100%);
-      font-size: 13px;
+      font-size: 14px;
       box-shadow: 0 10px 22px rgba(47, 107, 255, 0.22);
       white-space: nowrap;
     }
 
-    .main-card {
+    .menu-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(31, 49, 97, 0.95), rgba(18, 30, 61, 0.95));
+      border: 1px solid rgba(120, 160, 255, 0.16);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.03),
+        0 8px 18px rgba(12, 22, 46, 0.24);
+      font-size: 15px;
+      line-height: 1;
+      color: #dfeaff;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    }
+
+    .wallet-btn:active,
+    .menu-btn:active {
+      transform: scale(0.98);
+    }
+
+    .wallet-btn:hover {
+      box-shadow: 0 12px 26px rgba(47, 107, 255, 0.28);
+    }
+
+    .wallet-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .card {
       background: var(--card-bg);
       border: 1px solid rgba(98, 127, 197, 0.14);
       border-radius: 30px;
@@ -160,290 +162,272 @@
         0 20px 40px var(--shadow-soft),
         inset 0 1px 0 rgba(255,255,255,0.03);
       backdrop-filter: blur(10px);
-      overflow: hidden;
-      position: relative;
     }
 
-    .main-card::before {
-      content: "";
-      position: absolute;
-      width: 180px;
-      height: 180px;
-      top: -60px;
-      right: -60px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(88, 216, 255, 0.12), transparent 70%);
-      pointer-events: none;
+    .network-warning {
+      display: none;
+      margin-bottom: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(239, 68, 68, 0.10);
+      border: 1px solid rgba(239, 68, 68, 0.28);
+      color: #ffd1d1;
+      font-size: 14px;
     }
 
-    .hero-mini {
-      text-align: center;
-      font-size: 11px;
-      letter-spacing: 2.8px;
-      text-transform: uppercase;
-      color: var(--gold);
-      font-weight: 900;
-      margin-bottom: 8px;
-      position: relative;
-      z-index: 1;
+    .switch-network-btn {
+      margin-top: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: linear-gradient(135deg, #ff7b72, #ffb26b);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
     }
 
-    .hero-title {
-      text-align: center;
-      font-size: 29px;
-      line-height: 1.04;
-      font-weight: 900;
-      color: var(--cream);
-      margin: 0;
-      position: relative;
-      z-index: 1;
+    .swap-box {
+      background: var(--box-bg);
+      border: 1px solid rgba(117, 146, 212, 0.15);
+      border-radius: 24px;
+      padding: 16px;
+      margin-bottom: 10px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
     }
 
-    .hero-title span {
-      color: var(--cyan);
-    }
-
-    .hero-text {
-      text-align: center;
+    .row-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
       color: var(--text-soft);
       font-size: 13px;
-      line-height: 1.5;
-      margin: 9px auto 10px;
-      position: relative;
-      z-index: 1;
-      max-width: 300px;
+      gap: 8px;
     }
 
-    .hero-illustration-wrap {
+    .row-top-pay {
+      min-height: 28px;
+    }
+
+    .amount-row {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 10px;
-      position: relative;
-      z-index: 1;
-      min-height: 110px;
-    }
-
-    .hero-illustration {
-      width: 74%;
-      max-width: 255px;
-      height: auto;
-      display: block;
-      object-fit: contain;
-      filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.26));
-    }
-
-    .section-card {
-      background: var(--box-bg);
-      border: 1px solid var(--line-soft);
-      border-radius: 24px;
-      padding: 15px;
-      margin-bottom: 12px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
-      position: relative;
-      z-index: 1;
-    }
-
-    .section-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .section-title {
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--cream);
-    }
-
-    .section-chip {
-      border-radius: 999px;
-      padding: 7px 10px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(117, 146, 212, 0.12);
-      color: var(--cyan);
-      font-size: 11px;
-      font-weight: 800;
-    }
-
-    .field-grid {
-      display: grid;
       gap: 12px;
+      align-items: flex-start;
+      justify-content: space-between;
     }
 
-    .field {
-      display: grid;
-      gap: 7px;
+    .amount-side {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 10px;
     }
 
-    .field label {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-soft);
+    .token-side {
+      min-width: 152px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 5px;
     }
 
-    .field input,
-    .field textarea {
+    .amount-input {
       width: 100%;
-      border: 1px solid rgba(255,255,255,0.06);
+      min-width: 0;
+      border: none;
       outline: none;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.04);
+      background: transparent;
       color: var(--text-main);
-      padding: 14px 14px;
-      font-size: 14px;
-      font-family: inherit;
-      resize: none;
+      font-size: 34px;
+      font-weight: 800;
+      padding: 0;
+      margin: 0;
+      transition: color 0.15s ease;
     }
 
-    .field input::placeholder,
-    .field textarea::placeholder {
-      color: #7891bc;
+    .amount-input::placeholder {
+      color: #7385af;
     }
 
-    .recipient-input {
-      border-color: rgba(88, 216, 255, 0.16);
-      box-shadow: 0 0 0 1px rgba(88, 216, 255, 0.05) inset;
+    .amount-input.insufficient {
+      color: var(--danger);
     }
 
-    .split-row {
-      display: grid;
-      grid-template-columns: 1fr 112px;
-      gap: 10px;
+    .amount-input.blocked {
+      caret-color: transparent;
+    }
+
+    .quick-amounts {
+      display: none;
+      gap: 5px;
+      flex-wrap: nowrap;
+      align-items: center;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: opacity 0.16s ease, transform 0.16s ease;
+    }
+
+    .quick-amounts.show {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .quick-btn {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+      color: #edf4ff;
+      border-radius: 999px;
+      padding: 3px 8px;
+      height: 24px;
+      min-width: 0;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1;
+      transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .quick-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+
+    .quick-btn:active {
+      transform: scale(0.97);
     }
 
     .token-pill {
       border: 1px solid rgba(112, 140, 210, 0.13);
-      border-radius: 16px;
+      border-radius: 999px;
       background: rgba(27, 39, 76, 0.95);
       color: var(--text-main);
-      min-height: 50px;
+      padding: 11px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      min-width: 152px;
+      text-align: center;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      font-size: 14px;
-      font-weight: 800;
+      cursor: pointer;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
-      padding: 0 10px;
+      transition: transform 0.15s ease, border-color 0.15s ease;
     }
 
-    .token-dot {
-      width: 22px;
-      height: 22px;
+    .token-pill:hover {
+      border-color: rgba(140, 170, 230, 0.24);
+    }
+
+    .token-pill:active {
+      transform: scale(0.985);
+    }
+
+    .token-icon {
+      width: 28px;
+      height: 28px;
       border-radius: 999px;
+      object-fit: cover;
       flex-shrink: 0;
-      display: inline-block;
+      box-shadow: 0 0 12px rgba(79, 134, 255, 0.18);
     }
 
-    .token-dot.orbit {
-      background: radial-gradient(circle at 30% 30%, #ffe395, #f5ab2f 70%, #b66d08);
-      box-shadow: 0 0 12px rgba(255, 180, 60, 0.22);
-    }
-
-    .token-dot.usdc {
-      background: radial-gradient(circle at 30% 30%, #8fd0ff, #2b8fff 70%, #0f52c9);
-      box-shadow: 0 0 12px rgba(79, 134, 255, 0.22);
-    }
-
-    .quote-highlight {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    .highlight-box {
-      border-radius: 18px;
-      padding: 13px 12px;
-      background: rgba(255,255,255,0.035);
-      border: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .highlight-label {
+    .balance-under-token {
+      width: 100%;
+      text-align: right;
+      display: block;
+      padding-right: 6px;
       font-size: 11px;
       color: var(--text-dim);
-      margin-bottom: 7px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 700;
+      line-height: 1.2;
+      transition: color 0.15s ease;
     }
 
-    .highlight-value {
-      font-size: 25px;
-      font-weight: 900;
-      color: var(--cream);
-      line-height: 1;
-      white-space: nowrap;
+    .balance-under-token.insufficient {
+      color: var(--danger-soft);
     }
 
-    .quote-grid {
-      display: grid;
-      gap: 10px;
+    .switch-wrap {
+      display: flex;
+      justify-content: center;
+      margin: -4px 0 6px;
+      position: relative;
+      z-index: 2;
     }
 
-    .quote-row {
+    .switch-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 4px solid #0c1530;
+      background: linear-gradient(180deg, #162856, #101d40);
+      color: #f2f6ff;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow:
+        0 8px 18px rgba(0,0,0,0.28),
+        0 0 18px rgba(79, 134, 255, 0.18);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .switch-btn:hover {
+      box-shadow:
+        0 10px 20px rgba(0,0,0,0.32),
+        0 0 20px rgba(79, 134, 255, 0.24);
+    }
+
+    .switch-btn:active {
+      transform: scale(0.97);
+    }
+
+    .details {
+      margin-top: 12px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.022);
+      padding: 14px 12px;
+      font-size: 13px;
+      color: var(--text-soft);
+      border: 1px solid rgba(117, 146, 212, 0.08);
+    }
+
+    .details-row {
       display: flex;
       justify-content: space-between;
       gap: 12px;
+      margin: 9px 0;
       align-items: center;
-      font-size: 13px;
     }
 
-    .quote-row span:first-child {
-      color: var(--text-dim);
-    }
-
-    .quote-row span:last-child {
-      color: var(--text-main);
-      font-weight: 700;
+    .details-row span:last-child {
       text-align: right;
     }
 
-    .payment-flow {
-      margin-top: 12px;
-      border-radius: 18px;
-      padding: 12px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.04);
-    }
-
-    .flow-title {
-      font-size: 12px;
-      color: var(--text-soft);
-      margin-bottom: 10px;
-      font-weight: 700;
-    }
-
-    .flow-line {
+    .slippage-row-main {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
       gap: 10px;
-      flex-wrap: nowrap;
+      margin-top: 14px;
+      padding-top: 2px;
     }
 
-    .flow-pill {
-      flex: 1;
-      min-width: 0;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.05);
-      padding: 12px 10px;
-      text-align: center;
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--cream);
-      white-space: nowrap;
-    }
-
-    .flow-arrow {
-      flex-shrink: 0;
-      font-size: 18px;
-      color: var(--cyan);
-      font-weight: 900;
+    .slippage-open-btn {
+      border: 1px solid rgba(119, 170, 255, 0.14);
+      background: linear-gradient(180deg, rgba(25, 38, 76, 0.96), rgba(18, 29, 58, 0.96));
+      color: #e6eeff;
+      border-radius: 999px;
+      padding: 9px 13px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
     }
 
     .main-btn {
@@ -453,249 +437,1635 @@
       border-radius: 18px;
       padding: 16px;
       font-size: 16px;
-      font-weight: 900;
+      font-weight: 800;
       cursor: pointer;
       color: #f7fbff;
       background: linear-gradient(135deg, var(--arc-blue-1) 0%, var(--arc-blue-2) 36%, var(--arc-blue-3) 72%, var(--arc-blue-4) 100%);
       box-shadow: 0 14px 30px rgba(29, 86, 242, 0.24);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
     }
 
-    .secondary-row {
-      display: flex;
-      gap: 10px;
+    .main-btn:hover {
+      box-shadow: 0 16px 34px rgba(29, 86, 242, 0.30);
+    }
+
+    .main-btn:active {
+      transform: scale(0.99);
+    }
+
+    .main-btn:disabled {
+      opacity: 0.68;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .status {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-soft);
+      min-height: 18px;
+    }
+
+    .footer {
       margin-top: 10px;
-    }
-
-    .secondary-btn {
-      flex: 1;
-      border: 1px solid rgba(119, 170, 255, 0.14);
-      background: rgba(255,255,255,0.04);
-      color: #e6eeff;
-      border-radius: 16px;
-      padding: 13px 12px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 800;
-    }
-
-    .status-box {
-      margin-top: 14px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.025);
-      padding: 13px;
-      border: 1px solid rgba(117, 146, 212, 0.08);
-    }
-
-    .status-title {
+      text-align: center;
+      color: var(--text-dim);
       font-size: 12px;
-      color: var(--gold);
-      font-weight: 800;
-      letter-spacing: 1.6px;
-      text-transform: uppercase;
-      margin-bottom: 10px;
     }
 
-    .status-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin: 8px 0;
-      font-size: 13px;
-      align-items: flex-start;
-    }
-
-    .status-row span:first-child {
+    .mini {
+      font-size: 12px;
       color: var(--text-dim);
     }
 
-    .status-row span:last-child {
-      color: var(--text-main);
+    .token-page-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .token-page-heading {
+      font-size: 20px;
+      font-weight: 800;
+      color: #eef4ff;
+    }
+
+    .token-page-sub {
+      font-size: 12px;
+      color: var(--text-soft);
+      margin-top: 3px;
+    }
+
+    .token-main-card {
+      background: var(--box-bg);
+      border: 1px solid rgba(117, 146, 212, 0.18);
+      border-radius: 24px;
+      padding: 18px;
+      margin-bottom: 12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+    }
+
+    .token-main-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .token-main-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 999px;
+      object-fit: cover;
+      flex-shrink: 0;
+      box-shadow: 0 0 18px rgba(79, 134, 255, 0.20);
+    }
+
+    .token-main-name {
+      font-size: 20px;
+      font-weight: 800;
+      color: #eef4ff;
+    }
+
+    .token-main-symbol {
+      font-size: 13px;
+      color: var(--text-soft);
+      margin-top: 2px;
+    }
+
+    .token-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .info-card {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(117, 146, 212, 0.10);
+      border-radius: 18px;
+      padding: 12px;
+    }
+
+    .info-label {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+
+    .info-value {
+      font-size: 14px;
       font-weight: 700;
-      text-align: right;
-      max-width: 58%;
+      color: #f3f7ff;
       word-break: break-word;
     }
 
-    .summary-note {
+    .address-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .small-btn {
+      border: 1px solid rgba(119, 170, 255, 0.16);
+      background: rgba(255,255,255,0.05);
+      color: #e6eeff;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
       font-size: 12px;
-      line-height: 1.35;
+      font-weight: 700;
     }
 
-    .bottom-note {
-      margin-top: 12px;
+    .coming-soon {
       text-align: center;
-      color: var(--text-dim);
-      font-size: 11px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
+      padding: 26px 16px;
     }
 
-    @media (max-width: 420px) {
-      .quote-highlight {
-        grid-template-columns: 1fr;
+    .coming-title {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .coming-text {
+      color: var(--text-soft);
+      font-size: 14px;
+    }
+
+    .sheet-backdrop,
+    .slippage-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(1, 6, 20, 0.55);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease;
+      z-index: 70;
+    }
+
+    .sheet-backdrop.show,
+    .slippage-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bottom-sheet,
+    .slippage-sheet {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%) translateY(110%);
+      width: min(100%, 430px);
+      background: var(--panel-bg);
+      border: 1px solid rgba(117, 146, 212, 0.18);
+      border-bottom: none;
+      border-radius: 26px 26px 0 0;
+      box-shadow: 0 -18px 40px rgba(0,0,0,0.30);
+      transition: transform 0.22s ease;
+      z-index: 80;
+    }
+
+    .bottom-sheet {
+      padding: 12px 14px calc(18px + env(safe-area-inset-bottom));
+      min-height: 62vh;
+      max-height: 78vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .slippage-sheet {
+      padding: 12px 14px calc(14px + env(safe-area-inset-bottom));
+    }
+
+    .bottom-sheet.show,
+    .slippage-sheet.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .sheet-handle {
+      width: 44px;
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.16);
+      margin: 0 auto 10px;
+    }
+
+    .menu-sheet-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #eef4ff;
+      text-align: center;
+      margin: 2px 0 14px;
+    }
+
+    .sheet-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .sheet-item {
+      border: 1px solid rgba(117, 146, 212, 0.14);
+      background: rgba(255,255,255,0.04);
+      border-radius: 18px;
+      padding: 16px 10px;
+      min-height: 88px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease, box-shadow 0.14s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sheet-item:active {
+      transform: scale(0.98);
+    }
+
+    .sheet-item.active {
+      border-color: rgba(96, 159, 255, 0.64);
+      background: linear-gradient(180deg, rgba(46, 106, 255, 0.18), rgba(30, 73, 176, 0.12));
+      box-shadow:
+        0 0 0 1px rgba(96, 159, 255, 0.22) inset,
+        0 0 18px rgba(63, 135, 255, 0.12);
+    }
+
+    .sheet-item.locked {
+      background: rgba(255,255,255,0.025);
+      border-color: rgba(117, 146, 212, 0.10);
+      cursor: default;
+    }
+
+    .sheet-item-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #f3f7ff;
+    }
+
+    .sheet-item-sub {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 5px;
+    }
+
+    .lock-icon {
+      font-size: 22px;
+      line-height: 1;
+      margin-bottom: 6px;
+      opacity: 0.9;
+    }
+
+    .menu-socials {
+      margin-top: auto;
+      padding-top: 18px;
+    }
+
+    .menu-divider {
+      height: 1px;
+      background: rgba(117, 146, 212, 0.12);
+      margin-bottom: 14px;
+    }
+
+    .social-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .social-link,
+    .social-static {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      min-width: 70px;
+      text-decoration: none;
+      color: #dce8ff;
+    }
+
+    .social-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      border: 1px solid rgba(117, 146, 212, 0.16);
+      background: rgba(255,255,255,0.04);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+      transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+    }
+
+    .social-link:active .social-badge {
+      transform: scale(0.97);
+    }
+
+    .social-link:hover .social-badge {
+      border-color: rgba(96, 159, 255, 0.34);
+      background: rgba(63, 135, 255, 0.10);
+    }
+
+    .social-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-align: center;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+
+    .social-badge svg {
+      width: 19px;
+      height: 19px;
+      fill: currentColor;
+    }
+
+    .slippage-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .slippage-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #eef4ff;
+    }
+
+    .slippage-close {
+      border: none;
+      background: transparent;
+      color: #dfeaff;
+      font-size: 24px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .slippage-options {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .slippage-option {
+      border: 1px solid rgba(117, 146, 212, 0.14);
+      background: rgba(255,255,255,0.035);
+      color: #e6eeff;
+      border-radius: 16px;
+      padding: 14px 8px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .slippage-option.active {
+      background: linear-gradient(135deg, #8b7bf0 0%, #bfb4ff 100%);
+      color: #1b1238;
+      border-color: transparent;
+    }
+
+    @media (max-width: 480px) {
+      .welcome-line {
+        font-size: 19px;
+        margin: 0 0 8px;
       }
 
-      .hero-illustration {
-        width: 80%;
+      .slippage-options {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .bottom-sheet {
+        min-height: 60vh;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .app {
+        max-width: 560px;
+      }
+
+      .bottom-sheet,
+      .slippage-sheet {
+        width: min(100%, 560px);
+      }
+
+      .card {
+        padding: 20px;
+        border-radius: 32px;
+      }
+
+      .token-grid {
+        grid-template-columns: 1fr 1fr;
       }
     }
   </style>
 </head>
 <body>
   <div class="app">
+    <div class="welcome-line">Welcome to Arc Testnet</div>
+
     <div class="topbar">
-      <div class="brand">
-        <div class="brand-mark">◉</div>
-        <div class="brand-copy">
-          <div class="brand-title">Retro Pay</div>
-          <div class="brand-sub">Pay with ORBIT · Settle in USDC</div>
-        </div>
+      <div class="brand-wrap">
+        <img src="./retro-face1.png" alt="Retro DEX" class="brand-face" id="topLogo" />
       </div>
 
-      <button class="wallet-btn">Connect Wallet</button>
+      <div class="top-actions">
+        <button class="menu-btn" id="menuBtn" onclick="toggleBottomSheet()">☰</button>
+        <button class="wallet-btn" onclick="handleWalletButton()" id="walletBtn">
+          Connect Wallet
+        </button>
+      </div>
     </div>
 
-    <div class="main-card">
-      <div class="hero-mini">Payments</div>
-      <h1 class="hero-title">Pay with <span>ORBIT</span></h1>
-      <p class="hero-text">
-        Send a payment using ORBIT while the recipient receives USDC on Arc Testnet.
-      </p>
-
-      <div class="hero-illustration-wrap">
-        <img src="./retrodexpay1.png" alt="Retro Pay illustration" class="hero-illustration" />
-      </div>
-
-      <div class="section-card">
-        <div class="section-top">
-          <div class="section-title">Payment Details</div>
-          <div class="section-chip">USDC Settlement</div>
+    <div class="screen active" id="swapScreen">
+      <div class="card">
+        <div class="network-warning" id="networkWarning">
+          Você está na rede errada.
+          <button class="switch-network-btn" onclick="switchToArc()">
+            Switch to Arc Testnet
+          </button>
         </div>
 
-        <div class="field-grid">
-          <div class="field">
-            <label>Recipient Wallet</label>
-            <input class="recipient-input" type="text" placeholder="0x..." value="0x58A2...1d7E" />
+        <div class="swap-box">
+          <div class="row-top row-top-pay">
+            <span>You pay</span>
+            <div class="quick-amounts" id="quickAmounts">
+              <button class="quick-btn" type="button" onclick="setPercentageAmount(25)">25%</button>
+              <button class="quick-btn" type="button" onclick="setPercentageAmount(50)">50%</button>
+              <button class="quick-btn" type="button" onclick="setPercentageAmount(75)">75%</button>
+              <button class="quick-btn" type="button" onclick="setPercentageAmount(100)">Máx.</button>
+            </div>
           </div>
 
-          <div class="field">
-            <label>Recipient gets</label>
-            <div class="split-row">
-              <input type="text" placeholder="0.00" value="10" />
-              <div class="token-pill">
-                <span class="token-dot usdc"></span>
-                <span>USDC</span>
+          <div class="amount-row">
+            <div class="amount-side">
+              <input
+                id="amountIn"
+                class="amount-input"
+                type="text"
+                inputmode="decimal"
+                placeholder="0.0"
+                oninput="handleAmountInput()"
+                onfocus="handleAmountFocus()"
+                onblur="handleAmountBlur()"
+                onkeydown="handleAmountKeydown(event)"
+                onclick="handleAmountClick()"
+              />
+            </div>
+
+            <div class="token-side">
+              <button class="token-pill" id="tokenInBtn" onclick="toggleDirection()">
+                <img id="tokenInIcon" class="token-icon" src="./Usdc.png" alt="USDC" />
+                <span id="tokenInText">USDC</span>
+              </button>
+              <span class="balance-under-token mini" id="balanceIn">Balance: -</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="switch-wrap">
+          <button class="switch-btn" onclick="toggleDirection()">⇅</button>
+        </div>
+
+        <div class="swap-box">
+          <div class="row-top">
+            <span>You receive</span>
+            <span class="mini" id="balanceOut">Balance: -</span>
+          </div>
+
+          <div class="amount-row">
+            <input
+              id="amountOut"
+              class="amount-input"
+              type="text"
+              placeholder="0.0"
+              disabled
+            />
+
+            <button class="token-pill" id="tokenOutBtn" onclick="toggleDirection()">
+              <img id="tokenOutIcon" class="token-icon" src="./orbit.png" alt="ORBIT" />
+              <span id="tokenOutText">ORBIT</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="details">
+          <div class="details-row">
+            <span>Wallet</span>
+            <span id="walletStatus">-</span>
+          </div>
+          <div class="details-row">
+            <span>Network</span>
+            <span id="networkStatus">-</span>
+          </div>
+          <div class="details-row">
+            <span>Price</span>
+            <span id="priceStatus">-</span>
+          </div>
+          <div class="details-row">
+            <span>Slippage</span>
+            <span id="slippageStatus">Auto</span>
+          </div>
+          <div class="details-row">
+            <span>Minimum received</span>
+            <span id="minReceivedStatus">-</span>
+          </div>
+
+          <div class="slippage-row-main">
+            <span class="mini">Slippage settings</span>
+            <button class="slippage-open-btn" type="button" onclick="openSlippageSheet()">
+              <span id="slippageButtonLabel">Auto</span>
+              <span>✎</span>
+            </button>
+          </div>
+        </div>
+
+        <button class="main-btn" id="swapBtn" onclick="executeSwap()" disabled>
+          Enter amount
+        </button>
+
+        <div class="status" id="statusText"></div>
+      </div>
+
+      <div class="footer">retro-dex-two.vercel.app</div>
+    </div>
+
+    <div class="screen" id="tokensScreen">
+      <div class="card">
+        <div class="token-page-title">
+          <div>
+            <div class="token-page-heading">Orbit Token</div>
+            <div class="token-page-sub">Informações do token da Retro DEX</div>
+          </div>
+        </div>
+
+        <div class="token-main-card">
+          <div class="token-main-head">
+            <img src="./orbit.png" alt="Orbit" class="token-main-icon" />
+            <div>
+              <div class="token-main-name">Orbit</div>
+              <div class="token-main-symbol">ORBIT / Arc Testnet</div>
+            </div>
+          </div>
+
+          <div class="token-grid">
+            <div class="info-card">
+              <div class="info-label">Your Balance</div>
+              <div class="info-value" id="tokenPageBalance">-</div>
+            </div>
+
+            <div class="info-card">
+              <div class="info-label">Price</div>
+              <div class="info-value" id="tokenPagePrice">-</div>
+            </div>
+
+            <div class="info-card">
+              <div class="info-label">Token Contract</div>
+              <div class="info-value">0x56e2...9D26</div>
+              <div class="address-actions">
+                <button class="small-btn" onclick="copyText(ORBIT_ADDRESS)">Copy</button>
+                <button class="small-btn" onclick="openExplorerToken()">ArcScan</button>
               </div>
             </div>
-          </div>
 
-          <div class="field">
-            <label>Paying with ORBIT</label>
-            <div class="token-pill">
-              <span class="token-dot orbit"></span>
-              <span>ORBIT</span>
+            <div class="info-card">
+              <div class="info-label">Pair Contract</div>
+              <div class="info-value">0xdc6D...27B8</div>
+              <div class="address-actions">
+                <button class="small-btn" onclick="copyText(PAIR_ADDRESS)">Copy</button>
+                <button class="small-btn" onclick="openExplorerPair()">ArcScan</button>
+              </div>
+            </div>
+
+            <div class="info-card">
+              <div class="info-label">Swap Pair</div>
+              <div class="info-value">USDC ⇄ ORBIT</div>
+            </div>
+
+            <div class="info-card">
+              <div class="info-label">Token Status</div>
+              <div class="info-value">Live on Retro DEX</div>
             </div>
           </div>
-
-          <div class="field">
-            <label>Note</label>
-            <textarea rows="3" placeholder="Payment note">Retro payment on Arc Testnet.</textarea>
-          </div>
         </div>
+
+        <div class="status" id="tokenStatusText"></div>
       </div>
+    </div>
 
-      <div class="section-card">
-        <div class="section-top">
-          <div class="section-title">Conversion Preview</div>
-          <div class="section-chip">Estimated</div>
+    <div class="screen" id="stakeScreen">
+      <div class="card">
+        <div class="coming-soon">
+          <div class="coming-title">Stake</div>
+          <div class="coming-text">Coming soon 🚀</div>
         </div>
-
-        <div class="quote-highlight">
-          <div class="highlight-box">
-            <div class="highlight-label">Recipient gets</div>
-            <div class="highlight-value">10 USDC</div>
-          </div>
-
-          <div class="highlight-box">
-            <div class="highlight-label">You pay</div>
-            <div class="highlight-value">100 ORBIT</div>
-          </div>
-        </div>
-
-        <div class="quote-grid">
-          <div class="quote-row">
-            <span>Rate</span>
-            <span>1 ORBIT = 0.10 USDC</span>
-          </div>
-
-          <div class="quote-row">
-            <span>Slippage</span>
-            <span>Auto · 0.5%</span>
-          </div>
-
-          <div class="quote-row">
-            <span>Minimum received</span>
-            <span>9.95 USDC</span>
-          </div>
-        </div>
-
-        <div class="payment-flow">
-          <div class="flow-title">Flow</div>
-          <div class="flow-line">
-            <div class="flow-pill">ORBIT in</div>
-            <div class="flow-arrow">→</div>
-            <div class="flow-pill">Swap</div>
-            <div class="flow-arrow">→</div>
-            <div class="flow-pill">USDC out</div>
-          </div>
-        </div>
-
-        <button class="main-btn">Swap & Pay</button>
-
-        <div class="secondary-row">
-          <button class="secondary-btn">Preview</button>
-          <button class="secondary-btn">Clear</button>
-        </div>
-      </div>
-
-      <div class="status-box">
-        <div class="status-title">Payment Summary</div>
-
-        <div class="status-row">
-          <span>Status</span>
-          <span>Pending</span>
-        </div>
-
-        <div class="status-row">
-          <span>Recipient</span>
-          <span>0x58A2...1d7E</span>
-        </div>
-
-        <div class="status-row">
-          <span>Recipient Receives</span>
-          <span>10 USDC</span>
-        </div>
-
-        <div class="status-row">
-          <span>You Spend</span>
-          <span>100 ORBIT</span>
-        </div>
-
-        <div class="status-row">
-          <span>Settlement Asset</span>
-          <span>USDC</span>
-        </div>
-
-        <div class="status-row">
-          <span>Note</span>
-          <span class="summary-note">Retro payment on Arc Testnet.</span>
-        </div>
-      </div>
-
-      <div class="bottom-note">
-        Retro Pay · Arc Testnet
       </div>
     </div>
   </div>
+
+  <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeBottomSheet()"></div>
+  <div class="slippage-backdrop" id="slippageBackdrop" onclick="closeSlippageSheet()"></div>
+
+  <div class="bottom-sheet" id="bottomSheet">
+    <div class="sheet-handle"></div>
+    <div class="menu-sheet-title">Explore</div>
+
+    <div class="sheet-grid">
+      <div class="sheet-item active" id="navSwap" onclick="switchScreen('swap')">
+        <div class="sheet-item-title">Swap</div>
+        <div class="sheet-item-sub">Main view</div>
+      </div>
+
+      <div class="sheet-item" id="navTokens" onclick="switchScreen('tokens')">
+        <div class="sheet-item-title">Tokens</div>
+        <div class="sheet-item-sub">Orbit info</div>
+      </div>
+
+      <div class="sheet-item" id="navStake" onclick="switchScreen('stake')">
+        <div class="sheet-item-title">Stake</div>
+        <div class="sheet-item-sub">Coming soon</div>
+      </div>
+
+      <div class="sheet-item locked">
+        <div class="sheet-item-title">NFT</div>
+        <div class="sheet-item-sub">Coming soon</div>
+      </div>
+
+      <div class="sheet-item locked">
+        <div class="lock-icon">🔒</div>
+        <div class="sheet-item-sub">Locked</div>
+      </div>
+
+      <div class="sheet-item locked">
+        <div class="lock-icon">🔒</div>
+        <div class="sheet-item-sub">Locked</div>
+      </div>
+    </div>
+
+    <div class="menu-socials">
+      <div class="menu-divider"></div>
+
+      <div class="social-row">
+        <a
+          class="social-link"
+          href="https://github.com/Ediferras4"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="social-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.58 2 12.24c0 4.53 2.87 8.37 6.84 9.73.5.09.66-.22.66-.49 0-.24-.01-.89-.01-1.74-2.78.62-3.37-1.38-3.37-1.38-.46-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.63.07-.63 1 .07 1.53 1.05 1.53 1.05.9 1.57 2.35 1.12 2.92.86.09-.67.35-1.12.63-1.37-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.04 1.03-2.76-.1-.26-.45-1.31.1-2.73 0 0 .84-.28 2.75 1.05A9.33 9.33 0 0 1 12 6.84c.85 0 1.71.12 2.51.36 1.91-1.33 2.75-1.05 2.75-1.05.55 1.42.2 2.47.1 2.73.64.72 1.03 1.64 1.03 2.76 0 3.93-2.34 4.79-4.57 5.04.36.32.68.95.68 1.92 0 1.38-.01 2.49-.01 2.83 0 .27.18.59.67.49A10.25 10.25 0 0 0 22 12.24C22 6.58 17.52 2 12 2Z"/>
+            </svg>
+          </span>
+          <span class="social-label">GitHub</span>
+        </a>
+
+        <a
+          class="social-link"
+          href="https://x.com/crypto_edy"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="social-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M18.9 2H22l-6.77 7.74L23.2 22h-6.24l-4.89-6.86L6.06 22H3l7.24-8.28L.8 2h6.4l4.42 6.2L18.9 2Zm-1.1 18h1.73L6.26 3.9H4.4L17.8 20Z"/>
+            </svg>
+          </span>
+          <span class="social-label">X</span>
+        </a>
+
+        <div class="social-static">
+          <span class="social-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M20.32 4.37A17.4 17.4 0 0 0 15.9 3c-.19.34-.41.8-.56 1.16a16.2 16.2 0 0 0-4.68 0c-.15-.36-.38-.82-.57-1.16a17.36 17.36 0 0 0-4.42 1.37C2.87 8.58 2.1 12.7 2.48 16.77A17.6 17.6 0 0 0 7.9 19.5c.44-.6.83-1.23 1.17-1.89-.64-.25-1.25-.57-1.82-.94.15-.11.3-.23.44-.35 3.51 1.67 7.31 1.67 10.78 0 .15.12.3.24.44.35-.57.37-1.18.69-1.82.94.34.66.73 1.29 1.17 1.89a17.52 17.52 0 0 0 5.43-2.73c.44-4.72-.75-8.8-3.37-12.4ZM9.68 14.28c-1.05 0-1.91-.98-1.91-2.18 0-1.2.84-2.18 1.91-2.18 1.08 0 1.93.99 1.91 2.18 0 1.2-.84 2.18-1.91 2.18Zm4.64 0c-1.05 0-1.91-.98-1.91-2.18 0-1.2.84-2.18 1.91-2.18 1.08 0 1.93.99 1.91 2.18 0 1.2-.83 2.18-1.91 2.18Z"/>
+            </svg>
+          </span>
+          <span class="social-label">Discord<br>super800</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slippage-sheet" id="slippageSheet">
+    <div class="sheet-handle"></div>
+
+    <div class="slippage-head">
+      <div class="slippage-title">Slippage Setting</div>
+      <button class="slippage-close" type="button" onclick="closeSlippageSheet()">×</button>
+    </div>
+
+    <div class="slippage-options">
+      <button class="slippage-option active" id="slippageAutoOption" onclick="setSlippageMode('auto')">Auto</button>
+      <button class="slippage-option" id="slippage05Option" onclick="setSlippageMode(0.5)">0.5%</button>
+      <button class="slippage-option" id="slippage1Option" onclick="setSlippageMode(1)">1%</button>
+      <button class="slippage-option" id="slippage2Option" onclick="setSlippageMode(2)">2%</button>
+    </div>
+  </div>
+
+  <script>
+    const ARC_CHAIN_ID = 5042002;
+    const ARC_CHAIN_ID_HEX = "0x4cef52";
+    const USDC_ADDRESS = "0x3600000000000000000000000000000000000000";
+    const ORBIT_ADDRESS = "0x56e2a33050D671CB1A9080feF7f7c15e5D4a9D26";
+    const PAIR_ADDRESS = "0xdc6DdD6aFA8FdEFf8e95b613730c2a0d95Fa27B8";
+    const ARC_EXPLORER = "https://testnet.arcscan.app";
+
+    const USDC_ICON = "./Usdc.png";
+    const ORBIT_ICON = "./orbit.png";
+
+    const ERC20_ABI = [
+      "function approve(address spender, uint256 amount) returns (bool)",
+      "function allowance(address owner, address spender) view returns (uint256)",
+      "function balanceOf(address owner) view returns (uint256)",
+      "function decimals() view returns (uint8)",
+      "function symbol() view returns (string)"
+    ];
+
+    const PAIR_ABI = [
+      "function swap(address tokenIn, uint256 amountIn) public",
+      "function getAmountOut(address tokenIn, uint256 amountIn) view returns (uint256)",
+      "function token0() view returns (address)",
+      "function token1() view returns (address)",
+      "function reserve0() view returns (uint256)",
+      "function reserve1() view returns (uint256)"
+    ];
+
+    let provider;
+    let signer;
+    let userAddress = null;
+    let direction = "USDC_TO_ORBIT";
+    let slippagePercent = 0.5;
+    let slippageMode = "auto";
+    let isConnecting = false;
+    let isProcessingSwap = false;
+    let currentScreen = "swap";
+    let amountInputFocused = false;
+    let currentTokenInBalance = 0;
+    let currentTokenInDecimals = 18;
+
+    function updateWalletButton() {
+      const btn = document.getElementById("walletBtn");
+      btn.innerText = userAddress ? "Disconnect" : "Connect Wallet";
+    }
+
+    function getTokenInAddress() {
+      return direction === "USDC_TO_ORBIT" ? USDC_ADDRESS : ORBIT_ADDRESS;
+    }
+
+    function getTokenOutAddress() {
+      return direction === "USDC_TO_ORBIT" ? ORBIT_ADDRESS : USDC_ADDRESS;
+    }
+
+    function getTokenInLabel() {
+      return direction === "USDC_TO_ORBIT" ? "USDC" : "ORBIT";
+    }
+
+    function getTokenOutLabel() {
+      return direction === "USDC_TO_ORBIT" ? "ORBIT" : "USDC";
+    }
+
+    function getTokenInIcon() {
+      return direction === "USDC_TO_ORBIT" ? USDC_ICON : ORBIT_ICON;
+    }
+
+    function getTokenOutIcon() {
+      return direction === "USDC_TO_ORBIT" ? ORBIT_ICON : USDC_ICON;
+    }
+
+    function toggleBottomSheet() {
+      closeSlippageSheet();
+      const sheet = document.getElementById("bottomSheet");
+      const backdrop = document.getElementById("sheetBackdrop");
+      const show = !sheet.classList.contains("show");
+      sheet.classList.toggle("show", show);
+      backdrop.classList.toggle("show", show);
+    }
+
+    function closeBottomSheet() {
+      document.getElementById("bottomSheet").classList.remove("show");
+      document.getElementById("sheetBackdrop").classList.remove("show");
+    }
+
+    function openSlippageSheet() {
+      closeBottomSheet();
+      document.getElementById("slippageSheet").classList.add("show");
+      document.getElementById("slippageBackdrop").classList.add("show");
+    }
+
+    function closeSlippageSheet() {
+      document.getElementById("slippageSheet").classList.remove("show");
+      document.getElementById("slippageBackdrop").classList.remove("show");
+    }
+
+    function updateSlippageUI() {
+      const status = document.getElementById("slippageStatus");
+      const label = document.getElementById("slippageButtonLabel");
+
+      document.getElementById("slippageAutoOption").classList.remove("active");
+      document.getElementById("slippage05Option").classList.remove("active");
+      document.getElementById("slippage1Option").classList.remove("active");
+      document.getElementById("slippage2Option").classList.remove("active");
+
+      if (slippageMode === "auto") {
+        status.innerText = "Auto";
+        label.innerText = "Auto · 0.5%";
+        document.getElementById("slippageAutoOption").classList.add("active");
+      } else {
+        status.innerText = `${slippagePercent}%`;
+        label.innerText = `${slippagePercent}%`;
+
+        if (slippagePercent === 0.5) document.getElementById("slippage05Option").classList.add("active");
+        if (slippagePercent === 1) document.getElementById("slippage1Option").classList.add("active");
+        if (slippagePercent === 2) document.getElementById("slippage2Option").classList.add("active");
+      }
+    }
+
+    function setSlippageMode(value) {
+      if (value === "auto") {
+        slippageMode = "auto";
+        slippagePercent = 0.5;
+      } else {
+        slippageMode = "manual";
+        slippagePercent = value;
+      }
+
+      updateSlippageUI();
+      closeSlippageSheet();
+      handleAmountInput();
+    }
+
+    function switchScreen(screen) {
+      currentScreen = screen;
+
+      document.getElementById("swapScreen").classList.remove("active");
+      document.getElementById("tokensScreen").classList.remove("active");
+      document.getElementById("stakeScreen").classList.remove("active");
+
+      document.getElementById("navSwap").classList.remove("active");
+      document.getElementById("navTokens").classList.remove("active");
+      document.getElementById("navStake").classList.remove("active");
+
+      if (screen === "swap") {
+        document.getElementById("swapScreen").classList.add("active");
+        document.getElementById("navSwap").classList.add("active");
+      }
+
+      if (screen === "tokens") {
+        document.getElementById("tokensScreen").classList.add("active");
+        document.getElementById("navTokens").classList.add("active");
+        refreshTokenPage();
+      }
+
+      if (screen === "stake") {
+        document.getElementById("stakeScreen").classList.add("active");
+        document.getElementById("navStake").classList.add("active");
+      }
+
+      closeBottomSheet();
+    }
+
+    async function getTokenDecimals(tokenAddress) {
+      const token = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
+      return await token.decimals();
+    }
+
+    function setStatus(text) {
+      document.getElementById("statusText").innerText = text || "";
+    }
+
+    function setTokenStatus(text) {
+      document.getElementById("tokenStatusText").innerText = text || "";
+    }
+
+    function shortAddress(addr) {
+      return addr ? addr.slice(0, 6) + "..." + addr.slice(-4) : "-";
+    }
+
+    function formatDisplayNumber(value) {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return "-";
+      if (num === 0) return "0";
+
+      if (Math.abs(num) >= 1000) {
+        return num.toFixed(4).replace(/\.?0+$/, "");
+      }
+
+      if (Math.abs(num) >= 1) {
+        return num.toFixed(6).replace(/\.?0+$/, "");
+      }
+
+      return num.toFixed(8).replace(/\.?0+$/, "");
+    }
+
+    function formatBalanceNumber(value) {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return "-";
+      return num.toLocaleString("pt-BR", { maximumFractionDigits: 4 });
+    }
+
+    function trimMaxAmount(balanceNum, decimals) {
+      if (!Number.isFinite(balanceNum) || balanceNum <= 0) return 0;
+      const safeDecimals = decimals <= 6 ? 4 : 6;
+      const factor = 10 ** safeDecimals;
+      return Math.floor(balanceNum * factor) / factor;
+    }
+
+    function normalizeAmountInput(raw) {
+      let value = String(raw || "").replace(",", ".").replace(/[^\d.]/g, "");
+      const firstDot = value.indexOf(".");
+      if (firstDot !== -1) {
+        value = value.slice(0, firstDot + 1) + value.slice(firstDot + 1).replace(/\./g, "");
+      }
+      return value;
+    }
+
+    function updateQuickAmountsVisibility() {
+      const quick = document.getElementById("quickAmounts");
+      const input = document.getElementById("amountIn");
+      const normalized = normalizeAmountInput(input.value);
+      const hasValue = normalized !== "" && Number(normalized) > 0;
+      const shouldShow = amountInputFocused || hasValue;
+      quick.classList.toggle("show", shouldShow);
+    }
+
+    function getCurrentBalanceText() {
+      return `Balance: ${formatBalanceNumber(currentTokenInBalance)} ${getTokenInLabel()}`;
+    }
+
+    function getZeroBalanceLabel() {
+      return `No ${getTokenInLabel()} balance`;
+    }
+
+    function getInsufficientLabel() {
+      return `Insufficient ${getTokenInLabel()}`;
+    }
+
+    function setInputErrorState(isInsufficient) {
+      const input = document.getElementById("amountIn");
+      const balanceIn = document.getElementById("balanceIn");
+      input.classList.toggle("insufficient", isInsufficient);
+      balanceIn.classList.toggle("insufficient", isInsufficient);
+    }
+
+    function tokenInBalanceIsZero() {
+      return !Number.isFinite(currentTokenInBalance) || currentTokenInBalance <= 0;
+    }
+
+    function handleAmountFocus() {
+      amountInputFocused = true;
+      updateQuickAmountsVisibility();
+
+      if (tokenInBalanceIsZero()) {
+        document.getElementById("amountIn").blur();
+        setStatus(getZeroBalanceLabel());
+      }
+    }
+
+    function handleAmountBlur() {
+      amountInputFocused = false;
+      setTimeout(() => {
+        updateQuickAmountsVisibility();
+      }, 100);
+    }
+
+    function handleAmountClick() {
+      if (tokenInBalanceIsZero()) {
+        setStatus(getZeroBalanceLabel());
+      }
+    }
+
+    function handleAmountKeydown(event) {
+      if (tokenInBalanceIsZero()) {
+        const allowedKeys = ["Tab", "Escape"];
+        if (!allowedKeys.includes(event.key)) {
+          event.preventDefault();
+          setStatus(getZeroBalanceLabel());
+        }
+      }
+    }
+
+    async function getTokenInBalance() {
+      if (!provider || !userAddress) return null;
+
+      const tokenIn = new ethers.Contract(getTokenInAddress(), ERC20_ABI, provider);
+      const [balInRaw, decIn] = await Promise.all([
+        tokenIn.balanceOf(userAddress),
+        tokenIn.decimals()
+      ]);
+
+      return {
+        raw: balInRaw,
+        decimals: decIn,
+        formatted: ethers.utils.formatUnits(balInRaw, decIn)
+      };
+    }
+
+    async function getRequiredApprovalState() {
+      if (!provider || !userAddress) return { needsApproval: false, tokenLabel: null };
+
+      const amountText = normalizeAmountInput(document.getElementById("amountIn").value);
+      if (!amountText || Number(amountText) <= 0) {
+        return { needsApproval: false, tokenLabel: null };
+      }
+
+      const tokenInAddress = getTokenInAddress();
+      const tokenIn = new ethers.Contract(tokenInAddress, ERC20_ABI, provider);
+      const decIn = await tokenIn.decimals();
+      const amountIn = ethers.utils.parseUnits(amountText, decIn);
+      const currentAllowance = await tokenIn.allowance(userAddress, PAIR_ADDRESS);
+
+      return {
+        needsApproval: currentAllowance.lt(amountIn),
+        tokenLabel: getTokenInLabel(),
+        amountIn
+      };
+    }
+
+    async function setPercentageAmount(percent) {
+      if (!provider || !userAddress) {
+        setStatus("Conecte a wallet primeiro.");
+        return;
+      }
+
+      if (tokenInBalanceIsZero()) {
+        setStatus(getZeroBalanceLabel());
+        return;
+      }
+
+      try {
+        const balanceData = await getTokenInBalance();
+        if (!balanceData) return;
+
+        const balanceNum = Number(balanceData.formatted);
+
+        if (!balanceNum || balanceNum <= 0) {
+          document.getElementById("amountIn").value = "";
+          await handleAmountInput();
+          return;
+        }
+
+        let selectedAmount;
+
+        if (percent === 100) {
+          selectedAmount = trimMaxAmount(balanceNum, balanceData.decimals);
+        } else {
+          const rawAmount = (balanceNum * percent) / 100;
+          selectedAmount = trimMaxAmount(rawAmount, balanceData.decimals);
+        }
+
+        if (selectedAmount <= 0) {
+          document.getElementById("amountIn").value = "";
+          await handleAmountInput();
+          return;
+        }
+
+        document.getElementById("amountIn").value = formatDisplayNumber(selectedAmount);
+        await handleAmountInput();
+      } catch (err) {
+        console.error(err);
+        setStatus("Não foi possível preencher a porcentagem.");
+      }
+    }
+
+    function clearWalletUI() {
+      userAddress = null;
+      signer = null;
+      provider = null;
+      isConnecting = false;
+      isProcessingSwap = false;
+      currentTokenInBalance = 0;
+      currentTokenInDecimals = 18;
+      amountInputFocused = false;
+
+      document.getElementById("walletStatus").innerText = "-";
+      document.getElementById("balanceIn").innerText = "Balance: -";
+      document.getElementById("balanceOut").innerText = "Balance: -";
+      document.getElementById("amountIn").value = "";
+      document.getElementById("amountOut").value = "";
+      document.getElementById("priceStatus").innerText = "-";
+      document.getElementById("minReceivedStatus").innerText = "-";
+      document.getElementById("networkStatus").innerText = "-";
+      document.getElementById("networkWarning").style.display = "none";
+      document.getElementById("tokenPageBalance").innerText = "-";
+      document.getElementById("tokenPagePrice").innerText = "-";
+
+      setInputErrorState(false);
+      updateQuickAmountsVisibility();
+      updateSwapButton();
+      updateWalletButton();
+      setStatus("Wallet desconectada.");
+      setTokenStatus("");
+    }
+
+    async function handleWalletButton() {
+      if (isConnecting) return;
+
+      if (userAddress) {
+        clearWalletUI();
+        return;
+      }
+
+      await connectWallet();
+    }
+
+    function isWrongNetworkSync() {
+      const text = document.getElementById("networkStatus").innerText || "";
+      return text !== "-" && text !== "Arc Testnet";
+    }
+
+    function updateDirectionUI() {
+      document.getElementById("tokenInText").innerText = getTokenInLabel();
+      document.getElementById("tokenOutText").innerText = getTokenOutLabel();
+      document.getElementById("tokenInIcon").src = getTokenInIcon();
+      document.getElementById("tokenOutIcon").src = getTokenOutIcon();
+      document.getElementById("tokenInIcon").alt = getTokenInLabel();
+      document.getElementById("tokenOutIcon").alt = getTokenOutLabel();
+      document.getElementById("amountOut").value = "";
+      document.getElementById("priceStatus").innerText = "-";
+      document.getElementById("minReceivedStatus").innerText = "-";
+      document.getElementById("amountIn").value = "";
+      setInputErrorState(false);
+      updateQuickAmountsVisibility();
+      updateSwapButton();
+
+      if (userAddress) {
+        refreshBalances();
+      }
+    }
+
+    async function updateSwapButton() {
+      const amount = normalizeAmountInput(document.getElementById("amountIn").value);
+      const btn = document.getElementById("swapBtn");
+
+      if (isProcessingSwap) {
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+        return;
+      }
+
+      if (!userAddress) {
+        btn.disabled = true;
+        btn.innerText = "Connect Wallet";
+        return;
+      }
+
+      if (isWrongNetworkSync()) {
+        btn.disabled = false;
+        btn.innerText = "Wrong network";
+        return;
+      }
+
+      if (tokenInBalanceIsZero()) {
+        btn.disabled = true;
+        btn.innerText = getZeroBalanceLabel();
+        return;
+      }
+
+      if (!amount || Number(amount) <= 0) {
+        btn.disabled = true;
+        btn.innerText = "Enter amount";
+        return;
+      }
+
+      const amountNum = Number(amount);
+
+      if (Number.isFinite(amountNum) && amountNum > currentTokenInBalance) {
+        btn.disabled = true;
+        btn.innerText = getInsufficientLabel();
+        return;
+      }
+
+      try {
+        const approvalState = await getRequiredApprovalState();
+        if (approvalState.needsApproval) {
+          btn.disabled = false;
+          btn.innerText = `Approve ${approvalState.tokenLabel}`;
+          return;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+
+      btn.disabled = false;
+      btn.innerText = `Swap ${getTokenInLabel()} for ${getTokenOutLabel()}`;
+    }
+
+    async function switchToArc() {
+      if (!window.ethereum) {
+        alert("Abra no navegador da MetaMask.");
+        return;
+      }
+
+      try {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: ARC_CHAIN_ID_HEX }]
+        });
+      } catch (switchError) {
+        if (switchError.code === 4902) {
+          try {
+            await window.ethereum.request({
+              method: "wallet_addEthereumChain",
+              params: [{
+                chainId: ARC_CHAIN_ID_HEX,
+                chainName: "Arc Testnet",
+                nativeCurrency: {
+                  name: "USDC",
+                  symbol: "USDC",
+                  decimals: 6
+                },
+                rpcUrls: ["https://rpc.testnet.arc.network"],
+                blockExplorerUrls: [ARC_EXPLORER]
+              }]
+            });
+          } catch (addError) {
+            console.error(addError);
+            setStatus("Não foi possível adicionar a Arc Testnet.");
+          }
+        } else {
+          console.error(switchError);
+          setStatus("Não foi possível trocar para a Arc Testnet.");
+        }
+      }
+    }
+
+    async function connectWallet() {
+      if (!window.ethereum) {
+        alert("Abra no navegador da MetaMask.");
+        return;
+      }
+
+      if (isConnecting) return;
+
+      isConnecting = true;
+      const walletBtn = document.getElementById("walletBtn");
+      walletBtn.disabled = true;
+      walletBtn.innerText = "Connecting...";
+
+      try {
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        signer = provider.getSigner();
+        userAddress = await signer.getAddress();
+
+        const network = await provider.getNetwork();
+
+        document.getElementById("networkStatus").innerText =
+          Number(network.chainId) === ARC_CHAIN_ID
+            ? "Arc Testnet"
+            : `${network.name || "Unknown"} (${network.chainId})`;
+
+        document.getElementById("walletStatus").innerText = shortAddress(userAddress);
+
+        const isArc = Number(network.chainId) === ARC_CHAIN_ID;
+        document.getElementById("networkWarning").style.display = isArc ? "none" : "block";
+
+        await refreshBalances();
+        await handleAmountInput();
+        await refreshTokenPage();
+
+        setStatus("Wallet conectada.");
+      } catch (err) {
+        console.error(err);
+        setStatus("Erro ao conectar wallet.");
+      } finally {
+        isConnecting = false;
+        walletBtn.disabled = false;
+        updateWalletButton();
+      }
+    }
+
+    async function refreshBalances() {
+      if (!provider || !userAddress) return;
+
+      try {
+        const tokenIn = new ethers.Contract(getTokenInAddress(), ERC20_ABI, provider);
+        const tokenOut = new ethers.Contract(getTokenOutAddress(), ERC20_ABI, provider);
+
+        const [balInRaw, balOutRaw, decIn, decOut] = await Promise.all([
+          tokenIn.balanceOf(userAddress),
+          tokenOut.balanceOf(userAddress),
+          tokenIn.decimals(),
+          tokenOut.decimals()
+        ]);
+
+        const balIn = Number(ethers.utils.formatUnits(balInRaw, decIn));
+        const balOut = Number(ethers.utils.formatUnits(balOutRaw, decOut));
+
+        currentTokenInBalance = balIn;
+        currentTokenInDecimals = decIn;
+
+        document.getElementById("balanceIn").innerText =
+          `Balance: ${formatBalanceNumber(balIn)} ${getTokenInLabel()}`;
+
+        document.getElementById("balanceOut").innerText =
+          `Balance: ${formatBalanceNumber(balOut)} ${getTokenOutLabel()}`;
+
+        setInputErrorState(false);
+        updateQuickAmountsVisibility();
+        updateSwapButton();
+      } catch (err) {
+        console.error(err);
+        setStatus("Erro ao ler saldos.");
+      }
+    }
+
+    async function refreshTokenPage() {
+      try {
+        if (!provider || !userAddress) {
+          document.getElementById("tokenPageBalance").innerText = "-";
+          document.getElementById("tokenPagePrice").innerText = "-";
+          return;
+        }
+
+        const orbit = new ethers.Contract(ORBIT_ADDRESS, ERC20_ABI, provider);
+        const pair = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, provider);
+
+        const [balRaw, dec, quoteRaw, usdcDec] = await Promise.all([
+          orbit.balanceOf(userAddress),
+          orbit.decimals(),
+          pair.getAmountOut(ORBIT_ADDRESS, ethers.utils.parseUnits("1", 18)),
+          getTokenDecimals(USDC_ADDRESS)
+        ]);
+
+        const bal = Number(ethers.utils.formatUnits(balRaw, dec));
+        const quote = Number(ethers.utils.formatUnits(quoteRaw, usdcDec));
+
+        document.getElementById("tokenPageBalance").innerText = `${formatBalanceNumber(bal)} ORBIT`;
+        document.getElementById("tokenPagePrice").innerText = `1 ORBIT = ${formatDisplayNumber(quote)} USDC`;
+      } catch (err) {
+        console.error(err);
+        setTokenStatus("Não foi possível carregar informações do token.");
+      }
+    }
+
+    function toggleDirection() {
+      if (isProcessingSwap) return;
+
+      direction = direction === "USDC_TO_ORBIT"
+        ? "ORBIT_TO_USDC"
+        : "USDC_TO_ORBIT";
+
+      updateDirectionUI();
+      handleAmountInput();
+    }
+
+    async function handleAmountInput() {
+      const input = document.getElementById("amountIn");
+      const normalizedValue = normalizeAmountInput(input.value);
+      const output = document.getElementById("amountOut");
+
+      if (input.value !== normalizedValue) {
+        input.value = normalizedValue;
+      }
+
+      updateQuickAmountsVisibility();
+
+      if (tokenInBalanceIsZero()) {
+        input.value = "";
+        output.value = "";
+        document.getElementById("priceStatus").innerText = "-";
+        document.getElementById("minReceivedStatus").innerText = "-";
+        document.getElementById("balanceIn").innerText = getCurrentBalanceText();
+        setInputErrorState(false);
+        await updateSwapButton();
+        return;
+      }
+
+      if (!provider || normalizedValue === "") {
+        output.value = "";
+        document.getElementById("priceStatus").innerText = "-";
+        document.getElementById("minReceivedStatus").innerText = "-";
+        setInputErrorState(false);
+        setStatus("");
+        await updateSwapButton();
+        return;
+      }
+
+      const amountNum = Number(normalizedValue);
+
+      if (!Number.isFinite(amountNum) || amountNum <= 0) {
+        output.value = "";
+        document.getElementById("priceStatus").innerText = "-";
+        document.getElementById("minReceivedStatus").innerText = "-";
+        setInputErrorState(false);
+        setStatus("");
+        await updateSwapButton();
+        return;
+      }
+
+      const isInsufficient = amountNum > currentTokenInBalance;
+      setInputErrorState(isInsufficient);
+
+      if (isInsufficient) {
+        setStatus(getInsufficientLabel());
+      } else {
+        setStatus("");
+      }
+
+      try {
+        const pair = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, provider);
+        const tokenInAddress = getTokenInAddress();
+        const decIn = await getTokenDecimals(tokenInAddress);
+        const amountIn = ethers.utils.parseUnits(normalizedValue, decIn);
+
+        const amountOutRaw = await pair.getAmountOut(tokenInAddress, amountIn);
+        const decOut = await getTokenDecimals(getTokenOutAddress());
+        const amountOut = ethers.utils.formatUnits(amountOutRaw, decOut);
+        const amountOutNum = Number(amountOut);
+
+        if (!Number.isFinite(amountOutNum) || amountOutNum <= 0) {
+          output.value = "";
+          document.getElementById("priceStatus").innerText = "-";
+          document.getElementById("minReceivedStatus").innerText = "-";
+          await updateSwapButton();
+          return;
+        }
+
+        output.value = formatDisplayNumber(amountOutNum);
+
+        const price = amountOutNum / amountNum;
+        const minReceived = amountOutNum * (1 - slippagePercent / 100);
+
+        document.getElementById("priceStatus").innerText =
+          `1 ${getTokenInLabel()} = ${formatDisplayNumber(price)} ${getTokenOutLabel()}`;
+
+        document.getElementById("minReceivedStatus").innerText =
+          `${formatDisplayNumber(minReceived)} ${getTokenOutLabel()}`;
+      } catch (err) {
+        console.error(err);
+        output.value = "";
+        document.getElementById("priceStatus").innerText = "-";
+        document.getElementById("minReceivedStatus").innerText = "-";
+
+        if (!isInsufficient) {
+          setStatus("Não foi possível calcular o valor de saída.");
+        }
+      }
+
+      await updateSwapButton();
+    }
+
+    async function executeSwap() {
+      if (!window.ethereum) {
+        alert("Abra no navegador da MetaMask.");
+        return;
+      }
+
+      if (isProcessingSwap) return;
+
+      if (!userAddress) {
+        await connectWallet();
+        return;
+      }
+
+      if (tokenInBalanceIsZero()) {
+        setStatus(getZeroBalanceLabel());
+        return;
+      }
+
+      try {
+        const network = await provider.getNetwork();
+
+        if (Number(network.chainId) !== ARC_CHAIN_ID) {
+          await switchToArc();
+          return;
+        }
+
+        const amountText = normalizeAmountInput(document.getElementById("amountIn").value);
+
+        if (!amountText || Number(amountText) <= 0) {
+          alert("Digite um valor.");
+          return;
+        }
+
+        const amountNum = Number(amountText);
+
+        if (amountNum > currentTokenInBalance) {
+          setStatus(getInsufficientLabel());
+          return;
+        }
+
+        isProcessingSwap = true;
+        await updateSwapButton();
+
+        const tokenInAddress = getTokenInAddress();
+        const tokenIn = new ethers.Contract(tokenInAddress, ERC20_ABI, signer);
+        const pair = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, signer);
+
+        const decIn = await tokenIn.decimals();
+        const amountIn = ethers.utils.parseUnits(amountText, decIn);
+        const balanceRaw = await tokenIn.balanceOf(userAddress);
+
+        if (balanceRaw.lt(amountIn)) {
+          setStatus(`Saldo insuficiente de ${getTokenInLabel()}.`);
+          return;
+        }
+
+        const currentAllowance = await tokenIn.allowance(userAddress, PAIR_ADDRESS);
+
+        if (currentAllowance.lt(amountIn)) {
+          setStatus(`Aprovando ${getTokenInLabel()}...`);
+          const approveTx = await tokenIn.approve(PAIR_ADDRESS, amountIn);
+          await approveTx.wait();
+          setStatus(`${getTokenInLabel()} aprovado. Toque em swap novamente.`);
+          return;
+        }
+
+        setStatus(`Fazendo swap ${getTokenInLabel()} → ${getTokenOutLabel()}...`);
+        const swapTx = await pair.swap(tokenInAddress, amountIn);
+        await swapTx.wait();
+
+        setStatus("Swap concluído com sucesso 🚀");
+
+        document.getElementById("amountIn").value = "";
+        document.getElementById("amountOut").value = "";
+        document.getElementById("priceStatus").innerText = "-";
+        document.getElementById("minReceivedStatus").innerText = "-";
+
+        setInputErrorState(false);
+        updateQuickAmountsVisibility();
+
+        await refreshBalances();
+        await refreshTokenPage();
+      } catch (err) {
+        console.error(err);
+
+        const rawMessage =
+          err?.data?.message ||
+          err?.error?.message ||
+          err?.reason ||
+          err?.message ||
+          "";
+
+        const msg = rawMessage.toLowerCase();
+
+        if (msg.includes("user rejected") || msg.includes("denied") || msg.includes("rejected")) {
+          setStatus("Transação cancelada.");
+        } else if (msg.includes("transfer amount exceeds balance")) {
+          setStatus(`Saldo insuficiente de ${getTokenInLabel()}.`);
+        } else {
+          setStatus(rawMessage || "Erro no swap. Tente novamente.");
+        }
+      } finally {
+        isProcessingSwap = false;
+        await updateSwapButton();
+      }
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        setTokenStatus("Copiado.");
+      } catch {
+        setTokenStatus("Não foi possível copiar.");
+      }
+    }
+
+    function openExplorerToken() {
+      window.open(`${ARC_EXPLORER}/token/${ORBIT_ADDRESS}`, "_blank");
+    }
+
+    function openExplorerPair() {
+      window.open(`${ARC_EXPLORER}/address/${PAIR_ADDRESS}`, "_blank");
+    }
+
+    if (window.ethereum) {
+      window.ethereum.on("accountsChanged", async (accounts) => {
+        if (!accounts.length) {
+          clearWalletUI();
+          return;
+        }
+
+        userAddress = accounts[0];
+        signer = provider ? provider.getSigner() : null;
+        document.getElementById("walletStatus").innerText = shortAddress(userAddress);
+        updateWalletButton();
+
+        await refreshBalances();
+        await handleAmountInput();
+        await refreshTokenPage();
+      });
+
+      window.ethereum.on("chainChanged", () => {
+        window.location.reload();
+      });
+    }
+
+    updateDirectionUI();
+    updateWalletButton();
+    updateSlippageUI();
+    updateQuickAmountsVisibility();
+  </script>
 </body>
           </html>
