@@ -303,6 +303,11 @@
       color: #7891bc;
     }
 
+    .recipient-input {
+      border-color: rgba(88, 216, 255, 0.16);
+      box-shadow: 0 0 0 1px rgba(88, 216, 255, 0.05) inset;
+    }
+
     .split-row {
       display: grid;
       grid-template-columns: 1fr 112px;
@@ -371,6 +376,7 @@
       font-weight: 900;
       color: var(--cream);
       line-height: 1;
+      white-space: nowrap;
     }
 
     .quote-grid {
@@ -427,9 +433,10 @@
       border: 1px solid rgba(255,255,255,0.05);
       padding: 12px 10px;
       text-align: center;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 800;
       color: var(--cream);
+      white-space: nowrap;
     }
 
     .flow-arrow {
@@ -509,6 +516,11 @@
       word-break: break-word;
     }
 
+    .summary-note {
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
     .bottom-note {
       margin-top: 12px;
       text-align: center;
@@ -563,7 +575,7 @@
         <div class="field-grid">
           <div class="field">
             <label>Recipient Wallet</label>
-            <input type="text" placeholder="0x..." value="0x58A2...1d7E" />
+            <input class="recipient-input" type="text" placeholder="0x..." value="0x58A2...1d7E" />
           </div>
 
           <div class="field">
@@ -587,7 +599,7 @@
 
           <div class="field">
             <label>Note</label>
-            <textarea rows="3" placeholder="Payment note">Retro payment test on Arc Testnet.</textarea>
+            <textarea rows="3" placeholder="Payment note">Retro payment on Arc Testnet.</textarea>
           </div>
         </div>
       </div>
@@ -676,7 +688,7 @@
 
         <div class="status-row">
           <span>Note</span>
-          <span>Retro payment test on Arc Testnet.</span>
+          <span class="summary-note">Retro payment on Arc Testnet.</span>
         </div>
       </div>
 
