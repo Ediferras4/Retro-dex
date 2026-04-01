@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -170,45 +170,6 @@
       font-size: 15px;
       line-height: 1;
       color: #dfeaff;
-    }
-
-    .gear-dropdown {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      width: 170px;
-      background: rgba(13, 21, 43, 0.98);
-      border: 1px solid rgba(117, 146, 212, 0.18);
-      border-radius: 18px;
-      padding: 10px;
-      box-shadow: 0 18px 32px rgba(0,0,0,0.24);
-      display: none;
-      z-index: 30;
-    }
-
-    .gear-dropdown.show { display: block; }
-
-    .gear-title {
-      font-size: 11px;
-      color: var(--text-dim);
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 1.1px;
-      font-weight: 800;
-    }
-
-    .lang-btn {
-      width: 100%;
-      border: 1px solid rgba(119, 170, 255, 0.14);
-      background: rgba(255,255,255,0.04);
-      color: #e6eeff;
-      border-radius: 14px;
-      padding: 12px 12px;
-      cursor: default;
-      font-size: 13px;
-      font-weight: 800;
-      text-align: center;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
     }
 
     .segbar {
@@ -652,7 +613,8 @@
 
     .sheet-backdrop,
     .slippage-backdrop,
-    .wallet-sheet-backdrop {
+    .wallet-sheet-backdrop,
+    .gear-backdrop {
       position: fixed;
       inset: 0;
       background: rgba(1, 6, 20, 0.55);
@@ -664,14 +626,16 @@
 
     .sheet-backdrop.show,
     .slippage-backdrop.show,
-    .wallet-sheet-backdrop.show {
+    .wallet-sheet-backdrop.show,
+    .gear-backdrop.show {
       opacity: 1;
       pointer-events: auto;
     }
 
     .bottom-sheet,
     .slippage-sheet,
-    .wallet-sheet {
+    .wallet-sheet,
+    .gear-sheet {
       position: fixed;
       left: 50%;
       bottom: 0;
@@ -696,13 +660,15 @@
     }
 
     .slippage-sheet,
-    .wallet-sheet {
+    .wallet-sheet,
+    .gear-sheet {
       padding: 12px 14px calc(14px + env(safe-area-inset-bottom));
     }
 
     .bottom-sheet.show,
     .slippage-sheet.show,
-    .wallet-sheet.show {
+    .wallet-sheet.show,
+    .gear-sheet.show {
       transform: translateX(-50%) translateY(0);
     }
 
@@ -1120,24 +1086,6 @@
       padding: 0 10px;
     }
 
-    .token-dot {
-      width: 22px;
-      height: 22px;
-      border-radius: 999px;
-      flex-shrink: 0;
-      display: inline-block;
-    }
-
-    .token-dot.orbit {
-      background: radial-gradient(circle at 30% 30%, #ffe395, #f5ab2f 70%, #b66d08);
-      box-shadow: 0 0 12px rgba(255, 180, 60, 0.22);
-    }
-
-    .token-dot.usdc {
-      background: radial-gradient(circle at 30% 30%, #8fd0ff, #2b8fff 70%, #0f52c9);
-      box-shadow: 0 0 12px rgba(79, 134, 255, 0.22);
-    }
-
     .quote-highlight {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1313,7 +1261,7 @@
 
     @media (min-width: 768px) {
       .app { max-width: 560px; }
-      .bottom-sheet, .slippage-sheet, .wallet-sheet { width: min(100%, 560px); }
+      .bottom-sheet, .slippage-sheet, .wallet-sheet, .gear-sheet { width: min(100%, 560px); }
       .card, .payment-card { padding: 20px; border-radius: 32px; }
       .token-grid { grid-template-columns: 1fr 1fr; }
     }
@@ -1329,16 +1277,10 @@
       </div>
 
       <div class="top-actions">
-        <button class="gear-btn" id="gearBtn" onclick="toggleGearDropdown()">⚙</button>
-
+        <button class="gear-btn" id="gearBtn" onclick="openGearSheet()">⚙</button>
         <button class="wallet-btn" onclick="handleWalletButton()" id="walletBtn">
           Connect Wallet
         </button>
-
-        <div class="gear-dropdown" id="gearDropdown">
-          <div class="gear-title">Language</div>
-          <div class="lang-btn">English only</div>
-        </div>
       </div>
     </div>
 
@@ -1351,7 +1293,7 @@
     <div class="screen active" id="swapScreen">
       <div class="card">
         <div class="network-warning" id="networkWarning">
-          Você está na rede errada.
+          You are on the wrong network.
           <button class="switch-network-btn" onclick="switchToArc()">
             Switch to Arc Testnet
           </button>
@@ -1364,7 +1306,7 @@
               <button class="quick-btn" type="button" onclick="setPercentageAmount(25)">25%</button>
               <button class="quick-btn" type="button" onclick="setPercentageAmount(50)">50%</button>
               <button class="quick-btn" type="button" onclick="setPercentageAmount(75)">75%</button>
-              <button class="quick-btn" type="button" onclick="setPercentageAmount(100)">Máx.</button>
+              <button class="quick-btn" type="button" onclick="setPercentageAmount(100)">Max</button>
             </div>
           </div>
 
@@ -1490,7 +1432,7 @@
               <div class="split-row">
                 <input id="payUsdcAmount" type="text" inputmode="decimal" placeholder="0.00" oninput="updatePaymentPreview()" />
                 <div class="pay-token-pill">
-                  <span class="token-dot usdc"></span>
+                  <img src="./usdc-logo1.png" class="token-icon" style="width:28px;height:28px;border-radius:999px;" alt="USDC" />
                   <span>USDC</span>
                 </div>
               </div>
@@ -1499,7 +1441,7 @@
             <div class="field">
               <label>Paying with ORBIT</label>
               <div class="pay-token-pill">
-                <span class="token-dot orbit"></span>
+                <img src="./orbit.png" class="token-icon" style="width:28px;height:28px;border-radius:999px;" alt="ORBIT" />
                 <span>ORBIT</span>
               </div>
             </div>
@@ -1611,57 +1553,73 @@
       <div class="card">
         <div class="token-page-title">
           <div>
-            <div class="token-page-heading">Orbit Token</div>
-            <div class="token-page-sub">Informações do token da Retro DEX</div>
+            <div class="token-page-heading">Retro DEX Assets</div>
+            <div class="token-page-sub">Core tokens on Arc Testnet</div>
           </div>
         </div>
 
+        <!-- ORBIT -->
         <div class="token-main-card">
           <div class="token-main-head">
-            <img src="./orbit.png" alt="Orbit" class="token-main-icon" />
+            <img src="./orbit.png" alt="ORBIT" class="token-main-icon" />
             <div>
-              <div class="token-main-name">Orbit</div>
-              <div class="token-main-symbol">ORBIT / Arc Testnet</div>
+              <div class="token-main-name">ORBIT</div>
+              <div class="token-main-symbol">ORBIT • Arc Testnet</div>
             </div>
           </div>
-
           <div class="token-grid">
             <div class="info-card">
               <div class="info-label">Your Balance</div>
-              <div class="info-value" id="tokenPageBalance">-</div>
+              <div class="info-value" id="orbitBalance">-</div>
             </div>
-
-            <div class="info-card">
-              <div class="info-label">Price</div>
-              <div class="info-value" id="tokenPagePrice">-</div>
-            </div>
-
             <div class="info-card">
               <div class="info-label">Token Contract</div>
-              <div class="info-value">0x56e2...9D26</div>
+              <div class="info-value" id="orbitContract">0x56e2...9D26</div>
               <div class="address-actions">
                 <button class="small-btn" onclick="copyText(ORBIT_ADDRESS)">Copy</button>
                 <button class="small-btn" onclick="openExplorerToken()">ArcScan</button>
               </div>
             </div>
-
-            <div class="info-card">
-              <div class="info-label">Pair Contract</div>
-              <div class="info-value">0xdc6D...27B8</div>
-              <div class="address-actions">
-                <button class="small-btn" onclick="copyText(PAIR_ADDRESS)">Copy</button>
-                <button class="small-btn" onclick="openExplorerPair()">ArcScan</button>
-              </div>
-            </div>
-
             <div class="info-card">
               <div class="info-label">Swap Pair</div>
               <div class="info-value">USDC ⇄ ORBIT</div>
             </div>
-
             <div class="info-card">
               <div class="info-label">Token Status</div>
-              <div class="info-value">Live on Retro DEX</div>
+              <div class="info-value">Active on Retro DEX</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- USDC -->
+        <div class="token-main-card">
+          <div class="token-main-head">
+            <img src="./usdc-logo1.png" alt="USDC" class="token-main-icon" />
+            <div>
+              <div class="token-main-name">USDC</div>
+              <div class="token-main-symbol">USDC • Arc Testnet</div>
+            </div>
+          </div>
+          <div class="token-grid">
+            <div class="info-card">
+              <div class="info-label">Your Balance</div>
+              <div class="info-value" id="usdcBalance">-</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Role in System</div>
+              <div class="info-value">Settlement asset</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Token Contract</div>
+              <div class="info-value" id="usdcContract">0x3600...0000</div>
+              <div class="address-actions">
+                <button class="small-btn" onclick="copyText(USDC_ADDRESS)">Copy</button>
+                <button class="small-btn" onclick="openExplorerUSDC()">ArcScan</button>
+              </div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Token Status</div>
+              <div class="info-value">Active on Retro DEX</div>
             </div>
           </div>
         </div>
@@ -1683,20 +1641,17 @@
   <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeBottomSheet()"></div>
   <div class="slippage-backdrop" id="slippageBackdrop" onclick="closeSlippageSheet()"></div>
   <div class="wallet-sheet-backdrop" id="walletSheetBackdrop" onclick="closeWalletSheet()"></div>
+  <div class="gear-backdrop" id="gearBackdrop" onclick="closeGearSheet()"></div>
 
+  <!-- Menu Sheet -->
   <div class="bottom-sheet" id="bottomSheet">
     <div class="sheet-handle"></div>
     <div class="menu-sheet-title">Explore</div>
 
     <div class="sheet-grid">
-      <div class="sheet-item active" id="navSwap" onclick="switchMenuDestination('swap')">
-        <div class="sheet-item-title">Swap</div>
-        <div class="sheet-item-sub">Main view</div>
-      </div>
-
       <div class="sheet-item" id="navTokens" onclick="switchMenuDestination('tokens')">
         <div class="sheet-item-title">Tokens</div>
-        <div class="sheet-item-sub">Orbit info</div>
+        <div class="sheet-item-sub">Assets info</div>
       </div>
 
       <div class="sheet-item" id="navStake" onclick="lockedMenuTap('Stake')">
@@ -1718,11 +1673,24 @@
         <div class="lock-icon">🔒</div>
         <div class="sheet-item-sub">Locked</div>
       </div>
+
+      <div class="sheet-item locked" onclick="lockedMenuTap('Locked')">
+        <div class="lock-icon">🔒</div>
+        <div class="sheet-item-sub">Locked</div>
+      </div>
     </div>
+
+    <!-- Exit button - gold premium style -->
+    <button onclick="closeBottomSheet()" 
+            style="width:100%; margin: 24px 0 12px; padding: 16px; 
+                   background: linear-gradient(135deg, var(--gold-1) 0%, var(--gold-2) 100%); 
+                   color: #2d1f00; border: none; border-radius: 18px; 
+                   font-weight: 800; font-size: 15px; box-shadow: 0 10px 22px rgba(255,207,107,0.22);">
+      Exit
+    </button>
 
     <div class="menu-socials">
       <div class="menu-divider"></div>
-
       <div class="social-row">
         <a class="social-link" href="https://github.com/Ediferras4" target="_blank" rel="noopener noreferrer">
           <span class="social-badge" aria-hidden="true">
@@ -1754,20 +1722,37 @@
     </div>
   </div>
 
+  <!-- Wallet Sheet - Generic EVM -->
   <div class="wallet-sheet" id="walletSheet">
     <div class="sheet-handle"></div>
     <div class="wallet-sheet-title">Connect wallet</div>
-    <div class="wallet-sheet-sub">Conectar MetaMask</div>
+    <div class="wallet-sheet-sub">Use your EVM wallet on Arc Testnet</div>
 
     <button class="wallet-sheet-option" onclick="connectWalletFromSheet()">
-      <span class="wallet-sheet-icon">🦊</span>
+      <span class="wallet-sheet-icon">🌐</span>
       <span class="wallet-sheet-copy">
-        <strong>MetaMask</strong>
-        <span>Tap to connect MetaMask</span>
+        <strong>Browser Wallet</strong>
+        <span>MetaMask, Rabby and compatible wallets</span>
       </span>
     </button>
   </div>
 
+  <!-- Gear Sheet - Language -->
+  <div class="gear-sheet" id="gearSheet">
+    <div class="sheet-handle"></div>
+    <div style="padding: 24px 14px 40px; text-align: center;">
+      <button onclick="closeGearSheet()" 
+              style="background: rgba(255,255,255,0.06); border: 1px solid rgba(119,170,255,0.25); 
+                     color: #fff; border-radius: 18px; padding: 18px 32px; font-size: 17px; 
+                     font-weight: 800; display: flex; align-items: center; gap: 14px; 
+                     margin: 0 auto; cursor: pointer; box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);">
+        <span style="font-size: 32px;">🌎</span>
+        English
+      </button>
+    </div>
+  </div>
+
+  <!-- Slippage Sheet -->
   <div class="slippage-sheet" id="slippageSheet">
     <div class="sheet-handle"></div>
 
@@ -1792,7 +1777,7 @@
     const PAIR_ADDRESS = "0xdc6DdD6aFA8FdEFf8e95b613730c2a0d95Fa27B8";
     const ARC_EXPLORER = "https://testnet.arcscan.app";
 
-    const USDC_ICON = "./Usdc.png";
+    const USDC_ICON = "./usdc-logo1.png";
     const ORBIT_ICON = "./orbit.png";
 
     const ERC20_ABI = [
@@ -1856,7 +1841,7 @@
     function formatBalanceNumber(value) {
       const num = Number(value);
       if (!Number.isFinite(num)) return "-";
-      return num.toLocaleString("pt-BR", { maximumFractionDigits: 4 });
+      return num.toLocaleString("en-US", { maximumFractionDigits: 4 });
     }
 
     function trimMaxAmount(balanceNum, decimals) {
@@ -1910,15 +1895,15 @@
       return direction === "USDC_TO_ORBIT" ? ORBIT_ICON : USDC_ICON;
     }
 
-    function updatePrimaryTabs(active) {
-      document.getElementById("segSwap").classList.toggle("active", active === "swap");
-      document.getElementById("segPayment").classList.toggle("active", active === "payment");
-      document.getElementById("segMenu").classList.toggle("active", active === "menu");
+    function updatePrimaryTabs(tab) {
+      document.getElementById("segSwap").classList.toggle("active", tab === "swap");
+      document.getElementById("segPayment").classList.toggle("active", tab === "payment");
+      document.getElementById("segMenu").classList.toggle("active", tab === "menu");
     }
 
     function activatePrimaryTab(tab) {
       closeBottomSheet();
-      closeGearDropdown();
+      closeGearSheet();
 
       if (tab === "swap") {
         switchMainScreen("swap");
@@ -1933,11 +1918,10 @@
     }
 
     function activateMenuTab() {
-      closeGearDropdown();
+      closeGearSheet();
       const isOpen = document.getElementById("bottomSheet").classList.contains("show");
       if (isOpen) {
         closeBottomSheet();
-        updatePrimaryTabs(currentScreen === "payment" ? "payment" : "swap");
       } else {
         openBottomSheet();
         updatePrimaryTabs("menu");
@@ -1956,37 +1940,34 @@
       if (screen === "payment") document.getElementById("paymentScreen").classList.add("active");
       if (screen === "tokens") {
         document.getElementById("tokensScreen").classList.add("active");
-        refreshTokenPage();
+        refreshTokensPage();
+        updatePrimaryTabs(null);
       }
-      if (screen === "stake") document.getElementById("stakeScreen").classList.add("active");
+      if (screen === "stake") {
+        document.getElementById("stakeScreen").classList.add("active");
+        updatePrimaryTabs(null);
+      }
     }
 
     function switchMenuDestination(screen) {
-      document.getElementById("navSwap").classList.toggle("active", screen === "swap");
-      document.getElementById("navTokens").classList.toggle("active", screen === "tokens");
-
-      if (screen === "swap") {
-        switchMainScreen("swap");
-        updatePrimaryTabs("swap");
-      }
-
       if (screen === "tokens") {
         switchMainScreen("tokens");
-        updatePrimaryTabs("menu");
+        updatePrimaryTabs(null);
       }
-
       closeBottomSheet();
     }
 
     function lockedMenuTap(name) {
       setStatus(`${name} coming soon.`);
       closeBottomSheet();
-      updatePrimaryTabs(currentScreen === "payment" ? "payment" : "swap");
+      if (currentScreen === "payment") updatePrimaryTabs("payment");
+      else updatePrimaryTabs(null);
     }
 
     function openBottomSheet() {
       closeWalletSheet();
       closeSlippageSheet();
+      closeGearSheet();
       document.getElementById("bottomSheet").classList.add("show");
       document.getElementById("sheetBackdrop").classList.add("show");
     }
@@ -1994,14 +1975,20 @@
     function closeBottomSheet() {
       document.getElementById("bottomSheet").classList.remove("show");
       document.getElementById("sheetBackdrop").classList.remove("show");
-      if (currentScreen === "payment") updatePrimaryTabs("payment");
-      else updatePrimaryTabs("swap");
+
+      if (currentScreen === "payment") {
+        updatePrimaryTabs("payment");
+      } else if (currentScreen === "tokens" || currentScreen === "stake") {
+        updatePrimaryTabs(null);
+      } else {
+        updatePrimaryTabs("swap");
+      }
     }
 
     function openWalletSheet() {
       closeBottomSheet();
       closeSlippageSheet();
-      closeGearDropdown();
+      closeGearSheet();
       document.getElementById("walletSheet").classList.add("show");
       document.getElementById("walletSheetBackdrop").classList.add("show");
     }
@@ -2011,10 +1998,23 @@
       document.getElementById("walletSheetBackdrop").classList.remove("show");
     }
 
+    function openGearSheet() {
+      closeBottomSheet();
+      closeWalletSheet();
+      closeSlippageSheet();
+      document.getElementById("gearSheet").classList.add("show");
+      document.getElementById("gearBackdrop").classList.add("show");
+    }
+
+    function closeGearSheet() {
+      document.getElementById("gearSheet").classList.remove("show");
+      document.getElementById("gearBackdrop").classList.remove("show");
+    }
+
     function openSlippageSheet() {
       closeBottomSheet();
       closeWalletSheet();
-      closeGearDropdown();
+      closeGearSheet();
       document.getElementById("slippageSheet").classList.add("show");
       document.getElementById("slippageBackdrop").classList.add("show");
     }
@@ -2023,24 +2023,6 @@
       document.getElementById("slippageSheet").classList.remove("show");
       document.getElementById("slippageBackdrop").classList.remove("show");
     }
-
-    function toggleGearDropdown() {
-      closeBottomSheet();
-      closeWalletSheet();
-      const el = document.getElementById("gearDropdown");
-      el.classList.toggle("show");
-    }
-
-    function closeGearDropdown() {
-      document.getElementById("gearDropdown").classList.remove("show");
-    }
-
-    document.addEventListener("click", (e) => {
-      const topbar = document.querySelector(".topbar");
-      if (topbar && !topbar.contains(e.target)) {
-        closeGearDropdown();
-      }
-    });
 
     function updateSlippageUI() {
       const status = document.getElementById("slippageStatus");
@@ -2188,7 +2170,7 @@
 
     async function setPercentageAmount(percent) {
       if (!provider || !userAddress) {
-        setStatus("Conecte a wallet primeiro.");
+        setStatus("Connect your wallet first.");
         return;
       }
 
@@ -2224,7 +2206,7 @@
         await handleAmountInput();
       } catch (err) {
         console.error(err);
-        setStatus("Não foi possível preencher a porcentagem.");
+        setStatus("Could not fill percentage.");
       }
     }
 
@@ -2249,14 +2231,13 @@
       document.getElementById("minReceivedStatus").innerText = "-";
       document.getElementById("networkStatus").innerText = "-";
       document.getElementById("networkWarning").style.display = "none";
-      document.getElementById("tokenPageBalance").innerText = "-";
-      document.getElementById("tokenPagePrice").innerText = "-";
+      document.getElementById("tokenStatusText").innerText = "";
 
       setInputErrorState(false);
       updateQuickAmountsVisibility();
       updateSwapButton();
       updateWalletButton();
-      setStatus("Wallet desconectada.");
+      setStatus("Wallet disconnected.");
       setTokenStatus("");
       setPaymentStatus("Wallet disconnected.");
       updatePaymentPreview();
@@ -2451,7 +2432,7 @@
 
     async function switchToArc() {
       if (!window.ethereum) {
-        alert("Abra no navegador da MetaMask.");
+        alert("Please open in a compatible EVM wallet (MetaMask, Rabby, etc.).");
         return;
       }
 
@@ -2479,12 +2460,12 @@
             });
           } catch (addError) {
             console.error(addError);
-            setStatus("Não foi possível adicionar a Arc Testnet.");
+            setStatus("Could not add Arc Testnet.");
             setPaymentStatus("Could not add Arc Testnet.");
           }
         } else {
           console.error(switchError);
-          setStatus("Não foi possível trocar para a Arc Testnet.");
+          setStatus("Could not switch to Arc Testnet.");
           setPaymentStatus("Could not switch to Arc Testnet.");
         }
       }
@@ -2492,7 +2473,7 @@
 
     async function connectWallet() {
       if (!window.ethereum) {
-        alert("Abra no navegador da MetaMask.");
+        alert("Please open in a compatible EVM wallet (MetaMask, Rabby, etc.).");
         return;
       }
 
@@ -2514,7 +2495,7 @@
         document.getElementById("networkStatus").innerText =
           Number(network.chainId) === ARC_CHAIN_ID
             ? "Arc Testnet"
-            : `${network.name || "Unknown"} (${network.chainId})`;
+            : `\( {network.name || "Unknown"} ( \){network.chainId})`;
 
         document.getElementById("walletStatus").innerText = shortAddress(userAddress);
 
@@ -2524,14 +2505,14 @@
         await refreshBalances();
         await loadOrbitRate();
         await handleAmountInput();
-        await refreshTokenPage();
+        await refreshTokensPage();
         updatePaymentPreview();
 
-        setStatus("Wallet conectada.");
+        setStatus("Wallet connected.");
         setPaymentStatus("Wallet connected.");
       } catch (err) {
         console.error(err);
-        setStatus("Erro ao conectar wallet.");
+        setStatus("Error connecting wallet.");
         setPaymentStatus("Error connecting wallet.");
       } finally {
         isConnecting = false;
@@ -2571,7 +2552,7 @@
         updateSwapButton();
       } catch (err) {
         console.error(err);
-        setStatus("Erro ao ler saldos.");
+        setStatus("Could not load balances.");
       }
     }
 
@@ -2595,32 +2576,35 @@
       }
     }
 
-    async function refreshTokenPage() {
+    async function refreshTokensPage() {
+      if (!provider || !userAddress) {
+        if (document.getElementById("orbitBalance")) document.getElementById("orbitBalance").innerText = "-";
+        if (document.getElementById("usdcBalance")) document.getElementById("usdcBalance").innerText = "-";
+        return;
+      }
+
       try {
-        if (!provider || !userAddress) {
-          document.getElementById("tokenPageBalance").innerText = "-";
-          document.getElementById("tokenPagePrice").innerText = "-";
-          return;
-        }
-
         const orbit = new ethers.Contract(ORBIT_ADDRESS, ERC20_ABI, provider);
-        const pair = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, provider);
+        const usdc = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, provider);
 
-        const [balRaw, dec, quoteRaw, usdcDec] = await Promise.all([
+        const [orbitBalRaw, orbitDec, usdcBalRaw, usdcDec] = await Promise.all([
           orbit.balanceOf(userAddress),
           orbit.decimals(),
-          pair.getAmountOut(ORBIT_ADDRESS, ethers.utils.parseUnits("1", 18)),
-          getTokenDecimals(USDC_ADDRESS)
+          usdc.balanceOf(userAddress),
+          usdc.decimals()
         ]);
 
-        const bal = Number(ethers.utils.formatUnits(balRaw, dec));
-        const quote = Number(ethers.utils.formatUnits(quoteRaw, usdcDec));
+        const orbitBal = Number(ethers.utils.formatUnits(orbitBalRaw, orbitDec));
+        const usdcBal = Number(ethers.utils.formatUnits(usdcBalRaw, usdcDec));
 
-        document.getElementById("tokenPageBalance").innerText = `${formatBalanceNumber(bal)} ORBIT`;
-        document.getElementById("tokenPagePrice").innerText = `1 ORBIT = ${formatDisplayNumber(quote)} USDC`;
+        document.getElementById("orbitBalance").innerText = `${formatBalanceNumber(orbitBal)} ORBIT`;
+        document.getElementById("usdcBalance").innerText = `${formatBalanceNumber(usdcBal)} USDC`;
+
+        document.getElementById("orbitContract").innerText = shortAddress(ORBIT_ADDRESS);
+        document.getElementById("usdcContract").innerText = shortAddress(USDC_ADDRESS);
       } catch (err) {
         console.error(err);
-        setTokenStatus("Não foi possível carregar informações do token.");
+        setTokenStatus("Could not load token data.");
       }
     }
 
@@ -2714,7 +2698,7 @@
         output.value = "";
         document.getElementById("priceStatus").innerText = "-";
         document.getElementById("minReceivedStatus").innerText = "-";
-        if (!isInsufficient) setStatus("Não foi possível calcular o valor de saída.");
+        if (!isInsufficient) setStatus("Could not calculate output amount.");
       }
 
       await updateSwapButton();
@@ -2722,7 +2706,7 @@
 
     async function executeSwap() {
       if (!window.ethereum) {
-        alert("Abra no navegador da MetaMask.");
+        alert("Please open in a compatible EVM wallet (MetaMask, Rabby, etc.).");
         return;
       }
 
@@ -2749,7 +2733,7 @@
         const amountText = normalizeAmountInput(document.getElementById("amountIn").value);
 
         if (!amountText || Number(amountText) <= 0) {
-          alert("Digite um valor.");
+          alert("Enter an amount.");
           return;
         }
 
@@ -2771,25 +2755,25 @@
         const balanceRaw = await tokenIn.balanceOf(userAddress);
 
         if (balanceRaw.lt(amountIn)) {
-          setStatus(`Saldo insuficiente de ${getTokenInLabel()}.`);
+          setStatus(`Insufficient ${getTokenInLabel()}.`);
           return;
         }
 
         const currentAllowance = await tokenIn.allowance(userAddress, PAIR_ADDRESS);
 
         if (currentAllowance.lt(amountIn)) {
-          setStatus(`Aprovando ${getTokenInLabel()}...`);
+          setStatus(`Approving ${getTokenInLabel()}...`);
           const approveTx = await tokenIn.approve(PAIR_ADDRESS, amountIn);
           await approveTx.wait();
-          setStatus(`${getTokenInLabel()} aprovado. Toque em swap novamente.`);
+          setStatus(`${getTokenInLabel()} approved. Tap Swap again.`);
           return;
         }
 
-        setStatus(`Fazendo swap ${getTokenInLabel()} → ${getTokenOutLabel()}...`);
+        setStatus(`Swapping ${getTokenInLabel()} → ${getTokenOutLabel()}...`);
         const swapTx = await pair.swap(tokenInAddress, amountIn);
         await swapTx.wait();
 
-        setStatus("Swap concluído com sucesso 🚀");
+        setStatus("Swap completed successfully 🚀");
 
         document.getElementById("amountIn").value = "";
         document.getElementById("amountOut").value = "";
@@ -2800,7 +2784,7 @@
         updateQuickAmountsVisibility();
 
         await refreshBalances();
-        await refreshTokenPage();
+        await refreshTokensPage();
         await loadOrbitRate();
       } catch (err) {
         console.error(err);
@@ -2815,11 +2799,11 @@
         const msg = rawMessage.toLowerCase();
 
         if (msg.includes("user rejected") || msg.includes("denied") || msg.includes("rejected")) {
-          setStatus("Transação cancelada.");
+          setStatus("Transaction cancelled.");
         } else if (msg.includes("transfer amount exceeds balance")) {
-          setStatus(`Saldo insuficiente de ${getTokenInLabel()}.`);
+          setStatus(`Insufficient ${getTokenInLabel()}.`);
         } else {
-          setStatus(rawMessage || "Erro no swap. Tente novamente.");
+          setStatus(rawMessage || "Swap error. Please try again.");
         }
       } finally {
         isProcessingSwap = false;
@@ -2871,7 +2855,7 @@
 
     async function executePayment() {
       if (!window.ethereum) {
-        alert("Abra no navegador da MetaMask.");
+        alert("Please open in a compatible EVM wallet (MetaMask, Rabby, etc.).");
         return;
       }
 
@@ -2894,17 +2878,17 @@
         const usdcAmountNum = Number(usdcAmountText);
 
         if (!ethers.utils.isAddress(recipient)) {
-          setPaymentStatus("Recipient wallet inválida.");
+          setPaymentStatus("Invalid recipient wallet.");
           return;
         }
 
         if (!Number.isFinite(usdcAmountNum) || usdcAmountNum <= 0) {
-          setPaymentStatus("Digite o valor em USDC.");
+          setPaymentStatus("Enter USDC amount.");
           return;
         }
 
         if (!currentOrbitToUsdcRate || currentOrbitToUsdcRate <= 0) {
-          setPaymentStatus("Preço indisponível.");
+          setPaymentStatus("Price unavailable.");
           return;
         }
 
@@ -2925,22 +2909,22 @@
 
         const orbitBalBefore = await orbit.balanceOf(userAddress);
         if (orbitBalBefore.lt(orbitAmountIn)) {
-          setPaymentStatus("Saldo insuficiente de ORBIT.");
+          setPaymentStatus("Insufficient ORBIT balance.");
           return;
         }
 
         const allowance = await orbit.allowance(userAddress, PAIR_ADDRESS);
         if (allowance.lt(orbitAmountIn)) {
-          setPaymentStatus("Aprovando ORBIT...");
+          setPaymentStatus("Approving ORBIT...");
           const approveTx = await orbit.approve(PAIR_ADDRESS, orbitAmountIn);
           await approveTx.wait();
-          setPaymentStatus("ORBIT aprovado. Toque em Swap & Pay novamente.");
+          setPaymentStatus("ORBIT approved. Tap Swap & Pay again.");
           return;
         }
 
         const usdcBefore = await usdc.balanceOf(userAddress);
 
-        setPaymentStatus("Fazendo swap ORBIT → USDC...");
+        setPaymentStatus("Swapping ORBIT → USDC...");
         const swapTx = await pair.swap(ORBIT_ADDRESS, orbitAmountIn);
         await swapTx.wait();
 
@@ -2949,19 +2933,19 @@
         const desiredUsdcRaw = ethers.utils.parseUnits(usdcAmountText, usdcDec);
 
         if (receivedUsdcRaw.lte(ethers.constants.Zero)) {
-          setPaymentStatus("Nenhum USDC recebido no swap.");
+          setPaymentStatus("No USDC received from swap.");
           return;
         }
 
         const transferAmountRaw = receivedUsdcRaw.gte(desiredUsdcRaw) ? desiredUsdcRaw : receivedUsdcRaw;
         const transferAmountNum = Number(ethers.utils.formatUnits(transferAmountRaw, usdcDec));
 
-        setPaymentStatus("Enviando USDC ao recipient...");
+        setPaymentStatus("Sending USDC to recipient...");
         const transferTx = await usdc.transfer(recipient, transferAmountRaw);
         await transferTx.wait();
 
         if (receivedUsdcRaw.lt(desiredUsdcRaw)) {
-          setPaymentStatus(`Pagamento enviado, mas recebeu menos que o alvo: ${formatDisplayNumber(transferAmountNum)} USDC.`);
+          setPaymentStatus(`Payment sent, but received less than target: ${formatDisplayNumber(transferAmountNum)} USDC.`);
           document.getElementById("paySummaryStatus").innerText = "Partial";
         } else {
           setPaymentStatus("Payment completed 🚀");
@@ -2969,7 +2953,7 @@
         }
 
         await refreshBalances();
-        await refreshTokenPage();
+        await refreshTokensPage();
         await loadOrbitRate();
         updatePaymentPreview();
       } catch (err) {
@@ -2985,9 +2969,9 @@
         const msg = rawMessage.toLowerCase();
 
         if (msg.includes("user rejected") || msg.includes("denied") || msg.includes("rejected")) {
-          setPaymentStatus("Transação cancelada.");
+          setPaymentStatus("Transaction cancelled.");
         } else {
-          setPaymentStatus(rawMessage || "Erro no pagamento.");
+          setPaymentStatus(rawMessage || "Payment error.");
         }
       } finally {
         isProcessingPayment = false;
@@ -2998,18 +2982,19 @@
     async function copyText(text) {
       try {
         await navigator.clipboard.writeText(text);
-        setTokenStatus("Copiado.");
+        setTokenStatus("Copied to clipboard.");
+        setTimeout(() => setTokenStatus(""), 1800);
       } catch {
-        setTokenStatus("Não foi possível copiar.");
+        setTokenStatus("Could not copy.");
       }
     }
 
     function openExplorerToken() {
-      window.open(`${ARC_EXPLORER}/token/${ORBIT_ADDRESS}`, "_blank");
+      window.open(`\( {ARC_EXPLORER}/token/ \){ORBIT_ADDRESS}`, "_blank");
     }
 
-    function openExplorerPair() {
-      window.open(`${ARC_EXPLORER}/address/${PAIR_ADDRESS}`, "_blank");
+    function openExplorerUSDC() {
+      window.open(`\( {ARC_EXPLORER}/token/ \){USDC_ADDRESS}`, "_blank");
     }
 
     if (window.ethereum) {
@@ -3027,7 +3012,7 @@
         await refreshBalances();
         await loadOrbitRate();
         await handleAmountInput();
-        await refreshTokenPage();
+        await refreshTokensPage();
         updatePaymentPreview();
       });
 
@@ -3036,6 +3021,7 @@
       });
     }
 
+    // Initial setup
     updateDirectionUI();
     updateWalletButton();
     updateSlippageUI();
