@@ -1,1 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Atualizando</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #0a234f 0%, #123fd5 50%, #58d8ff 100%);
+      color: white;
+      overflow: hidden;
+    }
+
+    .wrap {
+      text-align: center;
+      padding: 24px;
+    }
+
+    .title {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-shadow: 0 0 18px rgba(255,255,255,0.25);
+      animation: pulse 1.8s infinite ease-in-out;
+    }
+
+    .dot {
+      display: inline-block;
+      animation: blink 1.2s infinite;
+    }
+
+    .dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.9;
+      }
+      50% {
+        transform: scale(1.04);
+        opacity: 1;
+      }
+    }
+
+    @keyframes blink {
+      0%, 80%, 100% {
+        opacity: 0.2;
+      }
+      40% {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title">
+      Atualizando<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
+    </div>
+  </div>
+</body>
+</html>
