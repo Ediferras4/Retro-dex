@@ -1,115 +1,588 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!DOCTYPE html><html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DEX - Swap</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Soft UI DEX Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body {
-      background: linear-gradient(to bottom, #f3e8ff, #e0bbff);
-      font-family: system-ui, -apple-system, sans-serif;
-    }
-    .glass {
-      background: rgba(255, 255, 255, 0.75);
-      backdrop-filter: blur(12px);
-    }
+    * { box-sizing: border-box; }:root {
+  --bg: #f4f2fb;
+  --surface: #f6f4fc;
+  --surface-2: #f2eff9;
+  --surface-3: #eeebf7;
+  --line: rgba(140, 120, 210, 0.18);
+  --line-strong: rgba(122, 98, 211, 0.28);
+  --text: #69638a;
+  --text-strong: #5f587f;
+  --purple: #8669ff;
+  --purple-2: #9d7cff;
+  --purple-3: #b496ff;
+  --white: rgba(255,255,255,0.92);
+  --shadow-soft: 0 12px 30px rgba(144, 124, 224, 0.14), 0 2px 8px rgba(140, 120, 210, 0.08);
+  --shadow-inset: inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -2px 6px rgba(176, 164, 221, 0.18);
+  --glow: 0 0 20px rgba(144, 112, 255, 0.18), 0 12px 28px rgba(144, 112, 255, 0.18);
+}
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  font-family: 'Inter', system-ui, sans-serif;
+  background:
+    radial-gradient(circle at 50% 12%, rgba(167, 139, 250, 0.14), transparent 26%),
+    radial-gradient(circle at 50% 82%, rgba(167, 139, 250, 0.12), transparent 22%),
+    linear-gradient(180deg, #f8f7fc 0%, #f0edf9 100%);
+  color: var(--text);
+}
+
+body {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 26px 14px 42px;
+}
+
+.phone {
+  width: 100%;
+  max-width: 430px;
+  min-height: 920px;
+  padding: 16px 18px 28px;
+  border-radius: 34px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(244,241,250,0.92));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    inset 0 -1px 0 rgba(184, 169, 232, 0.20),
+    0 24px 60px rgba(142, 126, 204, 0.18);
+  position: relative;
+  overflow: hidden;
+}
+
+.phone::before,
+.phone::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(134,105,255,0.35), transparent);
+  filter: blur(0.2px);
+}
+
+.phone::before { top: 132px; }
+.phone::after { bottom: 134px; }
+
+.top-shell {
+  position: relative;
+  height: 98px;
+  border-radius: 26px;
+  padding: 10px 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.68), rgba(240,236,248,0.96));
+  box-shadow: var(--shadow-soft), var(--shadow-inset);
+  border: 1px solid rgba(255,255,255,0.75);
+  overflow: hidden;
+}
+
+.top-shell::before {
+  content: "";
+  position: absolute;
+  left: 82px;
+  right: 92px;
+  top: 34px;
+  height: 18px;
+  border-top: 2px solid rgba(150, 133, 220, 0.18);
+  border-radius: 50% / 100%;
+  transform: skewX(-12deg);
+}
+
+.avatar {
+  position: absolute;
+  left: 16px;
+  top: 17px;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(238,233,248,0.96));
+  display: grid;
+  place-items: center;
+  box-shadow: inset 0 2px 2px rgba(255,255,255,0.9), inset 0 -4px 10px rgba(157,146,200,0.18), 0 8px 24px rgba(140,112,255,0.18);
+  border: 1px solid rgba(255,255,255,0.8);
+}
+
+.avatar svg {
+  width: 48px;
+  height: 48px;
+  stroke: #8a72ff;
+  fill: none;
+  stroke-width: 2.2;
+  filter: drop-shadow(0 0 6px rgba(138,114,255,0.18));
+}
+
+.connect-pill {
+  position: absolute;
+  right: 10px;
+  top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px;
+  padding-left: 16px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(248,246,252,0.92), rgba(233,228,246,0.94));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -4px 10px rgba(164,149,212,0.14);
+  border: 1px solid rgba(255,255,255,0.85);
+}
+
+.search-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #6d61a9;
+}
+
+.main-connect {
+  min-width: 156px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  color: white;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: linear-gradient(90deg, #8a70ff 0%, #8f6fff 42%, #7e63f5 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 10px 22px rgba(131, 102, 255, 0.32), inset 0 1px 0 rgba(255,255,255,0.32);
+}
+
+.divider {
+  margin: 28px 4px 18px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(132,112,210,0.28), transparent);
+  box-shadow: 0 1px 8px rgba(138,114,255,0.16);
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  gap: 0;
+  height: 94px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(248,246,252,0.92), rgba(236,232,245,0.98));
+  box-shadow: var(--shadow-soft), var(--shadow-inset);
+  border: 1px solid rgba(255,255,255,0.8);
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 19px;
+  font-weight: 700;
+  color: #736d91;
+  height: 100%;
+  letter-spacing: 0.01em;
+}
+
+.tab + .tab {
+  border-left: 1px solid rgba(128,114,184,0.34);
+}
+
+.tab svg {
+  width: 31px;
+  height: 31px;
+  stroke-width: 2;
+}
+
+.card {
+  margin-top: 34px;
+  border-radius: 34px;
+  padding: 18px;
+  background: linear-gradient(180deg, rgba(248,246,252,0.92), rgba(238,234,246,0.98));
+  box-shadow: var(--shadow-soft), var(--shadow-inset);
+  border: 1px solid rgba(255,255,255,0.84);
+  position: relative;
+  overflow: visible;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border-radius: 28px;
+  border: 1px solid rgba(255,255,255,0.48);
+  pointer-events: none;
+}
+
+.field {
+  height: 128px;
+  border-radius: 30px;
+  padding: 22px 24px;
+  background: linear-gradient(180deg, rgba(250,249,253,0.95), rgba(238,233,247,0.98));
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.92), inset 0 -8px 16px rgba(175,160,221,0.12);
+  border: 1px solid rgba(255,255,255,0.86);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.amount {
+  font-size: 64px;
+  line-height: 1;
+  font-weight: 800;
+  color: #656084;
+  letter-spacing: -0.04em;
+}
+
+.token-btn {
+  min-width: 136px;
+  height: 72px;
+  border-radius: 999px;
+  padding: 0 26px;
+  border: 1px solid rgba(255,255,255,0.82);
+  background: linear-gradient(180deg, rgba(248,246,252,0.96), rgba(233,228,245,0.98));
+  color: #6e688e;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 26px;
+  font-weight: 700;
+  box-shadow: inset 0 2px 2px rgba(255,255,255,0.9), 0 8px 18px rgba(135,113,214,0.18);
+}
+
+.swap-btn {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, rgba(250,249,253,0.98), rgba(237,232,247,0.98));
+  border: 1px solid rgba(255,255,255,0.9);
+  box-shadow: 0 8px 24px rgba(136,114,214,0.22), inset 0 2px 2px rgba(255,255,255,0.92);
+  z-index: 2;
+}
+
+.swap-btn svg {
+  width: 46px;
+  height: 46px;
+  stroke: #8a70ff;
+  filter: drop-shadow(0 0 7px rgba(138,112,255,0.16));
+}
+
+.field.lower {
+  margin-top: 22px;
+}
+
+.wallet-box {
+  margin-top: 18px;
+  border-radius: 0 0 30px 30px;
+  padding: 28px 22px 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.55) 0 1px, transparent 2px),
+    radial-gradient(circle at 70% 54%, rgba(255,255,255,0.45) 0 1.2px, transparent 2.2px),
+    radial-gradient(circle at 85% 24%, rgba(255,255,255,0.5) 0 1px, transparent 2px),
+    linear-gradient(180deg, rgba(242,238,249,0.92), rgba(232,227,244,0.98));
+  background-size: 120px 80px, 140px 100px, 120px 120px, auto;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
+  position: relative;
+  overflow: hidden;
+}
+
+.wallet-box::before {
+  content: "";
+  position: absolute;
+  left: -30px;
+  right: -30px;
+  top: -54px;
+  height: 120px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-bottom: 0;
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+  opacity: 0.8;
+}
+
+.wallet-message {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 14px;
+  align-items: center;
+  padding-bottom: 26px;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(120,103,185,0.18);
+}
+
+.wallet-message .title {
+  font-size: 24px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.88);
+  letter-spacing: 0.01em;
+  margin-bottom: 4px;
+}
+
+.wallet-message .title strong {
+  font-weight: 800;
+  color: rgba(255,255,255,0.98);
+}
+
+.wallet-message .desc {
+  font-size: 16px;
+  line-height: 1.45;
+  color: rgba(255,255,255,0.76);
+  max-width: 240px;
+}
+
+.cta-wrap {
+  margin: 0 -10px;
+  padding: 20px 18px 18px;
+  border-radius: 28px 28px 26px 26px;
+  background: linear-gradient(180deg, rgba(183, 144, 255, 0.50), rgba(125, 90, 255, 0.82));
+  box-shadow: 0 -10px 28px rgba(138,114,255,0.28), inset 0 1px 0 rgba(255,255,255,0.42);
+  position: relative;
+}
+
+.cta-wrap::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  right: -8px;
+  top: -14px;
+  height: 36px;
+  background: radial-gradient(circle at 50% 0, rgba(255,255,255,0.22), transparent 62%);
+  filter: blur(8px);
+}
+
+.cta {
+  width: 100%;
+  height: 74px;
+  border: 0;
+  border-radius: 999px;
+  color: white;
+  font-size: 26px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: linear-gradient(90deg, #956fff 0%, #865dff 52%, #794fff 100%);
+  box-shadow: 0 16px 30px rgba(110, 72, 241, 0.32), inset 0 1px 0 rgba(255,255,255,0.28);
+}
+
+.bottom-shell {
+  margin-top: 42px;
+  border-radius: 0 0 34px 34px;
+  background:
+    radial-gradient(circle at 18% 46%, rgba(255,255,255,0.5) 0 1px, transparent 2px),
+    radial-gradient(circle at 62% 30%, rgba(255,255,255,0.45) 0 1px, transparent 2px),
+    radial-gradient(circle at 84% 66%, rgba(255,255,255,0.42) 0 1px, transparent 2px),
+    linear-gradient(180deg, rgba(243,239,251,0.92), rgba(233,228,244,0.98));
+  background-size: 120px 100px, 120px 110px, 150px 100px, auto;
+  padding: 28px 28px 24px;
+  box-shadow: var(--shadow-soft), var(--shadow-inset);
+  position: relative;
+  overflow: hidden;
+}
+
+.bottom-shell::before {
+  content: "";
+  position: absolute;
+  left: -22px;
+  right: -22px;
+  top: -38px;
+  height: 78px;
+  border: 2px solid rgba(255,255,255,0.42);
+  border-bottom: 0;
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+}
+
+.socials {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.social-btn {
+  width: 86px;
+  height: 86px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(168,132,255,0.9), rgba(143,108,255,0.92));
+  display: grid;
+  place-items: center;
+  color: white;
+  box-shadow: 0 10px 24px rgba(138,114,255,0.28), inset 0 1px 0 rgba(255,255,255,0.36);
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.social-btn svg {
+  width: 40px;
+  height: 40px;
+  fill: currentColor;
+}
+
+svg { stroke: currentColor; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+.icon-fill { fill: currentColor; stroke: none; }
+
+@media (max-width: 390px) {
+  .phone { padding-left: 14px; padding-right: 14px; }
+  .amount { font-size: 54px; }
+  .token-btn { min-width: 122px; height: 66px; font-size: 23px; }
+  .tab { font-size: 17px; gap: 8px; }
+  .wallet-message .title { font-size: 21px; }
+  .cta { font-size: 23px; }
+}
+
   </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
-
-  <div class="w-full max-w-md mx-auto">
-
-    <!-- Top Bar -->
-    <div class="glass rounded-3xl p-2 mb-4 flex items-center shadow-lg">
-      <div class="w-10 h-10 bg-gradient-to-br from-purple-400 to-indigo-400 rounded-2xl flex items-center justify-center text-white text-2xl">
-        🙂
-      </div>
-      <div class="flex-1 mx-3">
-        <div class="h-10 bg-white/60 rounded-3xl"></div>
-      </div>
-      <button class="bg-purple-600 text-white px-5 py-2 rounded-3xl flex items-center gap-2 font-medium">
-        <span>👤</span>
-        CONECTE
-      </button>
+<body>
+  <main class="phone">
+    <section class="top-shell">
+      <div class="avatar" aria-hidden="true">
+        <svg viewBox="0 0 48 48">
+          <path d="M14 19c1.8-2.4 4.2-3.6 6.5-3.6" />
+          <path d="M27.5 15.4C30 15.4 32.2 16.6 34 19" />
+          <path d="M14 29c2.7 3.1 5.9 4.7 10 4.7s7.4-1.6 10-4.7" />
+        </svg>
+      </div><div class="connect-pill">
+    <div class="search-btn" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="28" height="28">
+        <circle cx="11" cy="11" r="6.5"></circle>
+        <path d="M16 16l5 5"></path>
+      </svg>
     </div>
+    <button class="main-connect">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <circle cx="12" cy="8" r="3.5"></circle>
+        <path d="M5 20c0-3.4 3.1-6 7-6s7 2.6 7 6"></path>
+      </svg>
+      CONECTE
+      <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true">
+        <rect x="5" y="3" width="11" height="18" rx="2"></rect>
+        <path d="M18 8h1.5A1.5 1.5 0 0 1 21 9.5v5A1.5 1.5 0 0 1 19.5 16H18"></path>
+      </svg>
+    </button>
+  </div>
+</section>
 
-    <!-- Tabs -->
-    <div class="glass rounded-3xl p-1 mb-6 flex text-sm font-medium">
-      <button class="flex-1 py-3 flex items-center justify-center gap-2 text-purple-700 bg-white/70 rounded-3xl">
-        ↔️ SWP
-      </button>
-      <button class="flex-1 py-3 flex items-center justify-center gap-2 text-purple-700">
-        💳 PAY
-      </button>
-      <button class="flex-1 py-3 flex items-center justify-center gap-2 text-purple-700">
-        📋 MENU
-      </button>
-    </div>
+<div class="divider"></div>
 
-    <!-- Swap Card -->
-    <div class="glass rounded-3xl p-6 shadow-xl">
+<section class="tabs">
+  <div class="tab">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 7h13"></path>
+      <path d="M13 3l4 4-4 4"></path>
+      <path d="M20 17H7"></path>
+      <path d="M11 13l-4 4 4 4"></path>
+    </svg>
+    <span>SWP</span>
+  </div>
+  <div class="tab">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3.5" y="5" width="17" height="14" rx="3"></rect>
+      <path d="M3.5 9.5h17"></path>
+    </svg>
+    <span>PAY</span>
+  </div>
+  <div class="tab">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3.5" y="3.5" width="7" height="7"></rect>
+      <rect x="13.5" y="3.5" width="7" height="7"></rect>
+      <rect x="3.5" y="13.5" width="7" height="7"></rect>
+      <rect x="13.5" y="13.5" width="7" height="7"></rect>
+    </svg>
+    <span>MENU</span>
+  </div>
+</section>
 
-      <!-- From -->
-      <div class="bg-white/80 rounded-2xl p-4 mb-3">
-        <div class="flex justify-between items-center">
-          <span class="text-5xl font-semibold text-gray-800">12</span>
-          <div class="bg-purple-100 text-purple-700 px-4 py-2 rounded-3xl flex items-center gap-2">
-            USD <span class="text-xl">▼</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Swap Button -->
-      <div class="flex justify-center -my-5 relative z-10">
-        <button class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-purple-100 hover:scale-110 transition">
-          <span class="text-2xl">↔️</span>
-        </button>
-      </div>
-
-      <!-- To -->
-      <div class="bg-white/80 rounded-2xl p-4 mt-3">
-        <div class="flex justify-between items-center">
-          <span class="text-5xl font-semibold text-gray-800">12</span>
-          <div class="bg-purple-100 text-purple-700 px-4 py-2 rounded-3xl flex items-center gap-2">
-            USD <span class="text-xl">▼</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Connect Wallet -->
-      <div class="mt-8 bg-gradient-to-br from-purple-100 to-purple-200 rounded-3xl p-6 text-center">
-        <div class="flex justify-center mb-3">
-          <div class="w-10 h-10 bg-white/70 rounded-2xl flex items-center justify-center text-2xl">👤</div>
-        </div>
-        <p class="text-purple-800 font-medium">
-          CONECTE sua carteira<br>
-          <span class="text-purple-600/80 text-sm">para transferir entre cadeias</span>
-        </p>
-
-        <button onclick="alert('Carteira conectada! (simulação)')" 
-                class="mt-6 w-full bg-gradient-to-r from-purple-500 to-violet-600 text-white py-4 rounded-3xl font-semibold flex items-center justify-center gap-3 shadow-md hover:brightness-105 transition">
-          <span class="text-xl">💼</span>
-          Conecte
-        </button>
-      </div>
-
-    </div>
-
-    <!-- Social Icons -->
-    <div class="flex justify-center gap-6 mt-10">
-      <div class="w-12 h-12 bg-white/70 rounded-2xl flex items-center justify-center shadow text-2xl hover:scale-110 transition">
-        🐙
-      </div>
-      <div class="w-12 h-12 bg-white/70 rounded-2xl flex items-center justify-center shadow text-2xl hover:scale-110 transition">
-        𝕏
-      </div>
-      <div class="w-12 h-12 bg-white/70 rounded-2xl flex items-center justify-center shadow text-2xl hover:scale-110 transition">
-        🟣
-      </div>
-    </div>
-
+<section class="card">
+  <div class="field">
+    <div class="amount">12</div>
+    <button class="token-btn">
+      USD
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <path d="M6 9l6 6 6-6"></path>
+      </svg>
+    </button>
   </div>
 
+  <button class="swap-btn" aria-label="Inverter tokens">
+    <svg viewBox="0 0 24 24">
+      <path d="M4 8h12"></path>
+      <path d="M12 4l4 4-4 4"></path>
+      <path d="M20 16H8"></path>
+      <path d="M12 12l-4 4 4 4"></path>
+    </svg>
+  </button>
+
+  <div class="field lower">
+    <div class="amount">12</div>
+    <button class="token-btn">
+      USD
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <path d="M6 9l6 6 6-6"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div class="wallet-box">
+    <div class="wallet-message">
+      <svg viewBox="0 0 24 24" width="50" height="50" aria-hidden="true" style="color:rgba(255,255,255,0.92)">
+        <circle cx="12" cy="8" r="3.5"></circle>
+        <path d="M5 20c0-3.4 3.1-6 7-6s7 2.6 7 6"></path>
+      </svg>
+      <div>
+        <div class="title"><strong>CONECTE</strong> sua carteira</div>
+        <div class="desc">para transferir entre cadeias</div>
+      </div>
+    </div>
+
+    <div class="cta-wrap">
+      <button class="cta">
+        <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+          <rect x="3" y="5" width="16" height="14" rx="3"></rect>
+          <path d="M19 9h2a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-2"></path>
+        </svg>
+        Conecte
+      </button>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="margin-top:32px;"></div>
+
+<section class="bottom-shell">
+  <div class="socials">
+    <div class="social-btn" aria-label="GitHub">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path class="icon-fill" d="M12 .8a11.2 11.2 0 0 0-3.54 21.82c.56.1.76-.24.76-.54v-2.1c-3.1.68-3.76-1.3-3.76-1.3-.5-1.3-1.24-1.66-1.24-1.66-1.02-.7.08-.68.08-.68 1.12.08 1.7 1.14 1.7 1.14 1 .1.56 2.06 3.28 1.48.1-.72.4-1.2.72-1.48-2.48-.28-5.08-1.24-5.08-5.52 0-1.22.44-2.22 1.14-3-.12-.28-.5-1.42.1-2.96 0 0 .94-.3 3.08 1.14a10.8 10.8 0 0 1 5.6 0c2.14-1.44 3.08-1.14 3.08-1.14.6 1.54.22 2.68.1 2.96.7.78 1.14 1.78 1.14 3 0 4.3-2.62 5.24-5.12 5.52.42.36.78 1.04.78 2.1v3.12c0 .3.2.66.78.54A11.2 11.2 0 0 0 12 .8Z"/>
+      </svg>
+    </div>
+    <div class="social-btn" aria-label="X">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path class="icon-fill" d="M18.9 2H22l-6.78 7.74L23.2 22h-6.24l-4.88-6.4L6.48 22H3.36l7.24-8.26L1 2h6.4l4.4 5.86L18.9 2Zm-1.1 18h1.72L6.46 3.9H4.62L17.8 20Z"/>
+      </svg>
+    </div>
+    <div class="social-btn" aria-label="Discord">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path class="icon-fill" d="M20.3 4.37A16.6 16.6 0 0 0 16.2 3a11.2 11.2 0 0 0-.52 1.08 15.4 15.4 0 0 0-7.34 0A11.2 11.2 0 0 0 7.82 3a16.5 16.5 0 0 0-4.12 1.38C1.1 8.24.42 11.99.76 15.69a16.75 16.75 0 0 0 5.06 2.56c.4-.56.76-1.16 1.06-1.78-.58-.22-1.14-.5-1.66-.82.14-.1.28-.22.42-.34 3.2 1.5 6.68 1.5 9.84 0 .14.12.28.24.42.34-.52.32-1.08.6-1.66.82.3.62.66 1.22 1.06 1.78a16.75 16.75 0 0 0 5.06-2.56c.42-4.28-.72-8-2.1-11.32ZM9.56 13.4c-.96 0-1.74-.9-1.74-2s.76-2 1.74-2c1 0 1.76.9 1.74 2 0 1.1-.76 2-1.74 2Zm4.88 0c-.96 0-1.74-.9-1.74-2s.76-2 1.74-2c1 0 1.76.9 1.74 2 0 1.1-.76 2-1.74 2Z"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+  </main>
 </body>
 </html>
