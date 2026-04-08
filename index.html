@@ -84,7 +84,7 @@
       stroke-linejoin: round;
     }
 
-    /* ===== CORREÇÃO DO HEADER FIXO ===== */
+    /* ===== HEADER FIXO - AGORA SÓLIDO ===== */
     .fixed-top {
       position: fixed;
       top: 0;
@@ -92,9 +92,7 @@
       right: 0;
       z-index: 1000;
       padding: 10px 10px 8px;
-      background: linear-gradient(180deg, rgba(249,247,255,0.95), rgba(242,239,254,0.80) 72%, rgba(242,239,254,0.10));
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      background: #f9f7ff;
       isolation: isolate;
     }
 
@@ -103,7 +101,7 @@
       border-radius: 30px;
       position: relative;
       overflow: hidden;
-      background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(246,243,255,0.94));
+      background: #ffffff;
       border: 1.8px solid rgba(255,255,255,0.98);
       box-shadow: var(--shadow-soft), 0 0 0 1.3px var(--line), inset 0 1px 0 rgba(255,255,255,0.98);
     }
@@ -140,7 +138,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(180deg, #fff, #f5f1ff);
+      background: #ffffff;
       border: 2px solid rgba(255,255,255,0.98);
       box-shadow: 0 10px 22px rgba(118, 110, 212, 0.12), 0 0 0 1.2px var(--line);
       font-size: 30px;
@@ -205,9 +203,7 @@
       height: 44px;
       border-radius: 999px;
       border: 1.4px solid rgba(137, 184, 255, 0.32);
-      background:
-        radial-gradient(circle at 35% 30%, rgba(255,255,255,0.88), transparent 38%),
-        linear-gradient(180deg, rgba(255,255,255,0.98), rgba(239,243,255,0.98));
+      background: #ffffff;
       color: var(--purple-3);
       display: flex;
       align-items: center;
@@ -277,7 +273,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: linear-gradient(180deg, rgba(255,255,255,0.60), rgba(246,243,255,0.86));
+      background: #ffffff;
       border: 1.7px solid rgba(255,255,255,0.98);
       box-shadow: var(--shadow-soft), 0 0 0 1.2px var(--line), inset 0 1px 0 rgba(255,255,255,0.96);
       margin-bottom: 18px;
@@ -306,7 +302,7 @@
 
     .nav-item.active {
       color: var(--purple-3);
-      background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(243,238,253,0.98));
+      background: #f3eefd;
       box-shadow:
         0 0 0 1px rgba(210, 176, 98, 0.14),
         0 12px 20px rgba(119,101,220,0.08),
@@ -331,7 +327,7 @@
       position: relative;
       overflow: hidden;
       border-radius: var(--radius-xl);
-      background: linear-gradient(180deg, rgba(255,255,255,0.70), rgba(244,240,252,0.92));
+      background: #ffffff;
       border: 1.7px solid rgba(255,255,255,0.98);
       box-shadow: var(--shadow-soft), 0 0 0 1.2px var(--line), inset 0 1px 0 rgba(255,255,255,0.98);
     }
@@ -375,9 +371,7 @@
       align-items: stretch;
       justify-content: space-between;
       gap: 16px;
-      background:
-        radial-gradient(circle at right center, rgba(255, 225, 160, 0.10), transparent 30%),
-        linear-gradient(180deg, rgba(255,255,255,0.48), rgba(246,242,252,0.78));
+      background: #ffffff;
       border: 1.6px solid rgba(255,255,255,0.98);
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.98),
@@ -390,9 +384,7 @@
     .swap-field + .swap-field { margin-top: 28px; }
 
     .swap-field.active-field {
-      background:
-        radial-gradient(circle at right center, rgba(255, 225, 160, 0.16), transparent 30%),
-        linear-gradient(180deg, rgba(255,255,255,0.64), rgba(247,243,252,0.88));
+      background: #faf8ff;
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.98),
         inset 0 0 0 1px rgba(215, 153, 49, 0.10),
@@ -440,7 +432,7 @@
 
     .small-pill {
       border: 1.2px solid rgba(124, 170, 255, 0.18);
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(243,239,251,0.98));
+      background: #ffffff;
       color: var(--purple-3);
       border-radius: 999px;
       min-height: 30px;
@@ -491,7 +483,7 @@
       border-radius: 999px;
       padding: 0 18px;
       border: 1.5px solid rgba(129, 178, 255, 0.28);
-      background: linear-gradient(180deg, rgba(255,255,255,0.99), rgba(245,240,252,0.99));
+      background: #ffffff;
       color: var(--text-strong);
       display: inline-flex;
       align-items: center;
@@ -538,7 +530,7 @@
       width: min(220px, 72vw);
       border-radius: 24px;
       padding: 10px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(244,240,252,0.98));
+      background: #ffffff;
       border: 1.4px solid rgba(129, 178, 255, 0.26);
       box-shadow: 0 18px 34px rgba(116,103,212,0.14), 0 0 0 1px rgba(111,170,255,0.10), inset 0 1px 0 rgba(255,255,255,1);
       display: none;
@@ -554,7 +546,7 @@
       min-height: 54px;
       border-radius: 18px;
       border: 1.2px solid rgba(129, 178, 255, 0.18);
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(246,242,252,0.98));
+      background: #ffffff;
       color: var(--text-strong);
       display: flex;
       align-items: center;
@@ -587,9 +579,7 @@
       height: 76px;
       border-radius: 50%;
       border: 2px solid rgba(255,255,255,0.98);
-      background:
-        radial-gradient(circle at 50% 35%, rgba(255,255,255,0.78), transparent 36%),
-        linear-gradient(180deg, rgba(255,255,255,0.98), rgba(252,245,223,1));
+      background: #ffffff;
       color: var(--purple-3);
       display: flex;
       align-items: center;
@@ -637,9 +627,7 @@
     .swap-info-card {
       margin-top: 2px;
       padding: 18px 18px 14px;
-      background:
-        radial-gradient(circle at 12% 18%, rgba(212,177,109,0.09), transparent 24%),
-        linear-gradient(180deg, rgba(255,255,255,0.78), rgba(244,240,252,0.95));
+      background: #ffffff;
     }
 
     .rows { display: grid; gap: 12px; position: relative; z-index: 2; }
@@ -701,7 +689,7 @@
       height: 36px;
       border-radius: 50%;
       border: 1.2px solid rgba(129, 178, 255, 0.24);
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(243,238,251,0.98));
+      background: #ffffff;
       color: #2c2c39;
       display: flex;
       align-items: center;
@@ -723,7 +711,7 @@
       min-height: 52px;
       border-radius: 20px;
       border: 1.4px solid rgba(129, 178, 255, 0.20);
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(245,240,252,0.99));
+      background: #ffffff;
       color: var(--purple-3);
       font-size: 13px;
       font-weight: 900;
@@ -820,7 +808,7 @@
       margin-top: 18px;
       border-radius: 34px;
       border: 1.6px dashed rgba(122, 177, 255, 0.36);
-      background: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(243,239,250,0.34));
+      background: rgba(255,255,255,0.5);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -836,6 +824,7 @@
       padding: 22px 18px 24px;
       border-radius: 34px 34px 0 0;
       border-bottom: none;
+      background: #ffffff;
     }
 
     .socials {
@@ -873,7 +862,7 @@
 
     .final-copy strong { color: var(--text-strong); }
 
-    /* CORREÇÃO DO FOOTER - Z-INDEX MENOR PARA WALLET SHEET FICAR POR CIMA */
+    /* ===== RODAPÉ - MANTÉM TRANSPARÊNCIA E BLUR ===== */
     .fixed-bottom {
       position: fixed;
       left: 0;
@@ -971,9 +960,7 @@
       padding: 14px 14px 18px;
       z-index: 170;
       transition: transform 0.24s ease;
-      background:
-        radial-gradient(circle at top center, rgba(153, 214, 255, 0.18), transparent 28%),
-        linear-gradient(180deg, rgba(255,255,255,0.99), rgba(244,239,253,0.99));
+      background: #ffffff;
       border: 1.7px solid rgba(255,255,255,0.98);
       box-shadow: 0 0 0 1.2px var(--line), 0 18px 34px rgba(116,103,212,0.14), inset 0 1px 0 rgba(255,255,255,0.98);
     }
@@ -1003,9 +990,7 @@
       flex-direction: column;
       z-index: 170;
       border: 1.7px solid rgba(255,255,255,0.98);
-      background:
-        radial-gradient(circle at top center, rgba(212,177,109,0.10), transparent 26%),
-        linear-gradient(180deg, rgba(255,255,255,0.98), rgba(244,239,253,0.99));
+      background: #ffffff;
       box-shadow: 0 0 0 1.2px var(--line), 0 18px 34px rgba(116,103,212,0.14), inset 0 1px 0 rgba(255,255,255,0.98);
     }
 
@@ -1030,7 +1015,7 @@
       justify-content: center;
       color: #24242f;
       font-size: 18px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(244,240,252,0.98));
+      background: #ffffff;
       border: 1.2px solid rgba(129,178,255,0.22);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.98);
     }
@@ -1067,9 +1052,7 @@
       align-items: center;
       justify-content: center;
       color: var(--purple-3);
-      background:
-        radial-gradient(circle at 35% 30%, rgba(255,255,255,0.88), transparent 38%),
-        linear-gradient(180deg, rgba(255,255,255,0.98), rgba(238,244,255,0.98));
+      background: #ffffff;
       border: 1.4px solid rgba(129,178,255,0.22);
       box-shadow: 0 10px 20px rgba(110,104,214,0.10), inset 0 1px 0 rgba(255,255,255,0.98);
       flex: 0 0 auto;
@@ -1091,7 +1074,7 @@
       padding: 0 12px;
       border-radius: 999px;
       border: 1.2px solid rgba(129,178,255,0.18);
-      background: linear-gradient(180deg, rgba(255,255,255,0.99), rgba(243,239,251,0.99));
+      background: #ffffff;
       color: var(--purple-3);
       font-size: 11px;
       font-weight: 900;
@@ -1112,9 +1095,7 @@
     .pref-card {
       border-radius: 24px;
       border: 1.5px solid rgba(129,178,255,0.18);
-      background:
-        radial-gradient(circle at right center, rgba(212,177,109,0.08), transparent 28%),
-        linear-gradient(180deg, rgba(255,255,255,0.95), rgba(244,240,252,0.99));
+      background: #ffffff;
       box-shadow: 0 12px 18px rgba(119,105,220,0.06), inset 0 1px 0 rgba(255,255,255,0.98);
       padding: 14px;
       display: grid;
@@ -1154,7 +1135,7 @@
       min-height: 52px;
       border-radius: 20px;
       border: 1.4px solid rgba(129,178,255,0.18);
-      background: linear-gradient(180deg, rgba(255,255,255,0.99), rgba(244,240,252,0.99));
+      background: #ffffff;
       color: var(--text-strong);
       display: flex;
       align-items: center;
@@ -1186,7 +1167,7 @@
       min-height: 48px;
       border-radius: 18px;
       border: 1.2px solid rgba(129,178,255,0.16);
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(245,240,252,0.98));
+      background: #ffffff;
       color: var(--text-strong);
       display: flex;
       align-items: center;
@@ -1230,9 +1211,7 @@
       align-items: center;
       justify-content: center;
       color: #5a7aff;
-      background:
-        radial-gradient(circle at 35% 30%, rgba(255,255,255,0.88), transparent 38%),
-        linear-gradient(180deg, rgba(255,255,255,0.99), rgba(239,244,255,0.99));
+      background: #ffffff;
       border: 2px solid rgba(255,255,255,0.99);
       box-shadow: 0 12px 24px rgba(113,132,255,0.14), 0 0 0 1.2px rgba(129,178,255,0.18);
       font-size: 31px;
@@ -1273,9 +1252,7 @@
       width: 100%;
       border-radius: 24px;
       border: 1.5px solid rgba(129,178,255,0.16);
-      background:
-        radial-gradient(circle at right center, rgba(212,177,109,0.06), transparent 24%),
-        linear-gradient(180deg, rgba(255,255,255,0.98), rgba(244,240,252,0.99));
+      background: #ffffff;
       box-shadow: 0 10px 16px rgba(126,112,220,0.08), inset 0 1px 0 #fff;
       padding: 0 12px;
       display: flex;
@@ -1358,7 +1335,7 @@
       justify-content: center;
       color: #2c2c39;
       font-size: 18px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(242,237,252,0.98));
+      background: #ffffff;
     }
 
     .wallet-note {
@@ -1366,9 +1343,7 @@
       margin-top: 8px;
       border-radius: 24px;
       border: 1.4px solid rgba(129,178,255,0.18);
-      background:
-        radial-gradient(circle at right center, rgba(212,177,109,0.06), transparent 26%),
-        linear-gradient(180deg, rgba(255,255,255,0.92), rgba(243,239,251,0.97));
+      background: #ffffff;
       padding: 12px 12px;
       display: flex;
       align-items: flex-start;
@@ -1428,7 +1403,7 @@
       flex-direction: column;
       gap: 14px;
       border: 1.7px solid rgba(255,255,255,0.98);
-      background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(243,238,251,0.98));
+      background: #ffffff;
       box-shadow:
         0 0 0 1.2px var(--line),
         0 18px 34px rgba(116,103,212,0.14),
@@ -1457,7 +1432,7 @@
       height: 38px;
       border-radius: 50%;
       border: 1.2px solid var(--line);
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(242,237,252,0.98));
+      background: #ffffff;
       color: var(--purple-3);
       font-size: 22px;
       font-weight: 900;
@@ -1478,7 +1453,7 @@
       min-height: 92px;
       border-radius: 22px;
       border: 1.5px solid var(--line);
-      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(244,240,252,0.98));
+      background: #ffffff;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1512,6 +1487,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 14px;
+      background: #ffffff;
     }
 
     .banner-left {
@@ -1528,7 +1504,7 @@
       min-height: 28px;
       padding: 0 12px;
       border-radius: 999px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(242,237,252,0.98));
+      background: #f3eefd;
       border: 1.2px solid var(--line);
       color: var(--purple-3);
       font-size: 11px;
@@ -1558,7 +1534,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(242,247,255,0.96));
+      background: #faf8ff;
       border: 1.5px solid var(--line);
       font-size: 40px;
       box-shadow: 0 10px 18px rgba(117,105,220,0.08), inset 0 1px 0 rgba(255,255,255,0.98);
@@ -1583,7 +1559,7 @@
       padding: 0 12px;
       border-radius: 999px;
       border: 1.2px solid var(--line);
-      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(243,239,251,0.98));
+      background: #f3eefd;
       color: var(--purple-3);
       font-size: 11px;
       font-weight: 900;
@@ -1612,7 +1588,7 @@
       border: 1.5px solid var(--line);
       outline: none;
       border-radius: 22px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(245,240,252,0.96));
+      background: #ffffff;
       color: var(--text-strong);
       padding: 15px 16px;
       font-size: 14px;
@@ -1627,7 +1603,7 @@
       min-height: 54px;
       border-radius: 22px;
       border: 1.5px solid var(--line);
-      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(245,240,252,0.98));
+      background: #ffffff;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -1663,7 +1639,7 @@
       min-height: 96px;
       border-radius: 24px;
       padding: 14px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.76), rgba(243,238,251,0.92));
+      background: #faf8ff;
       border: 1.4px solid var(--line);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.98);
     }
@@ -1734,7 +1710,7 @@
       min-height: 78px;
       border-radius: 24px;
       border: 1.5px solid var(--line);
-      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(244,240,252,0.98));
+      background: #ffffff;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -1796,7 +1772,7 @@
       width: 108px;
       height: 108px;
       border-radius: 50%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(241,247,255,0.98));
+      background: #ffffff;
       border: 2px solid rgba(255,255,255,0.98);
       box-shadow: 0 14px 28px rgba(112,104,216,0.12), 0 0 0 1.2px var(--line);
       display: flex;
@@ -1863,7 +1839,7 @@
       font-size: 12px;
       font-weight: 900;
       border: 1.2px solid var(--line);
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(243,238,251,0.98));
+      background: #ffffff;
       color: var(--text-strong);
     }
 
@@ -1944,7 +1920,7 @@
       position: relative;
       overflow: hidden;
       border-radius: 30px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.74), rgba(246,243,252,0.95));
+      background: #ffffff;
       border: 1.5px solid rgba(255,255,255,0.98);
       box-shadow: var(--rp-shadow-soft), 0 0 0 1px var(--rp-line), inset 0 1px 0 rgba(255,255,255,0.98);
     }
@@ -1972,9 +1948,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      background:
-        radial-gradient(circle at right center, rgba(255, 221, 150, 0.14), transparent 32%),
-        linear-gradient(180deg, rgba(255,255,255,0.94), rgba(246,243,252,0.98));
+      background: #ffffff;
     }
 
     .rp-banner-left {
@@ -1991,7 +1965,7 @@
       width: fit-content;
       padding: 0 10px;
       border-radius: 999px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(242,237,252,0.98));
+      background: #f3eefd;
       border: 1px solid var(--rp-blue-line);
       color: var(--rp-purple-3);
       font-size: 10px;
@@ -2022,7 +1996,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,244,233,0.96));
+      background: #faf8ff;
       border: 1.3px solid var(--rp-blue-line);
       font-size: 28px;
       box-shadow: 0 8px 14px rgba(117,105,220,0.06), inset 0 1px 0 rgba(255,255,255,0.98);
@@ -2053,7 +2027,7 @@
       padding: 0 10px;
       border-radius: 999px;
       border: 1px solid var(--rp-blue-line);
-      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(243,239,251,0.98));
+      background: #f3eefd;
       color: var(--rp-purple-3);
       font-size: 10px;
       font-weight: 900;
@@ -2116,7 +2090,7 @@
       height: 34px;
       border-radius: 12px;
       border: 1.2px solid var(--rp-blue-line);
-      background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(243,239,251,0.98));
+      background: #ffffff;
       color: var(--rp-purple-3);
       display: flex;
       align-items: center;
@@ -2131,7 +2105,7 @@
     .rp-info {
       border-radius: 20px;
       border: 1.3px solid var(--rp-blue-line);
-      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(245,241,252,0.98));
+      background: #ffffff;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.98);
     }
 
@@ -2170,9 +2144,7 @@
     .rp-asset-big {
       border-radius: 24px;
       padding: 12px;
-      background:
-        radial-gradient(circle at right center, rgba(255, 223, 164, 0.18), transparent 34%),
-        linear-gradient(180deg, rgba(255,255,255,0.95), rgba(248,244,235,0.98));
+      background: #ffffff;
       border: 1.3px solid rgba(219, 180, 97, 0.42);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.98), 0 8px 18px rgba(223, 183, 97, 0.06);
       display: grid;
@@ -2221,7 +2193,7 @@
       min-height: 24px;
       padding: 0 10px;
       border-radius: 999px;
-      background: linear-gradient(90deg, rgba(223,249,245,0.96), rgba(255,255,255,0.96));
+      background: #e5fbf5;
       border: 1px solid rgba(126, 220, 205, 0.56);
       color: var(--rp-mint-3);
       font-size: 10px;
@@ -2236,7 +2208,7 @@
     .rp-token-btn {
       border-radius: 20px;
       border: 1.3px solid var(--rp-blue-line);
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(246,241,252,0.98));
+      background: #ffffff;
       color: var(--rp-text-strong);
       font-weight: 900;
       box-shadow: 0 6px 14px rgba(121,105,212,0.06), inset 0 1px 0 #fff;
@@ -2307,9 +2279,7 @@
     .rp-preview {
       border-radius: 24px;
       padding: 12px;
-      background:
-        radial-gradient(circle at center, rgba(255, 225, 149, 0.08), transparent 40%),
-        linear-gradient(180deg, rgba(255,255,255,0.95), rgba(248,244,235,0.98));
+      background: #ffffff;
       border: 1.3px solid rgba(219, 180, 97, 0.38);
       display: grid;
       gap: 12px;
@@ -2334,7 +2304,7 @@
       min-height: 24px;
       padding: 0 9px;
       border-radius: 999px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(243,239,251,0.98));
+      background: #f3eefd;
       border: 1px solid var(--rp-blue-line);
       color: var(--rp-purple-3);
       font-size: 10px;
@@ -2355,7 +2325,7 @@
       min-height: 84px;
       border-radius: 20px;
       padding: 10px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.84), rgba(245,241,252,0.96));
+      background: #faf8ff;
       border: 1.2px solid var(--rp-blue-line);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.98);
       display: grid;
@@ -2384,9 +2354,7 @@
       height: 60px;
       border-radius: 50%;
       border: 1.4px solid rgba(219, 180, 97, 0.48);
-      background:
-        radial-gradient(circle at 50% 38%, rgba(255,255,255,0.74), transparent 38%),
-        linear-gradient(180deg, rgba(255,255,255,0.98), rgba(252,245,222,0.98));
+      background: #ffffff;
       box-shadow: 0 10px 18px rgba(219, 180, 97, 0.12), inset 0 1px 0 rgba(255,255,255,0.98);
       display: flex;
       align-items: center;
@@ -2494,9 +2462,7 @@
       opacity: 0;
       transform: translateY(10px);
       transition: opacity 0.24s ease, transform 0.24s ease;
-      background:
-        radial-gradient(circle at center, rgba(216, 159, 63, 0.04), transparent 42%),
-        linear-gradient(180deg, rgba(255,255,255,0.76), rgba(246,243,252,0.96));
+      background: #ffffff;
     }
 
     .rp-flow-card.show {
@@ -2528,7 +2494,7 @@
       min-height: 68px;
       border-radius: 20px;
       border: 1.2px solid var(--rp-blue-line);
-      background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(246,241,252,0.99));
+      background: #faf8ff;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.98);
       display: grid;
       place-items: center;
@@ -2553,9 +2519,7 @@
       height: 64px;
       border-radius: 50%;
       border: 1.4px solid rgba(219, 180, 97, 0.42);
-      background:
-        radial-gradient(circle at 50% 35%, rgba(255,255,255,0.78), transparent 38%),
-        linear-gradient(180deg, rgba(255,255,255,0.98), rgba(251,245,225,0.98));
+      background: #ffffff;
       color: var(--rp-purple-3);
       display: flex;
       align-items: center;
@@ -2605,7 +2569,7 @@
       gap: 10px;
     }
 
-    .rp-helper-card { padding: 14px 12px; }
+    .rp-helper-card { padding: 14px 12px; background: #ffffff; }
 
     .rp-helper-head {
       position: relative;
@@ -2664,6 +2628,7 @@
       padding: 14px 12px 16px;
       border-radius: 28px 28px 0 0;
       border-bottom: none;
+      background: #ffffff;
     }
 
     .rp-final-copy {
@@ -2689,7 +2654,7 @@
       z-index: 190;
       border-radius: 26px;
       padding: 14px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(246,241,252,0.98));
+      background: #ffffff;
       border: 1.5px solid rgba(255,255,255,0.98);
       box-shadow: 0 0 0 1px var(--rp-line), 0 18px 34px rgba(116,103,212,0.14), inset 0 1px 0 rgba(255,255,255,0.98);
       transition: transform 0.20s ease, opacity 0.20s ease;
@@ -2720,7 +2685,7 @@
       height: 34px;
       border-radius: 50%;
       border: 1px solid var(--rp-blue-line);
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(242,237,252,0.98));
+      background: #ffffff;
       color: var(--rp-purple-3);
       display: flex;
       align-items: center;
@@ -2732,7 +2697,7 @@
     .rp-qr-box {
       border-radius: 20px;
       border: 1.2px solid var(--rp-blue-line);
-      background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(245,240,252,0.98));
+      background: #faf8ff;
       padding: 14px;
       display: grid;
       gap: 12px;
@@ -2979,7 +2944,7 @@
 
                   <div class="token-column">
                     <button class="swap-token-btn" type="button" onclick="toggleSwapDropdown('pay')">
-                      <span class="token-icon token-usdc" id="swapPayTokenIcon">$</span>
+                      <span class="token-icon token-usdc" id="swapPayTokenIcon"><img src="iconeusdc.png" style="width:100%;height:100%;object-fit:cover;"></span>
                       <span class="token-name-row">
                         <span id="swapPayTokenText">USDC</span>
                         <span class="token-black-caret">▼</span>
@@ -3029,7 +2994,7 @@
 
                   <div class="token-column">
                     <button class="swap-token-btn" type="button" onclick="toggleSwapDropdown('receive')">
-                      <span class="token-icon token-orbit" id="swapReceiveTokenIcon">◎</span>
+                      <span class="token-icon token-orbit" id="swapReceiveTokenIcon"><img src="iconeorbit1.png" style="width:100%;height:100%;object-fit:cover;"></span>
                       <span class="token-name-row">
                         <span id="swapReceiveTokenText">ORBIT</span>
                         <span class="token-black-caret">▼</span>
@@ -3083,18 +3048,7 @@
           </div>
 
           <div class="swap-side-column">
-            <div class="soft-card" style="padding:18px;">
-              <div class="card-head">
-                <div class="card-title">Swap Summary</div>
-                <div class="chip">Live preview</div>
-              </div>
-              <div class="summary-grid">
-                <div class="summary-row"><span>Pay asset</span><span id="swapSummaryPay">USDC</span></div>
-                <div class="summary-row"><span>Receive asset</span><span id="swapSummaryReceive">ORBIT</span></div>
-                <div class="summary-row"><span>Swap mode</span><span id="swapModeText">Input-driven</span></div>
-                <div class="summary-row"><span>Selected slippage</span><span id="swapSummarySlip">Auto</span></div>
-              </div>
-            </div>
+            <div class="soft-card" style="padding:0; overflow:hidden;"><img src="banner1.png" style="width:100%; height:auto; display:block;"></div>
 
             <div class="soft-card" style="padding:18px;">
               <div class="card-head">
@@ -3130,14 +3084,7 @@
       <section id="payScreen" class="screen">
         <div class="rp-wrap">
           <div class="rp-stack">
-            <div class="rp-banner">
-              <div class="rp-banner-left">
-                <div class="rp-banner-chip">Retro Pay</div>
-                <div class="rp-banner-title">The payer chooses the asset, the receiver gets stability.</div>
-                <div class="rp-banner-text">Payment page with a more premium flow, optimized first for mobile.</div>
-              </div>
-              <div class="rp-banner-icon">💵</div>
-            </div>
+            <div class="rp-banner" style="padding:0; overflow:hidden;"><img src="logopay1.png" style="width:100%; height:auto; display:block;"></div>
 
             <div class="rp-card">
               <div class="rp-head">
@@ -3438,7 +3385,7 @@
           <div class="profile-top-card">
             <div class="profile-top">
               <div class="avatar-wrap">
-                <div class="avatar-main">🙂</div>
+                <div class="avatar-main"><img src="perfildex1.png" alt="Avatar" style="width:100%;height:100%;object-fit:cover;"></div>
                 <div class="avatar-level">Lv.<br>0</div>
               </div>
               <div class="profile-copy">
@@ -3752,15 +3699,15 @@
       </div>
 
       <div class="menu-grid">
-        <button class="menu-cell" type="button" onclick="openMenuPage('tokens')"><div class="menu-emoji">🪙</div><div>Tokens</div></button>
-        <button class="menu-cell" type="button" onclick="openMenuPage('stake')"><div class="menu-emoji">🐷</div><div>Stake</div></button>
-        <button class="menu-cell" type="button" onclick="openMenuPage('nft')"><div class="menu-emoji">🖼️</div><div>NFT</div></button>
-        <button class="menu-cell" type="button" onclick="openMenuPage('docs')"><div class="menu-emoji">📘</div><div>Docs</div></button>
-        <button class="menu-cell" type="button" onclick="openMenuPage('explore')"><div class="menu-emoji">🧭</div><div>Explore</div></button>
-        <button class="menu-cell" type="button" onclick="openMenuPage('community')"><div class="menu-emoji">👥</div><div>Community</div></button>
-        <button class="menu-cell" type="button" onclick="openMenuPage('rewards')"><div class="menu-emoji">🎁</div><div>Rewards</div></button>
-        <button class="menu-cell" type="button" onclick="openMenuPage('events')"><div class="menu-emoji">🎉</div><div>Events</div></button>
-        <button class="menu-cell" type="button" onclick="openMenuPage('profile')"><div class="menu-emoji">🙂</div><div>Profile</div></button>
+        <button class="menu-cell" type="button" onclick="openMenuPage('tokens')"><div class="menu-emoji"><img src="tokensmenu.png" alt="Tokens" style="width:100%;height:100%;object-fit:contain;"></div><div>Tokens</div></button>
+        <button class="menu-cell" type="button" onclick="openMenuPage('stake')"><div class="menu-emoji"><img src="stakemenu.png" alt="Stake" style="width:100%;height:100%;object-fit:contain;"></div><div>Stake</div></button>
+        <button class="menu-cell" type="button" onclick="openMenuPage('nft')"><div class="menu-emoji"><img src="nftmenu.png" alt="NFT" style="width:100%;height:100%;object-fit:contain;"></div><div>NFT</div></button>
+        <button class="menu-cell" type="button" onclick="openMenuPage('docs')"><div class="menu-emoji"><img src="docsmenu.png" alt="Docs" style="width:100%;height:100%;object-fit:contain;"></div><div>Docs</div></button>
+        <button class="menu-cell" type="button" onclick="openMenuPage('explore')"><div class="menu-emoji"><img src="exploremenu.png" alt="Explore" style="width:100%;height:100%;object-fit:contain;"></div><div>Explore</div></button>
+        <button class="menu-cell" type="button" onclick="openMenuPage('community')"><div class="menu-emoji"><img src="comunytmenu.png" alt="Community" style="width:100%;height:100%;object-fit:contain;"></div><div>Community</div></button>
+        <button class="menu-cell" type="button" onclick="openMenuPage('rewards')"><div class="menu-emoji"><img src="rewardsmenu.png" alt="Rewards" style="width:100%;height:100%;object-fit:contain;"></div><div>Rewards</div></button>
+        <button class="menu-cell" type="button" onclick="openMenuPage('events')"><div class="menu-emoji"><img src="eventsmenu.png" alt="Events" style="width:100%;height:100%;object-fit:contain;"></div><div>Events</div></button>
+        <button class="menu-cell" type="button" onclick="openMenuPage('profile')"><div class="menu-emoji"><img src="perfilmenu.png" alt="Profile" style="width:100%;height:100%;object-fit:contain;"></div><div>Profile</div></button>
       </div>
 
       <div class="banner-slot" style="min-height:118px; margin-top:auto;">
@@ -3996,13 +3943,13 @@
       if (type === 'pay') {
         swapPayToken = token;
         swapPayTokenText.textContent = token;
-        swapPayTokenIcon.textContent = iconText;
+        swapPayTokenIcon.innerHTML = '<img src="iconeusdc.png" style="width:100%;height:100%;object-fit:cover;">';
         swapPayTokenIcon.className = `token-icon ${iconClass}`;
         swapPayDropdown.classList.remove('show');
       } else {
         swapReceiveToken = token;
         swapReceiveTokenText.textContent = token;
-        swapReceiveTokenIcon.textContent = iconText;
+        swapReceiveTokenIcon.innerHTML = '<img src="iconeorbit1.png" style="width:100%;height:100%;object-fit:cover;">';
         swapReceiveTokenIcon.className = `token-icon ${iconClass}`;
         swapReceiveDropdown.classList.remove('show');
       }
@@ -4011,12 +3958,12 @@
         if (type === 'pay') {
           swapReceiveToken = swapPayToken === 'USDC' ? 'ORBIT' : 'USDC';
           swapReceiveTokenText.textContent = swapReceiveToken;
-          swapReceiveTokenIcon.textContent = swapReceiveToken === 'ORBIT' ? '◎' : '$';
+          swapReceiveTokenIcon.innerHTML = '<img src="iconeorbit1.png" style="width:100%;height:100%;object-fit:cover;">';
           swapReceiveTokenIcon.className = `token-icon ${swapReceiveToken === 'ORBIT' ? 'token-orbit' : 'token-usdc'}`;
         } else {
           swapPayToken = swapReceiveToken === 'ORBIT' ? 'USDC' : 'ORBIT';
           swapPayTokenText.textContent = swapPayToken;
-          swapPayTokenIcon.textContent = swapPayToken === 'USDC' ? '$' : '◎';
+          swapPayTokenIcon.innerHTML = '<img src="iconeusdc.png" style="width:100%;height:100%;object-fit:cover;">';
           swapPayTokenIcon.className = `token-icon ${swapPayToken === 'USDC' ? 'token-usdc' : 'token-orbit'}`;
         }
       }
@@ -4066,17 +4013,17 @@
     function invertSwapPair() {
       const oldPayToken = swapPayToken;
       const oldPayText = swapPayTokenText.textContent;
-      const oldPayIconText = swapPayTokenIcon.textContent;
+      const oldPayIconHTML = swapPayTokenIcon.innerHTML;
       const oldPayClass = swapPayTokenIcon.className;
 
       swapPayToken = swapReceiveToken;
       swapPayTokenText.textContent = swapReceiveTokenText.textContent;
-      swapPayTokenIcon.textContent = swapReceiveTokenIcon.textContent;
+      swapPayTokenIcon.innerHTML = swapReceiveTokenIcon.innerHTML;
       swapPayTokenIcon.className = swapReceiveTokenIcon.className;
 
       swapReceiveToken = oldPayToken;
       swapReceiveTokenText.textContent = oldPayText;
-      swapReceiveTokenIcon.textContent = oldPayIconText;
+      swapReceiveTokenIcon.innerHTML = oldPayIconHTML;
       swapReceiveTokenIcon.className = oldPayClass;
 
       const oldPayValue = swapPayInput.value;
